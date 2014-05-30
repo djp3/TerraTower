@@ -28,6 +28,7 @@ import java.util.Map;
 
 import net.minidev.json.JSONObject;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.uci.ics.luci.utility.Globals;
@@ -41,7 +42,7 @@ public class HandlerShutdown extends HandlerAbstract {
 	private static transient volatile Logger log = null;
 	public static Logger getLog(){
 		if(log == null){
-			log = Logger.getLogger(HandlerVersion.class);
+			log = LogManager.getLogger(HandlerVersion.class);
 		}
 		return log;
 	}
