@@ -43,6 +43,8 @@ public class GlobalsTerraTower extends Globals {
 
 	}
 	
+	private static final String LOG4J_CONFIG_FILE_DEFAULT = "TerraTower.log4j.xml";
+	
 	String version = null;
 
 	@Override
@@ -56,9 +58,9 @@ public class GlobalsTerraTower extends Globals {
 	
 	protected GlobalsTerraTower(String version, boolean testing){
 		super();
-		System.setProperty("Log4jDefaultStatusLevel","error");
 		this.version = version;
 		setTesting(true);
+		setLog4JPropertyFileName(LOG4J_CONFIG_FILE_DEFAULT);
 	}
 	
 }

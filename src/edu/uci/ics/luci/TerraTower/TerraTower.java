@@ -52,56 +52,75 @@ public class TerraTower {
 		return log;
 	}
 	
-	public static void main(String[] args) throws ConfigurationException{
+	public static void main(String[] args) throws ConfigurationException {
+
+		System.setProperty("Log4jDefaultStatusLevel","error");
 		
-		Configuration config = new PropertiesConfiguration("TerraTower.properties");
-		
+		Configuration config = new PropertiesConfiguration(
+				"TerraTower.properties");
+
 		Globals.setGlobals(new GlobalsTerraTower(VERSION));
-		
+
+		// Create world
+		Map map;
+		try {
+			map = new Map(config.getDouble("world.longitude.west"),
+					config.getDouble("world.longitude.east"),
+					config.getInt("world.xsplits"),
+					config.getDouble("world.latitude.south"),
+					config.getDouble("world.latitude.north"),
+					config.getInt("world.ysplits"));
+		} catch (java.util.NoSuchElementException e) {
+			getLog().fatal("Problem in configuration file\n" + e);
+		}
+
 		WebServer ws = null;
-		HashMap<String,HandlerAbstract> requestHandlerRegistry;
-		
+		HashMap<String, HandlerAbstract> requestHandlerRegistry;
+
 		try {
 			requestHandlerRegistry = new HashMap<String, HandlerAbstract>();
-			requestHandlerRegistry.put("",new HandlerVersion(VERSION));
-			requestHandlerRegistry.put("version",new HandlerVersion(VERSION));
-			requestHandlerRegistry.put("shutdown",new HandlerShutdown(Globals.getGlobals()));
-	
-			RequestDispatcher dispatcher = new RequestDispatcher(requestHandlerRegistry);
+			requestHandlerRegistry.put("", new HandlerVersion(VERSION));
+			requestHandlerRegistry.put("version", new HandlerVersion(VERSION));
+			requestHandlerRegistry.put("shutdown",
+					new HandlerShutdown(Globals.getGlobals()));
+
+			RequestDispatcher dispatcher = new RequestDispatcher(
+					requestHandlerRegistry);
 			ws = new WebServer(dispatcher, port, false, new AccessControl());
-			ws.start();
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
+			ws.start(1);
+
 			Globals.getGlobals().addQuittable(ws);
-			
+
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			Globals.getGlobals().setQuitting(true);
+			return;
 		}
-		
-		
+
+		getLog().info("Waiting 1 seconds");
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+
+		try {
+			HashMap<String, String> params = new HashMap<String, String>();
+
+			WebUtil.fetchWebPage("http://localhost:" + ws.getPort()
+					+ "/shutdown", false, params, 30 * 1000);
+		} catch (MalformedURLException e) {
+			getLog().error(e.toString());
+		} catch (IOException e) {
+			getLog().error(e.toString());
+		}
+
 		getLog().info("Waiting 10 seconds");
 		try {
 			Thread.sleep(10000);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		
-		
-		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-
-			WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/shutdown", false, params, 30 * 1000);
-		} catch (MalformedURLException e) {
-			getLog().error(e.toString());
-		} catch (IOException e) {
-			getLog().error(e.toString());
-		}
-		
 	}
 		
 }
