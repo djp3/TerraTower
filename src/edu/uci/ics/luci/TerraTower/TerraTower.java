@@ -24,12 +24,17 @@ package edu.uci.ics.luci.TerraTower;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.dsl.Disruptor;
 
 import edu.uci.ics.luci.utility.Globals;
 import edu.uci.ics.luci.utility.webserver.AccessControl;
@@ -45,6 +50,8 @@ public class TerraTower {
 	final static String VERSION="0.1";
 
 	private static transient volatile Logger log = null;
+
+	private static TTEventProducerWithTranslator eventPublisher;
 	public static Logger getLog(){
 		if(log == null){
 			log = LogManager.getLogger(TerraTower.class);
@@ -56,23 +63,22 @@ public class TerraTower {
 
 		System.setProperty("Log4jDefaultStatusLevel","error");
 		
-		Configuration config = new PropertiesConfiguration(
-				"TerraTower.properties");
+		Configuration config = new PropertiesConfiguration( "TerraTower.properties");
 
 		Globals.setGlobals(new GlobalsTerraTower(VERSION));
-
-		// Create world
-		Map map;
-		try {
-			map = new Map(config.getDouble("world.longitude.west"),
+		
+		eventPublisher = createEventQueue();
+		
+		eventPublisher.onData(new TTEventCreateWorld("Earth","EarthPassword"));
+		
+		eventPublisher.onData(new TTEventCreateMap(config.getDouble("world.longitude.west"),
 					config.getDouble("world.longitude.east"),
 					config.getInt("world.xsplits"),
 					config.getDouble("world.latitude.south"),
 					config.getDouble("world.latitude.north"),
-					config.getInt("world.ysplits"));
-		} catch (java.util.NoSuchElementException e) {
-			getLog().fatal("Problem in configuration file\n" + e);
-		}
+					config.getInt("world.ysplits")));
+
+	
 
 		WebServer ws = null;
 		HashMap<String, HandlerAbstract> requestHandlerRegistry;
@@ -121,6 +127,37 @@ public class TerraTower {
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
+	}
+
+	/**
+	 * Create Event Disruptor
+	 * @return 
+	 */
+	static TTEventProducerWithTranslator createEventQueue() {
+		// Executor that will be used to construct new threads for consumers
+        Executor executor = Executors.newCachedThreadPool();
+
+        // The factory for the event
+        TTEventFactory factory = new TTEventFactory();
+
+        // Specify the size of the ring buffer, must be power of 2.
+        int bufferSize = 1024;
+
+        // Construct the Disruptor
+        Disruptor<TTEvent> disruptor = new Disruptor<TTEvent>(factory, bufferSize, executor);
+
+        // Connect the handler
+        disruptor.handleEventsWith(new TTEventHandler());
+	        
+        // Start the Disruptor, starts all threads running
+        disruptor.start();
+
+        // Get the ring buffer from the Disruptor to be used for publishing.
+        RingBuffer<TTEvent> ringBuffer = disruptor.getRingBuffer();
+
+        TTEventProducerWithTranslator localEventPublisher = new TTEventProducerWithTranslator(ringBuffer);
+        
+        return(localEventPublisher);
 	}
 		
 }
