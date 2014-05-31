@@ -44,17 +44,18 @@ public class TTEventWrapperProducerTest {
 		Globals.setGlobals(new GlobalsTerraTower("TEST_VERSION"));
 		Globals.getGlobals().setTesting(true);
 		
-		TTEventWrapperProducer eventPublisher = TerraTower.createEventQueue(logFileName);     
+		TTEventWrapperQueuer eventPublisher = TerraTower.createEventQueue(logFileName);     
 		Globals.getGlobals().addQuittable(eventPublisher);
 		
 		TTEventCreateWorld ttEvent = new TTEventCreateWorld("Earth","EarthPassword");
 		TTEventWrapper event = new TTEventWrapper(TTEventType.CREATE_WORLD,ttEvent,null);
 		eventPublisher.onData(event);
 		
+		/*
 		try {
 			Thread.sleep(10000);
 		} catch (InterruptedException e1) {
-		}
+		}*/
 		Globals.getGlobals().setQuitting(true);
 		
 		boolean foundTheLine = false;

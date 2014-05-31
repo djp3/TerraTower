@@ -51,7 +51,7 @@ public class TerraTower {
 
 	private static transient volatile Logger log = null;
 
-	private static TTEventWrapperProducer eventPublisher;
+	private static TTEventWrapperQueuer eventPublisher;
 	public static Logger getLog(){
 		if(log == null){
 			log = LogManager.getLogger(TerraTower.class);
@@ -136,7 +136,7 @@ public class TerraTower {
 	 * Create Event Disruptor
 	 * @return 
 	 */
-	static TTEventWrapperProducer createEventQueue(String logFile) {
+	static TTEventWrapperQueuer createEventQueue(String logFile) {
 		// Executor that will be used to construct new threads for consumers
         Executor executor = Executors.newCachedThreadPool();
 
@@ -158,7 +158,7 @@ public class TerraTower {
         // Get the ring buffer from the Disruptor to be used for publishing.
         RingBuffer<TTEventWrapper> ringBuffer = disruptor.getRingBuffer();
 
-        TTEventWrapperProducer localEventPublisher = new TTEventWrapperProducer(ringBuffer,logFile);
+        TTEventWrapperQueuer localEventPublisher = new TTEventWrapperQueuer(ringBuffer,logFile);
         
         return(localEventPublisher);
 	}

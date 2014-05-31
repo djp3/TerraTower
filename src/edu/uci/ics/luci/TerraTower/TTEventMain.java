@@ -31,7 +31,7 @@ public class TTEventMain
         // Get the ring buffer from the Disruptor to be used for publishing.
         RingBuffer<TTEventWrapper> ringBuffer = disruptor.getRingBuffer();
 
-        TTEventWrapperProducer producer = new TTEventWrapperProducer(ringBuffer);
+        TTEventWrapperQueuer producer = new TTEventWrapperQueuer(ringBuffer);
 
         TTEventWrapper event = new TTEventWrapper(TTEventType.CREATE_MAP);
         for (int i = 0 ; i< 250000;i++)

@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,12 +17,12 @@ import com.lmax.disruptor.RingBuffer;
 
 import edu.uci.ics.luci.utility.Quittable;
 
-public class TTEventWrapperProducer implements Quittable{ 
+public class TTEventWrapperQueuer implements Quittable{ 
 	
 	private static transient volatile Logger log = null;
 	public static Logger getLog(){
 		if(log == null){
-			log = LogManager.getLogger(TTEventWrapperProducer.class);
+			log = LogManager.getLogger(TTEventWrapperQueuer.class);
 		}
 		return log;
 	}
@@ -33,7 +35,7 @@ public class TTEventWrapperProducer implements Quittable{
 	 * 
 	 * @param ringBuffer
 	 */
-    public TTEventWrapperProducer(RingBuffer<TTEventWrapper> ringBuffer){
+    public TTEventWrapperQueuer(RingBuffer<TTEventWrapper> ringBuffer){
     	this(ringBuffer,null);
     }
     
@@ -42,7 +44,7 @@ public class TTEventWrapperProducer implements Quittable{
      * @param ringBuffer
      * @param logFileName
      */
-    public TTEventWrapperProducer(RingBuffer<TTEventWrapper> ringBuffer,String logFileName)
+    public TTEventWrapperQueuer(RingBuffer<TTEventWrapper> ringBuffer,String logFileName)
     {
     	if(ringBuffer == null){
     		getLog().fatal("ringBuffer can't be null");
@@ -80,7 +82,10 @@ public class TTEventWrapperProducer implements Quittable{
 			/* Write event to log */
 			if (logWriter != null) {
 				try {
-					logWriter.append(incoming.toJSON().toJSONString());
+					JSONObject json = new JSONObject();
+					json.put("timestamp",""+System.currentTimeMillis());
+					json.put("event_wrapper", incoming.toJSON());
+					logWriter.append(json.toJSONString());
 					logWriter.newLine();
 					logWriter.flush();
 				} catch (IOException exception) {
