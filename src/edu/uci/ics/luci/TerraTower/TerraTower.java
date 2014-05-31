@@ -51,7 +51,7 @@ public class TerraTower {
 
 	private static transient volatile Logger log = null;
 
-	private static TTEventProducerWithTranslator eventPublisher;
+	private static TTEventWrapperProducer eventPublisher;
 	public static Logger getLog(){
 		if(log == null){
 			log = LogManager.getLogger(TerraTower.class);
@@ -67,7 +67,9 @@ public class TerraTower {
 
 		Globals.setGlobals(new GlobalsTerraTower(VERSION));
 		
-		eventPublisher = createEventQueue();
+		String logFileName = config.getString("event.logfile");
+		eventPublisher = createEventQueue(logFileName);
+		Globals.getGlobals().addQuittable(eventPublisher);
 		
 		eventPublisher.onData(new TTEventCreateWorld("Earth","EarthPassword"));
 		
@@ -133,29 +135,29 @@ public class TerraTower {
 	 * Create Event Disruptor
 	 * @return 
 	 */
-	static TTEventProducerWithTranslator createEventQueue() {
+	static TTEventWrapperProducer createEventQueue(String logFile) {
 		// Executor that will be used to construct new threads for consumers
         Executor executor = Executors.newCachedThreadPool();
 
         // The factory for the event
-        TTEventFactory factory = new TTEventFactory();
+        TTEventWrapperFactory factory = new TTEventWrapperFactory();
 
         // Specify the size of the ring buffer, must be power of 2.
         int bufferSize = 1024;
 
         // Construct the Disruptor
-        Disruptor<TTEvent> disruptor = new Disruptor<TTEvent>(factory, bufferSize, executor);
+        Disruptor<TTEventWrapper> disruptor = new Disruptor<TTEventWrapper>(factory, bufferSize, executor);
 
         // Connect the handler
-        disruptor.handleEventsWith(new TTEventHandler());
+        disruptor.handleEventsWith(new TTEventWrapperHandler());
 	        
         // Start the Disruptor, starts all threads running
         disruptor.start();
 
         // Get the ring buffer from the Disruptor to be used for publishing.
-        RingBuffer<TTEvent> ringBuffer = disruptor.getRingBuffer();
+        RingBuffer<TTEventWrapper> ringBuffer = disruptor.getRingBuffer();
 
-        TTEventProducerWithTranslator localEventPublisher = new TTEventProducerWithTranslator(ringBuffer);
+        TTEventWrapperProducer localEventPublisher = new TTEventWrapperProducer(ringBuffer,logFile);
         
         return(localEventPublisher);
 	}

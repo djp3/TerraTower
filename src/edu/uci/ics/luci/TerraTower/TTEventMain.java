@@ -14,13 +14,13 @@ public class TTEventMain
         Executor executor = Executors.newCachedThreadPool();
 
         // The factory for the event
-        TTEventFactory factory = new TTEventFactory();
+        TTEventWrapperFactory factory = new TTEventWrapperFactory();
 
         // Specify the size of the ring buffer, must be power of 2.
         int bufferSize = 1024;
 
         // Construct the Disruptor
-        Disruptor<TTEvent> disruptor = new Disruptor<TTEvent>(factory, bufferSize, executor);
+        Disruptor<TTEventWrapper> disruptor = new Disruptor<TTEventWrapper>(factory, bufferSize, executor);
 
         // Connect the handler
         disruptor.handleEventsWith(new TTEventHandler());
@@ -29,11 +29,11 @@ public class TTEventMain
         disruptor.start();
 
         // Get the ring buffer from the Disruptor to be used for publishing.
-        RingBuffer<TTEvent> ringBuffer = disruptor.getRingBuffer();
+        RingBuffer<TTEventWrapper> ringBuffer = disruptor.getRingBuffer();
 
-        TTEventProducerWithTranslator producer = new TTEventProducerWithTranslator(ringBuffer);
+        TTEventWrapperProducer producer = new TTEventWrapperProducer(ringBuffer);
 
-        TTEvent event = new TTEvent(TTEvent.TTEventType.CREATE_MAP);
+        TTEventWrapper event = new TTEventWrapper(TTEventType.CREATE_MAP);
         for (int i = 0 ; i< 250000;i++)
         {
             producer.onData(event);
