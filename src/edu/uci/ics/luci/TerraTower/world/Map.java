@@ -1,4 +1,6 @@
-package edu.uci.ics.luci.TerraTower;
+package edu.uci.ics.luci.TerraTower.world;
+
+import edu.uci.ics.luci.TerraTower.GridCell;
 
 public class Map {
 

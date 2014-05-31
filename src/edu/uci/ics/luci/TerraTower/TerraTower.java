@@ -71,7 +71,8 @@ public class TerraTower {
 		eventPublisher = createEventQueue(logFileName);
 		Globals.getGlobals().addQuittable(eventPublisher);
 		
-		eventPublisher.onData(new TTEventCreateWorld("Earth","EarthPassword"));
+		TTEventWrapper wrapper = new TTEventWrapper(TTEventType.CREATE_WORLD, new TTEventCreateWorld("Earth","EarthPassword"),null);
+		eventPublisher.onData(wrapper);
 		
 		eventPublisher.onData(new TTEventCreateMap(config.getDouble("world.longitude.west"),
 					config.getDouble("world.longitude.east"),

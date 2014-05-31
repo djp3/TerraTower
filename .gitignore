@@ -6,8 +6,9 @@ target/classes/*
 # Package Files #
 *.jar
 
-# Logs
+# Logs and test files
 logs/*
+test/*
 *.log
 
 #This should be developer specific, not sure

@@ -1,5 +1,6 @@
 package edu.uci.ics.luci.TerraTower;
 
+import edu.uci.ics.luci.TerraTower.world.Map;
 import net.minidev.json.JSONObject;
 
 
