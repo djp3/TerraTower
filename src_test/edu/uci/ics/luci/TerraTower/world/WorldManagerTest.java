@@ -32,11 +32,11 @@ public class WorldManagerTest {
 		String name = "foo"+System.currentTimeMillis();
 		String password = "foo"+System.currentTimeMillis();
 		
-		assertTrue(!WorldManager.exists(name));
-		assertTrue(!WorldManager.exists(name));
+		assertTrue(!WorldManager.worldExists(name));
+		assertTrue(!WorldManager.worldExists(name));
 		
 		assertTrue(WorldManager.create(name,password));
-		assertTrue(WorldManager.exists(name));
+		assertTrue(WorldManager.worldExists(name));
 		assertTrue(!WorldManager.create(name,password));
 	}
 

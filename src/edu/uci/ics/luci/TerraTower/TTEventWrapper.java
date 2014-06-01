@@ -28,6 +28,7 @@ public class TTEventWrapper {
 	
 	public void setEvent(TTEvent event){
 		this.event = event;
+		resetEventHandler();
 	}
 	
 	public TTEventHandler getHandler(){
@@ -67,7 +68,26 @@ public class TTEventWrapper {
 	public void setResultListeners(List<TTEventHandlerResultListener> rl){
 		this.resultListeners = rl;
 	}
-
+	
+	
+	
+	/**
+	 *	Constructor 
+	 */
+	TTEventWrapper(TTEventType eventType,TTEvent event,TTEventHandlerResultListener resultListener){
+		if(eventType == null){
+			throw new IllegalArgumentException("eventType can't be null");
+		}
+		this.setEventType(eventType);
+		
+		//Event can be null because it has to be initialized for disruptor
+		//before an event exists
+		this.setEvent(event);
+		
+		this.setResultListeners(new ArrayList<TTEventHandlerResultListener>());
+		this.addResultListener(resultListener);
+	}
+	
 	
 	/**
 	 *	Constructor 
@@ -78,18 +98,17 @@ public class TTEventWrapper {
 		if(eventType == null){
 			throw new IllegalArgumentException("eventType can't be null");
 		}
-		this.eventType = eventType;
+		this.setEventType(eventType);
 		
 		//Event can be null because it has to be initialized for disruptor
 		//before an event exists
-		this.event = event;
-		resetEventHandler();
+		this.setEvent(event);
 		
 		if(resultListeners == null){
-			this.resultListeners = new ArrayList<TTEventHandlerResultListener>();
+			this.setResultListeners(new ArrayList<TTEventHandlerResultListener>());
 		}
 		else{
-			this.resultListeners = resultListeners;
+			this.setResultListeners(resultListeners);
 		}
 	}
 	
@@ -123,12 +142,14 @@ public class TTEventWrapper {
 				break;
 			case CREATE_MAP: event = TTEventCreateMap.fromJSON((JSONObject)in.get("event"));
 				break;
+				/*
 			case CREATE_PLAYER: event = TTEventCreatePlayer.fromJSON((JSONObject)in.get("event"));
 				break;
+				*/
 			default:event = null;
 				break;
 		}
-		TTEventWrapper ret = new TTEventWrapper(eventType,event,null);
+		TTEventWrapper ret = new TTEventWrapper(eventType,event,(TTEventHandlerResultListener)null);
 		return ret;
 	}
 

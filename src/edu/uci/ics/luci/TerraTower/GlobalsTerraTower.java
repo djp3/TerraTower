@@ -24,6 +24,10 @@ package edu.uci.ics.luci.TerraTower;
 
 import java.util.TimeZone;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import edu.uci.ics.luci.TerraTower.world.WorldManager;
 import edu.uci.ics.luci.utility.CalendarCache;
 import edu.uci.ics.luci.utility.Globals;
 
@@ -45,7 +49,17 @@ public class GlobalsTerraTower extends Globals {
 	
 	private static final String LOG4J_CONFIG_FILE_DEFAULT = "TerraTower.log4j.xml";
 	
+
+	private static transient volatile Logger log = null;
+	public static Logger getLog(){
+		if(log == null){
+			log = LogManager.getLogger(GlobalsTerraTower.class);
+		}
+		return log;
+	}
 	String version = null;
+	
+	WorldManager wm = null;
 
 	@Override
 	public String getSystemVersion() {
@@ -56,11 +70,23 @@ public class GlobalsTerraTower extends Globals {
 		this(version,true);
 	}
 	
+	static GlobalsTerraTower getGlobalsTerraTower(){
+		return (GlobalsTerraTower) Globals.getGlobals();
+	}
+	
 	protected GlobalsTerraTower(String version, boolean testing){
 		super();
 		this.version = version;
 		setTesting(true);
 		setLog4JPropertyFileName(LOG4J_CONFIG_FILE_DEFAULT);
+	}
+	
+	public void setWorldManager(WorldManager wm){
+		this.wm = wm;
+	}
+	
+	public WorldManager getWorldManager(){
+		return(this.wm);
 	}
 	
 }

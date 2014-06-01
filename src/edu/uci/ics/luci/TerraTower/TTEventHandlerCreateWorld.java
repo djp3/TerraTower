@@ -1,8 +1,8 @@
 package edu.uci.ics.luci.TerraTower;
 
-import edu.uci.ics.luci.TerraTower.world.WorldManager;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import edu.uci.ics.luci.TerraTower.world.WorldManager;
 
 
 public class TTEventHandlerCreateWorld implements TTEventHandler{    
@@ -11,13 +11,14 @@ public class TTEventHandlerCreateWorld implements TTEventHandler{
 	public JSONObject onEvent(TTEvent _event) {
 		JSONObject ret = new JSONObject();
 		TTEventCreateWorld event = (TTEventCreateWorld) _event;
-		if(WorldManager.exists(event.getName())){
+		WorldManager wm = GlobalsTerraTower.getGlobalsTerraTower().getWorldManager();
+		if(wm.worldExists(event.getName())){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
 			errors.add("World with name, "+event.getName()+" already exists");
 			ret.put("errors", errors);
 		}else{
-			if(WorldManager.create(event.getName(),event.getPassword())){
+			if(wm.create(event.getName(),event.getPassword())){
 				ret.put("error", "false");
 			}
 			else{

@@ -6,6 +6,6 @@ public class TTEventWrapperFactory implements EventFactory<TTEventWrapper>
 {
     public TTEventWrapper newInstance()
     {
-        return new TTEventWrapper(TTEventType.VOID,null,null);
+        return new TTEventWrapper(TTEventType.VOID,null,(TTEventHandlerResultListener)null);
     }
 }
