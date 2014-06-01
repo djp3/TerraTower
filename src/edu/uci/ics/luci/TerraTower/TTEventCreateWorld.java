@@ -40,10 +40,6 @@ public class TTEventCreateWorld implements TTEvent {
 		this.setPassword(password);
 	}
 	
-	void set(TTEventCreateWorld ttEvent){
-		this.setName(ttEvent.getName());
-		this.setPassword(ttEvent.getPassword());
-	}
 
 	@Override
 	public JSONObject toJSON() {
