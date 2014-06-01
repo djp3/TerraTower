@@ -1,13 +1,12 @@
 package edu.uci.ics.luci.TerraTower.world;
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import edu.uci.ics.luci.TerraTower.PasswordUtils;
 
 public class WorldManager {
 	
@@ -19,25 +18,6 @@ public class WorldManager {
 		return log;
 	}
 	
-	private static MessageDigest digest = null;
-	
-	private static byte[] hashPassword(String password) {
-		byte[] hash = null;
-		try {
-			hash = digest.digest(password.getBytes("UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			getLog().fatal("Can't support UTF-8\n"+e);
-		}
-		return hash;
-	}
-	
-	static{
-		try {
-			digest = MessageDigest.getInstance("SHA-256");
-		} catch (NoSuchAlgorithmException e) {
-			getLog().fatal("Can't find SHA-256 algorithm:\n"+e);
-		}
-	}
 	
 	HashMap<String, byte[]> worlds = new HashMap<String,byte[]>();
 	HashMap<String,Map> maps = new HashMap<String,Map>();
@@ -52,12 +32,12 @@ public class WorldManager {
 			return false;
 		}
 		byte[] p = worlds.get(worldName);
-		return (Arrays.equals(p,hashPassword(password)));
+		return (Arrays.equals(p,PasswordUtils.hashPassword(password)));
 	}
 
 	public boolean create(String name, String password) {
 		if(!worldExists(name)){
-			worlds.put(name, hashPassword(password));
+			worlds.put(name, PasswordUtils.hashPassword(password));
 			return worldExists(name);
 		}
 		else{

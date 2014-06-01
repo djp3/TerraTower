@@ -3,15 +3,23 @@ package edu.uci.ics.luci.TerraTower;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateMap;
+import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateWorld;
+
 import net.minidev.json.JSONObject;
 
+/**
+ * Setting the eventType and the event is required
+ * @author djp3
+ *
+ */
 public class TTEventWrapper {
 	
 	/* The basic data encapsulated by the wrapper */
 	private TTEventType eventType;
 	private TTEvent event;
 	private TTEventHandler handler;
-	private transient List<TTEventHandlerResultListener> resultListeners;
+	private List<TTEventHandlerResultListener> resultListeners;
 	
 	/* Getters and Setters */
 	public TTEventType getEventType() {
@@ -45,15 +53,31 @@ public class TTEventWrapper {
 			break;
 		case CREATE_MAP: this.setHandler(new TTEventHandlerCreateMap());
 			break;
-			/*
 		case CREATE_PLAYER: this.setHandler(new TTEventHandlerCreatePlayer());
 			break;
-			*/
 		case VOID: this.setHandler(null);
 			break;
 		default:
 			break;
 		
+		}
+	}
+	
+	public void checkConsistency(){
+		boolean problem = false;
+		switch(this.getEventType()){
+		case CREATE_MAP: problem = (!(this.getEvent() instanceof TTEventCreateMap));
+			break;
+		case CREATE_PLAYER: problem = (!(this.getEvent() instanceof TTEventCreatePlayer));
+			break;
+		case CREATE_WORLD: problem = (!(this.getEvent() instanceof TTEventCreateWorld));
+			break;
+		case VOID: problem = (!(this.getEvent() instanceof TTEventVoid));
+			break;
+		default:
+			break;problem = true;}
+		if(problem){
+			throw new IllegalArgumentException("EventType:"+this.getEventType()+" is inconsistent with Event:"+this.getEvent().getClass().getCanonicalName());
 		}
 	}
 	
@@ -117,16 +141,22 @@ public class TTEventWrapper {
 	void set(TTEventWrapper ttEventWrapper){
 		this.setEventType(ttEventWrapper.getEventType());
 		TTEvent event = ttEventWrapper.getEvent();
-		if(event == null){
-			throw new IllegalArgumentException("event can't be null");
-		}
 		this.setEvent(event);
 		this.setResultListeners(ttEventWrapper.getResultListeners());
+		checkConsistency();
 	}
 	
 	@Override
 	public String toString(){
-		return(this.getEventType().toString()+":"+this.getEvent().toString());
+		String localEventType = "";
+		String localEvent = "";
+		if(this.getEventType() == null){
+			localEventType = "null";
+		}
+		if(this.getEvent() == null){
+			localEvent = "null";
+		}
+		return(localEventType+":"+localEvent);
 	}
 	
 	public JSONObject toJSON(){
@@ -140,14 +170,14 @@ public class TTEventWrapper {
 		TTEventType eventType = TTEventType.fromString((String) in.get("eventType"));
 		TTEvent event;
 		switch(eventType){
+			case VOID: event = TTEventVoid.fromJSON((JSONObject)in.get("event"));
+				break;
 			case CREATE_WORLD: event = TTEventCreateWorld.fromJSON((JSONObject)in.get("event"));
 				break;
 			case CREATE_MAP: event = TTEventCreateMap.fromJSON((JSONObject)in.get("event"));
 				break;
-				/*
 			case CREATE_PLAYER: event = TTEventCreatePlayer.fromJSON((JSONObject)in.get("event"));
 				break;
-				*/
 			default:event = null;
 				break;
 		}
@@ -165,6 +195,9 @@ public class TTEventWrapper {
 		result = prime * result + ((event == null) ? 0 : event.hashCode());
 		result = prime * result
 				+ ((eventType == null) ? 0 : eventType.hashCode());
+		result = prime * result + ((handler == null) ? 0 : handler.hashCode());
+		result = prime * result
+				+ ((resultListeners == null) ? 0 : resultListeners.hashCode());
 		return result;
 	}
 
@@ -193,7 +226,22 @@ public class TTEventWrapper {
 		if (eventType != other.eventType) {
 			return false;
 		}
+		if (handler == null) {
+			if (other.handler != null) {
+				return false;
+			}
+		} else if (!handler.equals(other.handler)) {
+			return false;
+		}
+		if (resultListeners == null) {
+			if (other.resultListeners != null) {
+				return false;
+			}
+		} else if (!resultListeners.equals(other.resultListeners)) {
+			return false;
+		}
 		return true;
 	}
+
 
 }

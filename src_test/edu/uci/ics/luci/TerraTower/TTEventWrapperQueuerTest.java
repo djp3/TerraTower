@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateMap;
+import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.world.WorldManager;
 import edu.uci.ics.luci.utility.Globals;
 

@@ -1,4 +1,4 @@
-package edu.uci.ics.luci.TerraTower;
+package edu.uci.ics.luci.TerraTower.gameEvents;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateWorld;
 
 public class TTEventCreateWorldTest {
 

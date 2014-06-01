@@ -2,11 +2,19 @@ package edu.uci.ics.luci.TerraTower;
 
 import static org.junit.Assert.*;
 
+import net.minidev.json.JSONObject;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateWorld;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 
 public class TTEventWrapperTest {
@@ -27,45 +35,100 @@ public class TTEventWrapperTest {
 	public void tearDown() throws Exception {
 	}
 
+	private class MyTTEventHandlerResultListener implements TTEventHandlerResultListener{
+
+		@Override
+		public void onFinish(JSONObject result) {
+		}
+		
+	}
+
 	@Test
 	public void testBasics() {
 		
 		TTEventWrapper t1;
 		try{
-			t1 = new TTEventWrapper(TTEventType.VOID,null);
+			//t1 = new TTEventWrapper(TTEventType.VOID,new TTEventVoid(),(TTEventHandlerResultListener) null);
+			t1 = new TTEventWrapper(null,new TTEventVoid(),(TTEventHandlerResultListener) null);
 			fail("Should throw an exception");
 		}catch(IllegalArgumentException e){
 			//ok
+		}catch(RuntimeException e){
+			fail("Should not throw an exception");
 		}
 		
 		try{
-			t1 = new TTEventWrapper(null,null);
+			//t1 = new TTEventWrapper(TTEventType.VOID,new TTEventVoid(),(TTEventHandlerResultListener) null);
+			t1 = new TTEventWrapper(null,new TTEventVoid(),(List<TTEventHandlerResultListener>) null);
 			fail("Should throw an exception");
 		}catch(IllegalArgumentException e){
 			//ok
+		}catch(RuntimeException e){
+			fail("Should not throw an exception");
+		}
+		
+		try{
+			t1 = new TTEventWrapper(TTEventType.VOID,null,(TTEventHandlerResultListener) null);
+		}catch(RuntimeException e){
+			fail("Should not throw an exception");
+		}
+		
+		try{
+			t1 = new TTEventWrapper(TTEventType.VOID,null,(List<TTEventHandlerResultListener>) null);
+		}catch(RuntimeException e){
+			fail("Should not throw an exception");
 		}
 		
 		TTEventCreateWorld ttEvent1 = new TTEventCreateWorld("name","password");
-		t1 = new TTEventWrapper(TTEventType.CREATE_WORLD,ttEvent1);
-		
-		assertEquals(t1.getEventType(), TTEventType.CREATE_WORLD);
-		assertEquals(t1.getEvent(), ttEvent1);
-		
-		TTEventCreateWorld ttEvent2 = new TTEventCreateWorld("name","password2");
-		TTEventWrapper t2 = new TTEventWrapper(TTEventType.CREATE_WORLD,ttEvent2);
-		
-		assertEquals(t2.getEventType(), TTEventType.CREATE_WORLD);
-		assertEquals(t2.getEvent(), ttEvent2);
-		
-		assertTrue(!t1.equals(t2));
-		
-		t1.set(t2);
+		TTEventHandlerResultListener rl = new MyTTEventHandlerResultListener();
+		List<TTEventHandlerResultListener> list = new ArrayList<TTEventHandlerResultListener>();
+		list.add(rl);
+		try{
+			t1 = new TTEventWrapper(TTEventType.CREATE_WORLD,ttEvent1,rl);
+			t1 = new TTEventWrapper(TTEventType.CREATE_MAP,ttEvent1,list);
+		}catch(RuntimeException e){
+			fail("Should not throw an exception");
+		}
+	}
+
+	@Test
+	public void testEquals() {
+		TTEventWrapper t1 = new TTEventWrapper(TTEventType.VOID,new TTEventVoid(),(TTEventHandlerResultListener) null);
+		TTEventWrapper t2 = new TTEventWrapper(TTEventType.VOID,new TTEventVoid(),(TTEventHandlerResultListener) null);
 		assertEquals(t1,t1);
+		assertTrue(t1.hashCode() == t2.hashCode());
 		assertEquals(t1,t2);
 		assertTrue(!t1.equals(null));
 		assertTrue(!t1.equals("foo"));
 		
-		assertEquals(t1,TTEventWrapper.fromJSON(t1.toJSON()));
+		
+		t2 = new TTEventWrapper(TTEventType.CREATE_WORLD,new TTEventCreateWorld("a","b"),(TTEventHandlerResultListener) null);
+		t1.set(t2);
+		assertEquals(t1,t1);
+		assertTrue(!t1.equals(t2));
+		
+		t2 = new TTEventWrapper(TTEventType.CREATE_WORLD,null,(TTEventHandlerResultListener) null);
+		assertEquals(t2,t2);
+		assertTrue(t1.hashCode() != t2.hashCode());
+		assertTrue(!t1.equals(t2));
+		assertTrue(!t2.equals(t1));
+		
+		t2 = new TTEventWrapper(TTEventType.CREATE_WORLD,new TTEventCreateWorld("a","b"),(TTEventHandlerResultListener) null);
+		assertEquals(t2,t2);
+		assertTrue(t1.hashCode() != t2.hashCode());
+		assertTrue(!t1.equals(t2));
+		assertTrue(!t2.equals(t1));
+		
+		for(TTEventType tet:TTEventType.values()){
+			t2 = new TTEventWrapper(tet,new TTEventVoid(),(TTEventHandlerResultListener) null);
+			try{
+				assertEquals(t2,TTEventWrapper.fromJSON(t2.toJSON()));
+			}
+			catch(AssertionError e){
+				System.err.println("Failed trying to translate JSON for:"+tet);
+				throw e;
+			}
+		}
 		
 		
 	}

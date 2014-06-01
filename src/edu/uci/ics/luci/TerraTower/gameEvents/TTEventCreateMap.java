@@ -1,5 +1,6 @@
-package edu.uci.ics.luci.TerraTower;
+package edu.uci.ics.luci.TerraTower.gameEvents;
 
+import edu.uci.ics.luci.TerraTower.TTEvent;
 import net.minidev.json.JSONObject;
 
 public class TTEventCreateMap implements TTEvent{
