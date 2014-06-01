@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateMap;
+import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreatePlayer;
 import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.gameEvents.TTEventHandlerCreateMap;
+import edu.uci.ics.luci.TerraTower.gameEvents.TTEventHandlerCreatePlayer;
 import edu.uci.ics.luci.TerraTower.gameEvents.TTEventHandlerCreateWorld;
 
 import net.minidev.json.JSONObject;
@@ -77,7 +79,9 @@ public class TTEventWrapper {
 		case VOID: problem = (!(this.getEvent() instanceof TTEventVoid));
 			break;
 		default:
-			break;problem = true;}
+			problem = true;
+			break;
+		}
 		if(problem){
 			throw new IllegalArgumentException("EventType:"+this.getEventType()+" is inconsistent with Event:"+this.getEvent().getClass().getCanonicalName());
 		}

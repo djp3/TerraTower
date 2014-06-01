@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateMap;
+import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreatePlayer;
 import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.world.WorldManager;
 import edu.uci.ics.luci.utility.Globals;
@@ -101,9 +102,19 @@ public class TTEventWrapperQueuerTest {
 		while(resultChecker.resultOK == null){};
 		assertTrue(resultChecker.resultOK);
 		
-		TTEventCreateMap ttEvent = new TTEventCreateMap(worldName,password,-180.0,180.0,10,-90,90,10);
+		TTEventCreateMap ttEvent2 = new TTEventCreateMap(worldName,password,-180.0,180.0,10,-90,90,10);
 		resultChecker = new ResultChecker(false);
-		event = new TTEventWrapper(TTEventType.CREATE_MAP,ttEvent,resultChecker);
+		event = new TTEventWrapper(TTEventType.CREATE_MAP,ttEvent2,resultChecker);
+		events.add(event);
+		eventPublisher.onData(event);
+		while(resultChecker.resultOK == null){};
+		assertTrue(resultChecker.resultOK);
+		
+		String playerName = "Player Name";
+		String playerPassword = "Player Password";
+		TTEventCreatePlayer ttEvent3 = new TTEventCreatePlayer(playerName,playerPassword);
+		resultChecker = new ResultChecker(false);
+		event = new TTEventWrapper(TTEventType.CREATE_PLAYER,ttEvent3,resultChecker);
 		events.add(event);
 		eventPublisher.onData(event);
 		while(resultChecker.resultOK == null){};
