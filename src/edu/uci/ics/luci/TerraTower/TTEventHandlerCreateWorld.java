@@ -30,4 +30,28 @@ public class TTEventHandlerCreateWorld implements TTEventHandler{
 		}
 		return ret;
 	}
+
+	@Override
+	public JSONObject checkParameters(TTEvent _event) {
+		JSONObject ret = new JSONObject();
+		TTEventCreateWorld event = (TTEventCreateWorld) _event;
+		
+		if(event.getName() == null){
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("World can't have a null name");
+			ret.put("errors", errors);
+			return ret;
+		}
+		
+		if(event.getPassword() == null){
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("World can't have a null password");
+			ret.put("errors", errors);
+			return ret;
+		}
+		
+		return null;
+	}
 }

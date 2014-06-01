@@ -57,4 +57,63 @@ public class TTEventHandlerCreateMap implements TTEventHandler{
 		}
 		return ret;
 	}
+	
+	@Override
+	public JSONObject checkParameters(TTEvent _event) {
+		JSONObject ret = new JSONObject();
+		TTEventCreateMap event = (TTEventCreateMap) _event;
+
+		if(event.getWorldName() == null){
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("World can't have a null name");
+			ret.put("errors", errors);
+			return ret;
+		}
+		
+		if(event.getPassword() == null){
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("World can't have a null password");
+			ret.put("errors", errors);
+			return ret;
+		}
+		
+		double left = event.getLeft();
+		double right = event.getRight();
+		int numXSplits = event.getNumXSplits();
+		if (left >= right) {
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("left must be less than right");
+			ret.put("errors", errors);
+			return ret;
+		}
+		if (numXSplits <= 0) {
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("number of X splits must be greater than 0");
+			ret.put("errors", errors);
+			return ret;
+		}
+		double top = event.getTop();
+		double bottom = event.getBottom();
+		int numYSplits = event.getNumYSplits();
+		if (bottom >= top) {
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("bottom must be less than top");
+			ret.put("errors", errors);
+			return ret;
+		}
+		if (numYSplits <= 0) {
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("number of Y splits must be greater than 0");
+			ret.put("errors", errors);
+			return ret;
+		}
+		
+		return null;
+	}
 }

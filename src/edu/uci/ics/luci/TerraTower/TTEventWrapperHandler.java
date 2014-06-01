@@ -11,7 +11,10 @@ public class TTEventWrapperHandler implements EventHandler<TTEventWrapper> {
 		TTEvent event = eventWrapper.getEvent();
 		JSONObject result = null;
 		if(handler != null){
-			result = handler.onEvent(event);
+			result = handler.checkParameters(event);
+			if(result == null){
+				result = handler.onEvent(event);
+			}
 		}
 		
 		for(TTEventHandlerResultListener rl:eventWrapper.getResultListeners()){
