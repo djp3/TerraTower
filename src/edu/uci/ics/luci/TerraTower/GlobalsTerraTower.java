@@ -70,7 +70,7 @@ public class GlobalsTerraTower extends Globals {
 		this(version,true);
 	}
 	
-	static GlobalsTerraTower getGlobalsTerraTower(){
+	public static GlobalsTerraTower getGlobalsTerraTower(){
 		return (GlobalsTerraTower) Globals.getGlobals();
 	}
 	

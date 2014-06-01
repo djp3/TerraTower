@@ -1,8 +1,10 @@
-package edu.uci.ics.luci.TerraTower;
+package edu.uci.ics.luci.TerraTower.gameEvents;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateMap;
+import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
+import edu.uci.ics.luci.TerraTower.TTEvent;
+import edu.uci.ics.luci.TerraTower.TTEventHandler;
 import edu.uci.ics.luci.TerraTower.world.Map;
 import edu.uci.ics.luci.TerraTower.world.WorldManager;
 

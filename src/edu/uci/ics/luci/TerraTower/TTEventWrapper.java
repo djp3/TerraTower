@@ -5,6 +5,8 @@ import java.util.List;
 
 import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateMap;
 import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateWorld;
+import edu.uci.ics.luci.TerraTower.gameEvents.TTEventHandlerCreateMap;
+import edu.uci.ics.luci.TerraTower.gameEvents.TTEventHandlerCreateWorld;
 
 import net.minidev.json.JSONObject;
 

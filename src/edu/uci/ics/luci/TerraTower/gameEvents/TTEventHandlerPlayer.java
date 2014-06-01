@@ -1,12 +1,14 @@
-package edu.uci.ics.luci.TerraTower;
+package edu.uci.ics.luci.TerraTower.gameEvents;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateWorld;
+import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
+import edu.uci.ics.luci.TerraTower.TTEvent;
+import edu.uci.ics.luci.TerraTower.TTEventHandler;
 import edu.uci.ics.luci.TerraTower.world.WorldManager;
 
 
-public class TTEventHandlerCreateWorld implements TTEventHandler{    
+public class TTEventHandlerPlayer implements TTEventHandler{    
 	
 	@Override
 	public JSONObject onEvent(TTEvent _event) {
