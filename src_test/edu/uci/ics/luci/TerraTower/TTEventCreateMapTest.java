@@ -45,15 +45,20 @@ public class TTEventCreateMapTest {
 		TTEventCreateMap t2 = new TTEventCreateMap(worldName,password,left,right,numXSplits,bottom,top,numYSplits);
 		TTEventCreateMap t3 = new TTEventCreateMap(worldName,password,left,right,numXSplits,bottom,top,numYSplits);
 		assertTrue(t1.equals(t2));
+		assertTrue(t1.hashCode()==t2.hashCode());
 		
 		t2 = new TTEventCreateMap(worldName+"x",password,left,right,numXSplits,bottom,top,numYSplits);
 		assertTrue(!t1.equals(t2));
+		assertTrue(t1.hashCode()!=t2.hashCode());
 		
 		t2 = new TTEventCreateMap(null,password,left,right,numXSplits,bottom,top,numYSplits);
 		t3 = new TTEventCreateMap(null,password,left,right,numXSplits,bottom,top,numYSplits);
 		assertTrue(t2.equals(t3));
+		assertTrue(t2.hashCode()==t3.hashCode());
 		assertTrue(!t1.equals(t2));
+		assertTrue(t1.hashCode()!=t2.hashCode());
 		assertTrue(!t2.equals(t1));
+		assertTrue(t2.hashCode()!=t1.hashCode());
 		
 		t2 = new TTEventCreateMap(worldName,password+"x",left,right,numXSplits,bottom,top,numYSplits);
 		assertTrue(!t1.equals(t2));
@@ -61,8 +66,11 @@ public class TTEventCreateMapTest {
 		t2 = new TTEventCreateMap(worldName,null,left,right,numXSplits,bottom,top,numYSplits);
 		t3 = new TTEventCreateMap(worldName,null,left,right,numXSplits,bottom,top,numYSplits);
 		assertTrue(t2.equals(t3));
+		assertTrue(t2.hashCode()==t3.hashCode());
 		assertTrue(!t1.equals(t2));
+		assertTrue(t1.hashCode()!=t2.hashCode());
 		assertTrue(!t2.equals(t1));
+		assertTrue(t2.hashCode()!=t1.hashCode());
 		
 		t2 = new TTEventCreateMap(worldName,password,(left+right)/2.0,right,numXSplits,bottom,top,numYSplits);
 		assertTrue(!t1.equals(t2));
