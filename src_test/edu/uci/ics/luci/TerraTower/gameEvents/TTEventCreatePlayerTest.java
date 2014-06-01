@@ -59,8 +59,8 @@ public class TTEventCreatePlayerTest {
 		t2 = new TTEventCreatePlayer(playerName,password+"x");
 		assertTrue(!t1.equals(t2));
 		
-		t2 = new TTEventCreatePlayer(playerName,null);
-		t3 = new TTEventCreatePlayer(playerName,null);
+		t2 = new TTEventCreatePlayer(playerName,(String)null);
+		t3 = new TTEventCreatePlayer(playerName,(String)null);
 		assertTrue(t2.equals(t3));
 		assertTrue(t2.hashCode()==t3.hashCode());
 		assertTrue(!t1.equals(t2));

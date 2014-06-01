@@ -2,9 +2,9 @@ package edu.uci.ics.luci.TerraTower.gameEvents;
 
 import java.util.Arrays;
 
+import net.minidev.json.JSONObject;
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
 import edu.uci.ics.luci.TerraTower.TTEvent;
-import net.minidev.json.JSONObject;
 
 public class TTEventCreatePlayer implements TTEvent{
 
@@ -40,18 +40,23 @@ public class TTEventCreatePlayer implements TTEvent{
 		this.setPlayerName(playerName);
 		this.setPassword(password);
 	}
+	
+	public TTEventCreatePlayer(String playerName, byte[] hashedPassword){
+		this.setPlayerName(playerName);
+		this.setHashedPassword(hashedPassword);
+	}
 
 	@Override
 	public JSONObject toJSON() {
 		JSONObject ret = new JSONObject();
 		ret.put("player_name", this.getPlayerName());
-		ret.put("hashed_password", this.getHashedPassword());
+		ret.put("hashed_password", PasswordUtils.bytesToHexString(this.getHashedPassword()));
 		return ret;
 	}
 	
 	static public TTEventCreatePlayer fromJSON(JSONObject in) {
 		String playerName = (String) in.get("player_name");
-		String hashedPassword = (String) in.get("hashed_password");
+		byte[] hashedPassword = PasswordUtils.hexStringToByteArray((String) in.get("hashed_password"));
 		return(new TTEventCreatePlayer(playerName,hashedPassword));
 	}
 
