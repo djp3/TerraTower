@@ -22,6 +22,8 @@ public class WorldManager {
 	HashMap<String, byte[]> worlds = new HashMap<String,byte[]>();
 	HashMap<String,Map> maps = new HashMap<String,Map>();
 	
+	HashMap<String,byte[]> players = new HashMap<String,byte[]>();
+	
 	
 	public boolean worldExists(String worldName) {
 		return worlds.containsKey(worldName);
@@ -62,4 +64,17 @@ public class WorldManager {
 		maps.put(worldName, map);
 		return true;
 	}
+
+	public boolean playerExists(String playerName) {
+		return players.containsKey(playerName);
+	}
+
+	public boolean createPlayer(String playerName, byte[] hashedPassword) {
+		if(playerExists(playerName)){
+			return false;
+		}
+		players.put(playerName, hashedPassword);
+		return true;
+	}
+	
 }

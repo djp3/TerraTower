@@ -8,26 +8,26 @@ import edu.uci.ics.luci.TerraTower.TTEventHandler;
 import edu.uci.ics.luci.TerraTower.world.WorldManager;
 
 
-public class TTEventHandlerPlayer implements TTEventHandler{    
+public class TTEventHandlerCreatePlayer implements TTEventHandler{    
 	
 	@Override
 	public JSONObject onEvent(TTEvent _event) {
 		JSONObject ret = new JSONObject();
-		TTEventCreateWorld event = (TTEventCreateWorld) _event;
+		TTEventCreatePlayer event = (TTEventCreatePlayer) _event;
 		WorldManager wm = GlobalsTerraTower.getGlobalsTerraTower().getWorldManager();
-		if(wm.worldExists(event.getName())){
+		if(wm.playerExists(event.getPlayerName())){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
-			errors.add("World with name, "+event.getName()+" already exists");
+			errors.add("Player with name, "+event.getPlayerName()+" already exists");
 			ret.put("errors", errors);
 		}else{
-			if(wm.create(event.getName(),event.getPassword())){
+			if(wm.createPlayer(event.getPlayerName(),event.getHashedPassword())){
 				ret.put("error", "false");
 			}
 			else{
 				ret.put("error","true");
 				JSONArray errors = new JSONArray();
-				errors.add("World with name, "+event.getName()+" could not be created");
+				errors.add("Player with name, "+event.getPlayerName()+" could not be created");
 				ret.put("errors", errors);
 			}
 		}
@@ -37,23 +37,16 @@ public class TTEventHandlerPlayer implements TTEventHandler{
 	@Override
 	public JSONObject checkParameters(TTEvent _event) {
 		JSONObject ret = new JSONObject();
-		TTEventCreateWorld event = (TTEventCreateWorld) _event;
+		TTEventCreatePlayer event = (TTEventCreatePlayer) _event;
 		
-		if(event.getName() == null){
+		if(event.getPlayerName() == null){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
-			errors.add("World can't have a null name");
+			errors.add("Player can't have a null name");
 			ret.put("errors", errors);
 			return ret;
 		}
 		
-		if(event.getPassword() == null){
-			ret.put("error","true");
-			JSONArray errors = new JSONArray();
-			errors.add("World can't have a null password");
-			ret.put("errors", errors);
-			return ret;
-		}
 		
 		return null;
 	}
