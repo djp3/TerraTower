@@ -3,12 +3,15 @@ package edu.uci.ics.luci.TerraTower;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import org.junit.Test;
+
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 
-public class TTEventMain
+public class DisruptorTest
 {
-    public static void main(String[] args) throws Exception
+	@Test
+    public void testDisruptor() 
     {
         // Executor that will be used to construct new threads for consumers
         Executor executor = Executors.newCachedThreadPool();
@@ -23,7 +26,7 @@ public class TTEventMain
         Disruptor<TTEventWrapper> disruptor = new Disruptor<TTEventWrapper>(factory, bufferSize, executor);
 
         // Connect the handler
-        disruptor.handleEventsWith(new TTEventHandler());
+        disruptor.handleEventsWith(new TTEventWrapperHandler());
 
         // Start the Disruptor, starts all threads running
         disruptor.start();
@@ -33,8 +36,8 @@ public class TTEventMain
 
         TTEventWrapperQueuer producer = new TTEventWrapperQueuer(ringBuffer);
 
-        TTEventWrapper event = new TTEventWrapper(TTEventType.CREATE_MAP);
-        for (int i = 0 ; i< 250000;i++)
+        TTEventWrapper event = new TTEventWrapper(TTEventType.VOID,new TTEventVoid(),(TTEventHandlerResultListener)null);
+        for (int i = 0 ; i< 25000;i++)
         {
             producer.onData(event);
         }

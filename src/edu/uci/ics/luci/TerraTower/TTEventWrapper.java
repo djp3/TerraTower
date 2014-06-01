@@ -62,7 +62,9 @@ public class TTEventWrapper {
 	}
 	
 	public void addResultListener(TTEventHandlerResultListener rl){
-		resultListeners.add(rl);
+		if(rl != null){
+			resultListeners.add(rl);
+		}
 	}
 	
 	public void setResultListeners(List<TTEventHandlerResultListener> rl){
