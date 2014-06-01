@@ -17,7 +17,22 @@ public class TTEventHandlerCreateMap implements TTEventHandler{
 		
 		JSONObject ret = new JSONObject();
 		
-		WorldManager wm = GlobalsTerraTower.getGlobalsTerraTower().getWorldManager();
+		GlobalsTerraTower globalsTerraTower = GlobalsTerraTower.getGlobalsTerraTower();
+		if(globalsTerraTower == null){
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("Globals wasn't initialized with GlobalsTerraTower");
+			ret.put("errors", errors);
+			return ret;
+		}
+		WorldManager wm = globalsTerraTower.getWorldManager();
+		if(wm == null){
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("WorldManager not assigned in GlobalsTerraTower");
+			ret.put("errors", errors);
+			return ret;
+		}		
 		
 		Map map = new Map(event.getLeft(),
 							event.getRight(),

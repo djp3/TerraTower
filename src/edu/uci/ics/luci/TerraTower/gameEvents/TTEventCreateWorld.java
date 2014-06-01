@@ -50,7 +50,7 @@ public class TTEventCreateWorld implements TTEvent {
 		return ret;
 	}
 	
-	static TTEventCreateWorld fromJSON(JSONObject in){
+	public static TTEventCreateWorld fromJSON(JSONObject in){
 		String localName = (String) in.get("name");
 		String localPassword = (String) in.get("password");
 		TTEventCreateWorld ret = new TTEventCreateWorld(localName,localPassword);

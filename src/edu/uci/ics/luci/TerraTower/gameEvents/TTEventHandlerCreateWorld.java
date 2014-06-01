@@ -14,7 +14,21 @@ public class TTEventHandlerCreateWorld implements TTEventHandler{
 	public JSONObject onEvent(TTEvent _event) {
 		JSONObject ret = new JSONObject();
 		TTEventCreateWorld event = (TTEventCreateWorld) _event;
-		WorldManager wm = GlobalsTerraTower.getGlobalsTerraTower().getWorldManager();
+		
+		GlobalsTerraTower globalsTerraTower = GlobalsTerraTower.getGlobalsTerraTower();
+		if(globalsTerraTower == null){
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("Globals wasn't initialized with GlobalsTerraTower");
+			ret.put("errors", errors);
+			return ret;
+		}
+		WorldManager wm = globalsTerraTower.getWorldManager();
+		if(wm == null){
+			wm = new WorldManager();
+			globalsTerraTower.setWorldManager(new WorldManager());
+		}
+		
 		if(wm.worldExists(event.getName())){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
