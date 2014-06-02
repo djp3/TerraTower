@@ -1,105 +1,46 @@
-package edu.uci.ics.luci.TerraTower.gameEvents;
+package edu.uci.ics.luci.TerraTower.events.handlers;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
-import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
-import edu.uci.ics.luci.TerraTower.TTEvent;
-import edu.uci.ics.luci.TerraTower.TTEventHandler;
-import edu.uci.ics.luci.TerraTower.world.Map;
-import edu.uci.ics.luci.TerraTower.world.WorldManager;
+import edu.uci.ics.luci.TerraTower.events.TTEvent;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
+import edu.uci.ics.luci.TerraTower.world.Territory;
 
 
-public class TTEventHandlerCreateMap implements TTEventHandler{
+public class TTEventHandlerCreateTerritory extends TTEventHandler{
+	
+	private double left;
+	private double right;
+	private int numXSplits;
+	private double top;
+	private double bottom;
+	private int numYSplits;
 
 	@Override
-	public JSONObject onEvent(TTEvent _event)  {   
-		TTEventCreateMap event = (TTEventCreateMap) _event;
-		
-		JSONObject ret = new JSONObject();
-		
-		GlobalsTerraTower globalsTerraTower = GlobalsTerraTower.getGlobalsTerraTower();
-		if(globalsTerraTower == null){
-			ret.put("error","true");
-			JSONArray errors = new JSONArray();
-			errors.add("Globals wasn't initialized with GlobalsTerraTower");
-			ret.put("errors", errors);
+	public JSONObject checkParameters(long eventTime, TTEvent _event) {
+		//Check parent 
+		JSONObject ret = super.checkParameters(eventTime, _event);
+		if(ret != null){
 			return ret;
 		}
-		WorldManager wm = globalsTerraTower.getWorldManager();
-		if(wm == null){
-			ret.put("error","true");
-			JSONArray errors = new JSONArray();
-			errors.add("WorldManager not assigned in GlobalsTerraTower");
-			ret.put("errors", errors);
-			return ret;
-		}		
-		
-		Map map = new Map(event.getLeft(),
-							event.getRight(),
-							event.getNumXSplits(),
-							event.getBottom(),
-							event.getTop(),
-							event.getNumYSplits());
-		
-		String worldName = event.getWorldName();
-		String password = event.getPassword();
-		
-		if(!wm.worldExists(worldName)){
-			ret.put("error","true");
-			JSONArray errors = new JSONArray();
-			errors.add("World with name, "+worldName+" already exists");
-			ret.put("errors", errors);
-		}
-		else if(!wm.passwordGood(worldName, password)){
-			ret.put("error","true");
-			JSONArray errors = new JSONArray();
-			errors.add("World exist with name, "+worldName+" but bad password: "+password);
-			ret.put("errors", errors);
-		}
-		else if(wm.mapExists(worldName)){
-			ret.put("error","true");
-			JSONArray errors = new JSONArray();
-			errors.add("Map already exists for world with name, "+worldName);
-			ret.put("errors", errors);
+		ret = new JSONObject();
+				
+		TTEventCreateTerritory event = null;
+		if(_event instanceof TTEventCreateTerritory){
+			event = ((TTEventCreateTerritory) _event);
 		}
 		else{
-			if(!wm.addMap(event.getWorldName(),event.getPassword(),map)){
-				ret.put("error","true");
-				JSONArray errors = new JSONArray();
-				errors.add("Making a new map failed for world with name, "+worldName);
-				ret.put("errors", errors);
-			}
-			else{
-				ret.put("error","false");
-			}
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("Internal error, event type mismatch\n"+this.getClass().getCanonicalName()+" was called with "+_event.getClass().getCanonicalName());
+			ret.put("errors", errors);
+			return ret;
 		}
-		return ret;
-	}
-	
-	@Override
-	public JSONObject checkParameters(TTEvent _event) {
-		JSONObject ret = new JSONObject();
-		TTEventCreateMap event = (TTEventCreateMap) _event;
 
-		if(event.getWorldName() == null){
-			ret.put("error","true");
-			JSONArray errors = new JSONArray();
-			errors.add("World can't have a null name");
-			ret.put("errors", errors);
-			return ret;
-		}
-		
-		if(event.getPassword() == null){
-			ret.put("error","true");
-			JSONArray errors = new JSONArray();
-			errors.add("World can't have a null password");
-			ret.put("errors", errors);
-			return ret;
-		}
-		
-		double left = event.getLeft();
-		double right = event.getRight();
-		int numXSplits = event.getNumXSplits();
+		//Check that left right top bottom are all correctly ordered
+		left = event.getLeft();
+		right = event.getRight();
+		numXSplits = event.getNumXSplits();
 		if (left >= right) {
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
@@ -114,9 +55,9 @@ public class TTEventHandlerCreateMap implements TTEventHandler{
 			ret.put("errors", errors);
 			return ret;
 		}
-		double top = event.getTop();
-		double bottom = event.getBottom();
-		int numYSplits = event.getNumYSplits();
+		top = event.getTop();
+		bottom = event.getBottom();
+		numYSplits = event.getNumYSplits();
 		if (bottom >= top) {
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
@@ -134,4 +75,18 @@ public class TTEventHandlerCreateMap implements TTEventHandler{
 		
 		return null;
 	}
+
+	@Override
+	public JSONObject onEvent()  {   
+		
+		JSONObject ret = new JSONObject();
+		
+		Territory t = new Territory(left,right,numXSplits,bottom,top,numYSplits);
+		
+		wm.setTerritory(t);
+		
+		ret.put("error","false");
+		return ret;
+	}
+
 }
