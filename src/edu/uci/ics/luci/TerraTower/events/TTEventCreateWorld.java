@@ -1,104 +1,34 @@
-package edu.uci.ics.luci.TerraTower.gameEvents;
+/*
+	Copyright 2014
+		University of California, Irvine (c/o Donald J. Patterson)
+*/
+/*
+	This file is part of the Laboratory for Ubiquitous Computing java TerraTower game, i.e. "TerraTower"
 
-import edu.uci.ics.luci.TerraTower.TTEvent;
-import net.minidev.json.JSONObject;
+    TerraTower is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-public class TTEventCreateWorld implements TTEvent {
+    Utilities is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	private String name;
-	private String password;
-	
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+    You should have received a copy of the GNU General Public License
+    along with Utilities.  If not, see <http://www.gnu.org/licenses/>.
+*/
+package edu.uci.ics.luci.TerraTower.events;
 
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
 
-	/**
-	 * @return the password
-	 */
-	public String getPassword() {
-		return password;
-	}
+public class TTEventCreateWorld extends TTEvent {
 
-	/**
-	 * @param password the password to set
-	 */
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public TTEventCreateWorld(String worldName, String password){
-		this.setName(worldName);
-		this.setPassword(password);
+	public TTEventCreateWorld(String worldName, String worldPassword) {
+		super(worldName, worldPassword);
 	}
 	
-
-	@Override
-	public JSONObject toJSON() {
-		JSONObject ret = new JSONObject();
-		ret.put("name",getName());
-		ret.put("password", getPassword());
-		return ret;
-	}
-	
-	public static TTEventCreateWorld fromJSON(JSONObject in){
-		String localName = (String) in.get("name");
-		String localPassword = (String) in.get("password");
-		TTEventCreateWorld ret = new TTEventCreateWorld(localName,localPassword);
-		return ret;
+	public TTEventCreateWorld(String worldName, byte[] worldHashedPassword) {
+		super(worldName, worldHashedPassword);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((password == null) ? 0 : password.hashCode());
-		return result;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof TTEventCreateWorld)) {
-			return false;
-		}
-		TTEventCreateWorld other = (TTEventCreateWorld) obj;
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-		if (password == null) {
-			if (other.password != null) {
-				return false;
-			}
-		} else if (!password.equals(other.password)) {
-			return false;
-		}
-		return true;
-	}
 }
