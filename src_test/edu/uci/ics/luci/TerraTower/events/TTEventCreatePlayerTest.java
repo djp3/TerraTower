@@ -1,6 +1,7 @@
-package edu.uci.ics.luci.TerraTower.gameEvents;
+package edu.uci.ics.luci.TerraTower.events;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -8,9 +9,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreatePlayer;
-
 public class TTEventCreatePlayerTest {
+	
+	static final String worldName = "wname";
+	static final String worldPassword = "wpassword";
+	static final String playerName = "player name";
+	static final String playerPassword = "password";
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -31,24 +35,22 @@ public class TTEventCreatePlayerTest {
 
 	@Test
 	public void testEquals() {
-		String playerName = "player name";
-		String password = "password";
-		TTEventCreatePlayer t1 = new TTEventCreatePlayer(playerName,password);
+		TTEventCreatePlayer t1 = new TTEventCreatePlayer(worldName,worldPassword,playerName,playerPassword);
 		assertEquals(t1,t1);
 		assertTrue(!t1.equals(null));
 		assertTrue(!t1.equals("string"));
 		
-		TTEventCreatePlayer t2 = new TTEventCreatePlayer(playerName,password);
-		TTEventCreatePlayer t3 = new TTEventCreatePlayer(playerName,password);
+		TTEventCreatePlayer t2 = new TTEventCreatePlayer(worldName,worldPassword,playerName,playerPassword);
+		TTEventCreatePlayer t3 = new TTEventCreatePlayer(worldName,worldPassword,playerName,playerPassword);
 		assertTrue(t1.equals(t2));
 		assertTrue(t1.hashCode()==t2.hashCode());
 		
-		t2 = new TTEventCreatePlayer(playerName+"x",password);
+		t2 = new TTEventCreatePlayer(worldName,worldPassword,playerName+"x",playerPassword);
 		assertTrue(!t1.equals(t2));
 		assertTrue(t1.hashCode()!=t2.hashCode());
 		
-		t2 = new TTEventCreatePlayer(null,password);
-		t3 = new TTEventCreatePlayer(null,password);
+		t2 = new TTEventCreatePlayer(worldName,worldPassword,null,playerPassword);
+		t3 = new TTEventCreatePlayer(worldName,worldPassword,null,playerPassword);
 		assertTrue(t2.equals(t3));
 		assertTrue(t2.hashCode()==t3.hashCode());
 		assertTrue(!t1.equals(t2));
@@ -56,11 +58,11 @@ public class TTEventCreatePlayerTest {
 		assertTrue(!t2.equals(t1));
 		assertTrue(t2.hashCode()!=t1.hashCode());
 		
-		t2 = new TTEventCreatePlayer(playerName,password+"x");
+		t2 = new TTEventCreatePlayer(worldName,worldPassword,playerName,playerPassword+"x");
 		assertTrue(!t1.equals(t2));
 		
-		t2 = new TTEventCreatePlayer(playerName,(String)null);
-		t3 = new TTEventCreatePlayer(playerName,(String)null);
+		t2 = new TTEventCreatePlayer(worldName,worldPassword,playerName,(String)null);
+		t3 = new TTEventCreatePlayer(worldName,worldPassword,playerName,(String)null);
 		assertTrue(t2.equals(t3));
 		assertTrue(t2.hashCode()==t3.hashCode());
 		assertTrue(!t1.equals(t2));
@@ -72,16 +74,12 @@ public class TTEventCreatePlayerTest {
 
 	@Test
 	public void testBasic() {
-		String playerName = "player name";
-		String password = "password";
-		new TTEventCreatePlayer(playerName,password);
+		new TTEventCreatePlayer(worldName,worldPassword,playerName,playerPassword);
 	}
 	
 	@Test
 	public void testJSON() {
-		String playerName = "player name";
-		String password = "password";
-		TTEventCreatePlayer t1 = new TTEventCreatePlayer(playerName,password);
+		TTEventCreatePlayer t1 = new TTEventCreatePlayer(worldName,worldPassword,playerName,playerPassword);
 		
 		assertEquals(t1,TTEventCreatePlayer.fromJSON(t1.toJSON()));
 	}
