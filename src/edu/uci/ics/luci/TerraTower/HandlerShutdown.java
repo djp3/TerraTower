@@ -1,5 +1,3 @@
-package edu.uci.ics.luci.TerraTower;
-
 /*
 	Copyright 2014
 		University of California, Irvine (c/o Donald J. Patterson)
@@ -20,7 +18,7 @@ package edu.uci.ics.luci.TerraTower;
     You should have received a copy of the GNU General Public License
     along with Utilities.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+package edu.uci.ics.luci.TerraTower;
 
 
 import java.net.InetAddress;
