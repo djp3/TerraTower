@@ -22,6 +22,7 @@
 package edu.uci.ics.luci.TerraTower;
 
 
+import java.util.HashMap;
 import java.util.TimeZone;
 
 import org.apache.logging.log4j.LogManager;
@@ -49,6 +50,10 @@ public class GlobalsTerraTower extends Globals {
 	
 	private static final String LOG4J_CONFIG_FILE_DEFAULT = "TerraTower.log4j.xml";
 	
+	static final long ONE_SECOND = 1000;
+	static final long ONE_MINUTE = 60 * ONE_SECOND;
+	public static final long DEFAULT_TOWER_DELAY= 5 * ONE_MINUTE;
+	
 
 	private static transient volatile Logger log = null;
 	public static Logger getLog(){
@@ -59,7 +64,7 @@ public class GlobalsTerraTower extends Globals {
 	}
 	String version = null;
 	
-	WorldManager wm = null;
+	HashMap<String,WorldManager> worlds = new HashMap<String,WorldManager>();
 
 	@Override
 	public String getSystemVersion() {
@@ -81,12 +86,86 @@ public class GlobalsTerraTower extends Globals {
 		setLog4JPropertyFileName(LOG4J_CONFIG_FILE_DEFAULT);
 	}
 	
-	public void setWorldManager(WorldManager wm){
-		this.wm = wm;
+
+	public boolean createWorld(String worldName, String password) {
+		if(!worldExists(worldName)){
+			WorldManager wm = new WorldManager(password);
+			worlds.put(worldName, wm);
+			return worldExists(worldName);
+		}
+		else{
+			return false;
+		}
 	}
 	
-	public WorldManager getWorldManager(){
-		return(this.wm);
+	public boolean createWorld(String worldName, byte[] hashedPassword) {
+		if(!worldExists(worldName)){
+			WorldManager wm = new WorldManager(hashedPassword);
+			worlds.put(worldName, wm);
+			return worldExists(worldName);
+		}
+		else{
+			return false;
+		}
+	}
+
+	public boolean worldExists(String worldName) {
+		return worlds.containsKey(worldName);
+	}
+	
+	public void setWorld(String worldName,WorldManager wm){
+		if(worldExists(worldName)){
+			throw new IllegalArgumentException("World exists, not replacing");
+		}
+		else{
+			this.worlds.put(worldName, wm);
+		}
+	}
+	
+	public WorldManager getWorld(String worldName,String password){
+		WorldManager wm = this.worlds.get(worldName);
+		if(wm == null){
+			return null;
+		}
+		if(!wm.passwordGood(password)){
+			return null;
+		}
+		return(wm);
+	}
+	
+	public WorldManager getWorld(String worldName,byte[] password){
+		WorldManager wm = this.worlds.get(worldName);
+		if(wm == null){
+			return null;
+		}
+		if(!wm.passwordGood(password)){
+			return null;
+		}
+		return(wm);
+	}
+	
+	public boolean clearWorld(String worldName,String password){
+		WorldManager wm = this.worlds.get(worldName);
+		if(wm == null){
+			return true;
+		}
+		if(!wm.passwordGood(password)){
+			return false;
+		}
+		this.worlds.remove(worldName);
+		return true;
+	}
+	
+	public boolean clearWorld(String worldName,byte[] password){
+		WorldManager wm = this.worlds.get(worldName);
+		if(wm == null){
+			return true;
+		}
+		if(!wm.passwordGood(password)){
+			return false;
+		}
+		this.worlds.remove(worldName);
+		return true;
 	}
 	
 }
