@@ -1,17 +1,21 @@
-package edu.uci.ics.luci.TerraTower;
+package edu.uci.ics.luci.TerraTower.events;
 
 public enum TTEventType{
 	VOID,
 	CREATE_WORLD,
 	CREATE_MAP,
-	CREATE_PLAYER;
+	CREATE_PLAYER,
+	PLACE_TOWER,
+	STEP_TOWER_TERRITORY_GROWTH;
 	
 	public static String toString(TTEventType x){
 		switch (x){
 			case CREATE_WORLD: return "CREATE_WORLD";
 			case CREATE_MAP: return "CREATE_MAP";
 			case CREATE_PLAYER: return "CREATE_PLAYER";
-			default :return "VOID";
+			case PLACE_TOWER: return "PLACE_TOWER";
+			case STEP_TOWER_TERRITORY_GROWTH: return "STEP_TOWER_TERRITORY_GROWTH";
+			default: return "VOID";
 		}
 	}
 	
@@ -20,6 +24,8 @@ public enum TTEventType{
 			case "CREATE_WORLD": return CREATE_WORLD;
 			case "CREATE_MAP": return CREATE_MAP;
 			case "CREATE_PLAYER": return CREATE_PLAYER;
+			case "PLACE_TOWER": return PLACE_TOWER;
+			case "STEP_TOWER_TERRITORY_GROWTH": return STEP_TOWER_TERRITORY_GROWTH;
 			default: return VOID;
 		}
 	}
