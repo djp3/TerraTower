@@ -36,8 +36,7 @@ import org.apache.logging.log4j.Logger;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateMap;
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateWorld;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.utility.Globals;
 import edu.uci.ics.luci.utility.webserver.AccessControl;
 import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
@@ -61,6 +60,37 @@ public class TerraTower {
 		return log;
 	}
 	
+	/**
+	 * Create Event Disruptor
+	 * @return 
+	 */
+	static TTEventWrapperQueuer createEventQueue(String logFile) {
+		// Executor that will be used to construct new threads for consumers
+	    Executor executor = Executors.newCachedThreadPool();
+	
+	    // The factory for the event
+	    TTEventWrapperFactory factory = new TTEventWrapperFactory();
+	
+	    // Specify the size of the ring buffer, must be power of 2.
+	    int bufferSize = 1024;
+	
+	    // Construct the Disruptor
+	    Disruptor<TTEventWrapper> disruptor = new Disruptor<TTEventWrapper>(factory, bufferSize, executor);
+	
+	    // Connect the handler
+	    disruptor.handleEventsWith(new TTEventWrapperHandler());
+	        
+	    // Start the Disruptor, starts all threads running
+	    disruptor.start();
+	
+	    // Get the ring buffer from the Disruptor to be used for publishing.
+	    RingBuffer<TTEventWrapper> ringBuffer = disruptor.getRingBuffer();
+	
+	    TTEventWrapperQueuer localEventPublisher = new TTEventWrapperQueuer(ringBuffer,logFile);
+	    
+	    return(localEventPublisher);
+	}
+
 	public static void main(String[] args) throws ConfigurationException {
 
 		System.setProperty("Log4jDefaultStatusLevel","error");
@@ -73,15 +103,19 @@ public class TerraTower {
 		eventPublisher = createEventQueue(logFileName);
 		Globals.getGlobals().addQuittable(eventPublisher);
 		
-		TTEventWrapper wrapper = new TTEventWrapper(TTEventType.CREATE_WORLD, new TTEventCreateWorld("Earth","EarthPassword"),null);
+		String worldName = config.getString("world.name"); 
+		String worldPassword = config.getString("world.password"); 
+		TTEventWrapper wrapper = new TTEventWrapper(TTEventType.CREATE_WORLD, new TTEventCreateWorld(worldName,worldPassword),new EventHandlerResultChecker());
 		eventPublisher.onData(wrapper);
 		
-		eventPublisher.onData(new TTEventCreateMap(config.getDouble("world.longitude.west"),
+		/*
+		eventPublisher.onData(new TTEventCreateTerritory(config.getDouble("world.longitude.west"),
 					config.getDouble("world.longitude.east"),
 					config.getInt("world.xsplits"),
 					config.getDouble("world.latitude.south"),
 					config.getDouble("world.latitude.north"),
 					config.getInt("world.ysplits")));
+					*/
 
 	
 
@@ -132,37 +166,6 @@ public class TerraTower {
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-	}
-
-	/**
-	 * Create Event Disruptor
-	 * @return 
-	 */
-	static TTEventWrapperQueuer createEventQueue(String logFile) {
-		// Executor that will be used to construct new threads for consumers
-        Executor executor = Executors.newCachedThreadPool();
-
-        // The factory for the event
-        TTEventWrapperFactory factory = new TTEventWrapperFactory();
-
-        // Specify the size of the ring buffer, must be power of 2.
-        int bufferSize = 1024;
-
-        // Construct the Disruptor
-        Disruptor<TTEventWrapper> disruptor = new Disruptor<TTEventWrapper>(factory, bufferSize, executor);
-
-        // Connect the handler
-        disruptor.handleEventsWith(new TTEventWrapperHandler());
-	        
-        // Start the Disruptor, starts all threads running
-        disruptor.start();
-
-        // Get the ring buffer from the Disruptor to be used for publishing.
-        RingBuffer<TTEventWrapper> ringBuffer = disruptor.getRingBuffer();
-
-        TTEventWrapperQueuer localEventPublisher = new TTEventWrapperQueuer(ringBuffer,logFile);
-        
-        return(localEventPublisher);
 	}
 		
 }
