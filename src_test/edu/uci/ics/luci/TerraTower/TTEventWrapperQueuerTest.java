@@ -12,18 +12,17 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minidev.json.JSONObject;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateMap;
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreatePlayer;
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateWorld;
-import edu.uci.ics.luci.TerraTower.world.WorldManager;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
+import edu.uci.ics.luci.TerraTower.events.TTEventPlaceTower;
+import edu.uci.ics.luci.TerraTower.events.TTEventType;
 import edu.uci.ics.luci.utility.Globals;
 
 public class TTEventWrapperQueuerTest {
@@ -44,35 +43,7 @@ public class TTEventWrapperQueuerTest {
 	public void tearDown() throws Exception {
 	}
 	
-	private class ResultChecker implements TTEventHandlerResultListener{
-		
-		public Boolean resultOK = null;
-		private String expect;
-		
-		ResultChecker(boolean expectError){
-			if(expectError){
-				this.expect = "true";
-			}
-			else{
-				this.expect = "false";
-			}
-		}
-
-		@Override
-		public void onFinish(JSONObject result) {
-			if(result == null){
-				resultOK = false;
-			}
-			
-			if(result.get("error").equals(this.expect)){
-				resultOK = true;
-			}
-			else{
-				resultOK = false;
-			}
-		}
-		
-	}
+	
 
 	@Test
 	public void testLogging() {
@@ -88,37 +59,97 @@ public class TTEventWrapperQueuerTest {
 		TTEventWrapperQueuer eventPublisher = TerraTower.createEventQueue(logFileName);     
 		globals.addQuittable(eventPublisher);
 		
-		WorldManager wm = new WorldManager();
-		globals.setWorldManager(wm);
+		String worldName = "earth";
+		String worldPassword = "earthPassword";
 		
-		String worldName = "Earth";
-		String password = "EarthPassword";
-		
-		TTEventCreateWorld ttEvent1 = new TTEventCreateWorld(worldName,password);
+		TTEventCreateWorld ttEvent1 = new TTEventCreateWorld(worldName,worldPassword);
 		ResultChecker resultChecker = new ResultChecker(false);
 		TTEventWrapper event = new TTEventWrapper(TTEventType.CREATE_WORLD,ttEvent1,resultChecker);
 		events.add(event);
 		eventPublisher.onData(event);
-		while(resultChecker.resultOK == null){};
-		assertTrue(resultChecker.resultOK);
+		synchronized(resultChecker.getSemaphore()){
+			while(resultChecker.getResultOK() == null){
+				try {
+					resultChecker.getSemaphore().wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		try{
+			assertTrue(resultChecker.getResultOK());
+		}
+		catch(AssertionError e){
+			System.err.println(resultChecker.getResults().toJSONString());
+			throw e;
+		}
 		
-		TTEventCreateMap ttEvent2 = new TTEventCreateMap(worldName,password,-180.0,180.0,10,-90,90,10);
+		TTEventCreateTerritory ttEvent2 = new TTEventCreateTerritory(worldName,worldPassword,-180.0,180.0,10,-90.0,90.0,10);
 		resultChecker = new ResultChecker(false);
-		event = new TTEventWrapper(TTEventType.CREATE_MAP,ttEvent2,resultChecker);
+		event = new TTEventWrapper(TTEventType.CREATE_TERRITORY,ttEvent2,resultChecker);
 		events.add(event);
 		eventPublisher.onData(event);
-		while(resultChecker.resultOK == null){};
-		assertTrue(resultChecker.resultOK);
+		synchronized(resultChecker.getSemaphore()){
+			while(resultChecker.getResultOK() == null){
+				try {
+					resultChecker.getSemaphore().wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		try{
+			assertTrue(resultChecker.getResultOK());
+		}
+		catch(AssertionError e){
+			System.err.println(resultChecker.getResults().toJSONString());
+			throw e;
+		}
 		
 		String playerName = "Player Name";
 		String playerPassword = "Player Password";
-		TTEventCreatePlayer ttEvent3 = new TTEventCreatePlayer(playerName,playerPassword);
+		TTEventCreatePlayer ttEvent3 = new TTEventCreatePlayer(worldName,worldPassword,playerName,playerPassword);
 		resultChecker = new ResultChecker(false);
 		event = new TTEventWrapper(TTEventType.CREATE_PLAYER,ttEvent3,resultChecker);
 		events.add(event);
 		eventPublisher.onData(event);
-		while(resultChecker.resultOK == null){};
-		assertTrue(resultChecker.resultOK);
+		synchronized(resultChecker.getSemaphore()){
+			while(resultChecker.getResultOK() == null){
+				try {
+					resultChecker.getSemaphore().wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		try{
+			assertTrue(resultChecker.getResultOK());
+		}
+		catch(AssertionError e){
+			System.err.println(resultChecker.getResults().toJSONString());
+			throw e;
+		}
+		
+		double lat = 0.0d;
+		double lng = 0.0d;
+		double alt = 0.0d;
+		TTEventPlaceTower ttEvent4 = new TTEventPlaceTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
+		resultChecker = new ResultChecker(false);
+		event = new TTEventWrapper(TTEventType.PLACE_TOWER,ttEvent4,resultChecker);
+		events.add(event);
+		eventPublisher.onData(event);
+		synchronized(resultChecker.getSemaphore()){
+			while(resultChecker.getResultOK() == null){
+				try {
+					resultChecker.getSemaphore().wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		try{
+			assertTrue(resultChecker.getResultOK());
+		}
+		catch(AssertionError e){
+			System.err.println(resultChecker.getResults().toJSONString());
+			throw e;
+		}
 		
 		Globals.getGlobals().setQuitting(true);
 		

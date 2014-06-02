@@ -7,8 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -82,10 +80,7 @@ public class TTEventWrapperQueuer implements Quittable{
 			/* Write event to log */
 			if (logWriter != null) {
 				try {
-					JSONObject json = new JSONObject();
-					json.put("timestamp",""+System.currentTimeMillis());
-					json.put("event_wrapper", incoming.toJSON());
-					logWriter.append(json.toJSONString());
+					logWriter.append(incoming.toJSON().toJSONString());
 					logWriter.newLine();
 					logWriter.flush();
 				} catch (IOException exception) {
