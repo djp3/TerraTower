@@ -34,13 +34,19 @@ public class PasswordUtilsTest {
 	public void test() {
 		//this is to force a UTF-8 check
 		Globals.setGlobals(new GlobalsTerraTower("TEST VERSION"));
-		String p = new String("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()-_[{]};:'\"\\|,<.>/?åéøüñ");
+		String p = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()-_[{]};:'\"\\|,<.>/?åéøüñ";
 		
 		byte[] first = PasswordUtils.hashPassword(p);
 		byte[] second = PasswordUtils.hashPassword(p);
 		assertTrue(Arrays.equals(first,second));
 		
 		assertTrue(Arrays.equals(first,PasswordUtils.hexStringToByteArray(PasswordUtils.bytesToHexString(first)))); 
+		
+		
+		assertTrue(PasswordUtils.checkPassword((String)null,(byte[])null));
+		assertTrue(PasswordUtils.checkPassword((byte[])null,(byte[])null));
+		assertTrue(PasswordUtils.checkPassword(p, PasswordUtils.hashPassword(p)));
+		assertTrue(PasswordUtils.checkPassword(PasswordUtils.hashPassword(p), PasswordUtils.hashPassword(p)));
 	}
 
 }

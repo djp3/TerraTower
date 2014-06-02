@@ -3,6 +3,7 @@ package edu.uci.ics.luci.TerraTower;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,7 +24,9 @@ public class PasswordUtils {
 	public static byte[] hashPassword(String password) {
 		byte[] hash = null;
 		try {
-			hash = digest.digest(password.getBytes("UTF-8"));
+			if(password != null){
+				hash = digest.digest(password.getBytes("UTF-8"));
+			}
 		} catch (UnsupportedEncodingException e) {
 			getLog().fatal("Can't support UTF-8\n"+e);
 		}
@@ -38,7 +41,7 @@ public class PasswordUtils {
 		}
 	}
 	
-	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
+	final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 	public static String bytesToHexString(byte[] bytes) {
 	    char[] hexChars = new char[bytes.length * 2];
 	    for ( int j = 0; j < bytes.length; j++ ) {
@@ -58,5 +61,21 @@ public class PasswordUtils {
 	    }
 	    return data;
 	}
+
+	public static boolean checkPassword(String password, byte[] p) {
+		if((password == null) && (p==null)){
+			return true;
+		}
+		return (Arrays.equals(p,PasswordUtils.hashPassword(password)));
+	}
+	
+
+	public static boolean checkPassword(byte[] a, byte[] b) {
+		if((a == null) && (b==null)){
+			return true;
+		}
+		return (Arrays.equals(a,b));
+	}
+
 
 }
