@@ -3,14 +3,20 @@ package edu.uci.ics.luci.TerraTower;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateMap;
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreatePlayer;
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventCreateWorld;
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventHandlerCreateMap;
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventHandlerCreatePlayer;
-import edu.uci.ics.luci.TerraTower.gameEvents.TTEventHandlerCreateWorld;
-
 import net.minidev.json.JSONObject;
+import edu.uci.ics.luci.TerraTower.events.TTEvent;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
+import edu.uci.ics.luci.TerraTower.events.TTEventPlaceTower;
+import edu.uci.ics.luci.TerraTower.events.TTEventType;
+import edu.uci.ics.luci.TerraTower.events.TTEventVoid;
+import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandler;
+import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerCreatePlayer;
+import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerCreateTerritory;
+import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerCreateWorld;
+import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerPlaceTower;
+import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerVoid;
 
 /**
  * Setting the eventType and the event is required
@@ -20,12 +26,21 @@ import net.minidev.json.JSONObject;
 public class TTEventWrapper {
 	
 	/* The basic data encapsulated by the wrapper */
+	private long timestamp;		//Official time of the event
 	private TTEventType eventType;
 	private TTEvent event;
-	private TTEventHandler handler;
-	private List<TTEventHandlerResultListener> resultListeners;
+	private transient TTEventHandler handler;
+	private transient List<TTEventHandlerResultListener> resultListeners;
 	
 	/* Getters and Setters */
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
 	public TTEventType getEventType() {
 		return eventType;
 	}
@@ -51,17 +66,39 @@ public class TTEventWrapper {
 		this.handler = handler;
 	}
 	
+	/** This is only helpful for testing
+	 * 
+	 */
+	public void resetEvent(){
+		switch(this.getEventType()){
+		case CREATE_WORLD: this.setEvent(new TTEventCreateWorld((String)null, (String)null));
+			break;
+		case CREATE_TERRITORY: this.setEvent(new TTEventCreateTerritory((String)null, (String)null, null, null, null, null, null, null));
+			break;
+		case CREATE_PLAYER: this.setEvent(new TTEventCreatePlayer((String)null, (String)null, null, null));
+			break;
+		case PLACE_TOWER: this.setEvent(new TTEventPlaceTower((String)null, (String)null, null, null, null, null, null));
+			break;
+		case VOID: this.setEvent(new TTEventVoid());
+			break;
+		default: this.setEvent(null);
+			break;
+		
+		}
+	}
 	public void resetEventHandler(){
 		switch(this.getEventType()){
 		case CREATE_WORLD: this.setHandler(new TTEventHandlerCreateWorld());
 			break;
-		case CREATE_MAP: this.setHandler(new TTEventHandlerCreateMap());
+		case CREATE_TERRITORY: this.setHandler(new TTEventHandlerCreateTerritory());
 			break;
 		case CREATE_PLAYER: this.setHandler(new TTEventHandlerCreatePlayer());
 			break;
-		case VOID: this.setHandler(null);
+		case PLACE_TOWER: this.setHandler(new TTEventHandlerPlaceTower());
 			break;
-		default:
+		case VOID: this.setHandler(new TTEventHandlerVoid());
+			break;
+		default: this.setHandler(null);
 			break;
 		
 		}
@@ -70,13 +107,20 @@ public class TTEventWrapper {
 	public void checkConsistency(){
 		boolean problem = false;
 		switch(this.getEventType()){
-		case CREATE_MAP: problem = (!(this.getEvent() instanceof TTEventCreateMap));
+		case CREATE_TERRITORY: problem = (!(this.getEvent() instanceof TTEventCreateTerritory));
+							   problem |= (!(this.getHandler() instanceof TTEventHandlerCreateTerritory));
 			break;
 		case CREATE_PLAYER: problem = (!(this.getEvent() instanceof TTEventCreatePlayer));
+							   problem |= (!(this.getHandler() instanceof TTEventHandlerCreatePlayer));
 			break;
 		case CREATE_WORLD: problem = (!(this.getEvent() instanceof TTEventCreateWorld));
+							   problem |= (!(this.getHandler() instanceof TTEventHandlerCreateWorld));
+			break;
+		case PLACE_TOWER: problem = (!(this.getEvent() instanceof TTEventPlaceTower));
+							   problem |= (!(this.getHandler() instanceof TTEventHandlerPlaceTower));
 			break;
 		case VOID: problem = (!(this.getEvent() instanceof TTEventVoid));
+							   problem |= (!(this.getHandler() instanceof TTEventHandlerVoid));
 			break;
 		default:
 			problem = true;
@@ -102,11 +146,14 @@ public class TTEventWrapper {
 	}
 	
 	
-	
-	/**
-	 *	Constructor 
-	 */
 	TTEventWrapper(TTEventType eventType,TTEvent event,TTEventHandlerResultListener resultListener){
+		this(System.currentTimeMillis(),eventType,event,resultListener);
+	}
+
+	
+	TTEventWrapper(long eventTime,TTEventType eventType,TTEvent event,TTEventHandlerResultListener resultListener){
+		this.setTimestamp(eventTime);
+		
 		if(eventType == null){
 			throw new IllegalArgumentException("eventType can't be null");
 		}
@@ -121,12 +168,14 @@ public class TTEventWrapper {
 	}
 	
 	
-	/**
-	 *	Constructor 
-	 * @param eventType
-	 * @param event
-	 */
 	TTEventWrapper(TTEventType eventType,TTEvent event,List<TTEventHandlerResultListener> resultListeners){
+		this(System.currentTimeMillis(),eventType,event,resultListeners);
+	}
+
+	
+	TTEventWrapper(long eventTime,TTEventType eventType,TTEvent event,List<TTEventHandlerResultListener> resultListeners){
+		
+		this.setTimestamp(eventTime);
 		if(eventType == null){
 			throw new IllegalArgumentException("eventType can't be null");
 		}
@@ -145,10 +194,12 @@ public class TTEventWrapper {
 	}
 	
 	void set(TTEventWrapper ttEventWrapper){
+		this.setTimestamp(ttEventWrapper.getTimestamp());
 		this.setEventType(ttEventWrapper.getEventType());
-		TTEvent event = ttEventWrapper.getEvent();
-		this.setEvent(event);
-		this.setResultListeners(ttEventWrapper.getResultListeners());
+		this.setEvent(ttEventWrapper.getEvent());
+		this.setHandler(ttEventWrapper.getHandler());
+		this.getResultListeners().clear();
+		this.getResultListeners().addAll(ttEventWrapper.getResultListeners());
 		checkConsistency();
 	}
 	
@@ -167,12 +218,14 @@ public class TTEventWrapper {
 	
 	public JSONObject toJSON(){
 		JSONObject ret = new JSONObject();
+		ret.put("timestamp",""+getTimestamp());
 		ret.put("eventType",getEventType().toString());
 		ret.put("event", getEvent().toJSON());
 		return ret;
 	}
 	
 	static public TTEventWrapper fromJSON(JSONObject in){
+		long eventTime = Long.parseLong((String) in.get("timestamp"));
 		TTEventType eventType = TTEventType.fromString((String) in.get("eventType"));
 		TTEvent event;
 		switch(eventType){
@@ -180,20 +233,19 @@ public class TTEventWrapper {
 				break;
 			case CREATE_WORLD: event = TTEventCreateWorld.fromJSON((JSONObject)in.get("event"));
 				break;
-			case CREATE_MAP: event = TTEventCreateMap.fromJSON((JSONObject)in.get("event"));
+			case CREATE_TERRITORY: event = TTEventCreateTerritory.fromJSON((JSONObject)in.get("event"));
 				break;
 			case CREATE_PLAYER: event = TTEventCreatePlayer.fromJSON((JSONObject)in.get("event"));
+				break;
+			case PLACE_TOWER: event = TTEventPlaceTower.fromJSON((JSONObject)in.get("event"));
 				break;
 			default:event = null;
 				break;
 		}
-		TTEventWrapper ret = new TTEventWrapper(eventType,event,(TTEventHandlerResultListener)null);
+		TTEventWrapper ret = new TTEventWrapper(eventTime,eventType,event,(TTEventHandlerResultListener)null);
 		return ret;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -201,15 +253,10 @@ public class TTEventWrapper {
 		result = prime * result + ((event == null) ? 0 : event.hashCode());
 		result = prime * result
 				+ ((eventType == null) ? 0 : eventType.hashCode());
-		result = prime * result + ((handler == null) ? 0 : handler.hashCode());
-		result = prime * result
-				+ ((resultListeners == null) ? 0 : resultListeners.hashCode());
+		result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -232,22 +279,13 @@ public class TTEventWrapper {
 		if (eventType != other.eventType) {
 			return false;
 		}
-		if (handler == null) {
-			if (other.handler != null) {
-				return false;
-			}
-		} else if (!handler.equals(other.handler)) {
-			return false;
-		}
-		if (resultListeners == null) {
-			if (other.resultListeners != null) {
-				return false;
-			}
-		} else if (!resultListeners.equals(other.resultListeners)) {
+		if (timestamp != other.timestamp) {
 			return false;
 		}
 		return true;
 	}
+
+
 
 
 }
