@@ -1,12 +1,36 @@
+/*
+	Copyright 2014
+		University of California, Irvine (c/o Donald J. Patterson)
+*/
+/*
+	This file is part of the Laboratory for Ubiquitous Computing java TerraTower game, i.e. "TerraTower"
+
+    TerraTower is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Utilities is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Utilities.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package edu.uci.ics.luci.TerraTower.world;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
+import edu.uci.ics.luci.TerraTower.gameElements.Player;
+import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 
 public class WorldManager {
 	
@@ -19,62 +43,96 @@ public class WorldManager {
 	}
 	
 	
-	HashMap<String, byte[]> worlds = new HashMap<String,byte[]>();
-	HashMap<String,Map> maps = new HashMap<String,Map>();
+	//World password 
+	byte[] worldHashedPassword;
+	Territory territory = null;
 	
-	HashMap<String,byte[]> players = new HashMap<String,byte[]>();
+	//Map from playerName to player
+	HashMap<String,Player> players;
 	
+	List<Tower> towers;
 	
-	public boolean worldExists(String worldName) {
-		return worlds.containsKey(worldName);
+	public WorldManager(String password){
+		this(PasswordUtils.hashPassword(password));
 	}
 	
-	public boolean passwordGood(String worldName,String password) {
-		if(!worldExists(worldName)){
-			return false;
-		}
-		byte[] p = worlds.get(worldName);
-		return (Arrays.equals(p,PasswordUtils.hashPassword(password)));
+	public WorldManager(byte[] hashedPassword){
+		this.worldHashedPassword=Arrays.copyOf(hashedPassword,hashedPassword.length);
+		
+		players = new HashMap<String,Player>();
+	
+		towers = new ArrayList<Tower>();
+	}
+	
+	
+	public boolean passwordGood(String proposedPassword) {
+		return(PasswordUtils.checkPassword(proposedPassword,worldHashedPassword));
 	}
 
-	public boolean create(String name, String password) {
-		if(!worldExists(name)){
-			worlds.put(name, PasswordUtils.hashPassword(password));
-			return worldExists(name);
+	public boolean passwordGood(byte[] proposedPassword) {
+		return(PasswordUtils.checkPassword(proposedPassword,worldHashedPassword));
+	}
+
+	public void setTerritory(Territory t) {
+		territory=t;
+	}
+	
+	public Territory getTerritory(){
+		return territory;
+	}
+
+	public boolean playerExists(String playerName) {
+		Player player = players.get(playerName);
+		return(player!=null);
+	}
+
+	public Player createPlayer(String playerName, byte[] hashedPassword) {
+		if(playerExists(playerName)){
+			return null;
+		}
+		Player player = new Player(playerName,hashedPassword);
+		players.put(playerName, player);
+		return player;
+	}
+	
+	public Player getPlayer(String playerName,String password){
+		Player player= players.get(playerName);
+		if(player == null){
+			return null;
+		}
+		if(!player.passwordGood(password)){
+			return null;
+		}
+		return(player);
+	}
+	
+	public Player getPlayer(String playerName,byte[] hashedPassword){
+		Player player= players.get(playerName);
+		if(player == null){
+			return null;
+		}
+		if(!player.passwordGood(hashedPassword)){
+			return null;
+		}
+		return(player);
+	}
+	
+	public boolean towerPresent(int x,int y){
+		return(territory.towerPresent(x,y));
+	}
+	
+	public boolean addTower(Tower tower){
+		if(towerPresent(tower.getX(),tower.getY())){
+			return false;
+		}
+		if(territory.addTower(tower)){
+			towers.add(tower);
+			return true;
 		}
 		else{
 			return false;
 		}
-	}
-	
-	public boolean mapExists(String worldName){
-		return(maps.containsKey(worldName));
-	}
-
-	public boolean addMap(String worldName, String password, Map map) {
-		if(!worldExists(worldName)){
-			return false;
-		}
-		if(!passwordGood(worldName,password)){
-			return false;
-		}
-		if(mapExists(worldName)){
-			return false;
-		}
-		maps.put(worldName, map);
-		return true;
-	}
-
-	public boolean playerExists(String playerName) {
-		return players.containsKey(playerName);
-	}
-
-	public boolean createPlayer(String playerName, byte[] hashedPassword) {
-		if(playerExists(playerName)){
-			return false;
-		}
-		players.put(playerName, hashedPassword);
-		return true;
+		
 	}
 	
 }
