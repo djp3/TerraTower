@@ -67,9 +67,9 @@ public class GridCellTest {
 		gc.addTower(new Tower(null, x, y));
 		assertTrue(gc.towerPresent());
 		
-		assertTrue(!gc.bombPresent());
+		assertTrue(gc.numBombsPresent() == 0);
 		gc.addBomb(new Bomb(null, x, y,0,0));
-		assertTrue(gc.bombPresent());
+		assertTrue(gc.numBombsPresent() == 1);
 		
 		assertTrue(gc.getTower().getOwner()==null);
 		assertTrue(gc.getTower().getX()==x);

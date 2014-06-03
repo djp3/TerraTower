@@ -29,6 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
+import edu.uci.ics.luci.TerraTower.gameElements.Bomb;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 
@@ -99,6 +100,24 @@ public class WorldManagerTest {
 		assertTrue(!wm.addTower(t));
 		
 		assertTrue(wm.towerPresent(0, 0));
+	}
+	
+	@Test
+	public void testBomb() {
+		
+		String name = "foo"+System.currentTimeMillis();
+		String password = "foo"+System.currentTimeMillis();
+		WorldManager wm = new WorldManager(password);
+		
+		Territory territory = new Territory(-1.0, 1.0, 2, -1.0, 1.0, 2);
+		wm.setTerritory(territory);
+		assertTrue(wm.numBombsPresent(0, 0) == 0);
+		Player player = wm.createPlayer("player"+name, PasswordUtils.hashPassword(password));
+		Bomb b = new Bomb(player,0,0,5,5);
+		assertTrue(wm.addBomb(b));
+		assertTrue(wm.addBomb(b));
+		
+		assertTrue(wm.numBombsPresent(0, 0) == 2);
 	}
 
 }

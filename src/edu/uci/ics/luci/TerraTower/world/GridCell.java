@@ -20,7 +20,9 @@
 */
 package edu.uci.ics.luci.TerraTower.world;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -48,7 +50,7 @@ public class GridCell {
 	private int y;
 	
 	private Tower t = null;
-	private TreeMap<Long,Bomb> bombs = null;
+	private TreeMap<Long,List<Bomb>> bombs = null;
 	private TreeMap<Double,Double> alts;
 	
 	private Pair<Player,Integer> owner;
@@ -80,11 +82,11 @@ public class GridCell {
 		this.t = t;
 	}
 
-	public TreeMap<Long, Bomb> getBombs() {
+	public TreeMap<Long, List<Bomb>> getBombs() {
 		return bombs;
 	}
 
-	public void setBombs(TreeMap<Long, Bomb> bombs) {
+	public void setBombs(TreeMap<Long, List<Bomb>> bombs) {
 		this.bombs = bombs;
 	}
 
@@ -123,7 +125,7 @@ public class GridCell {
 	public GridCell(int x,int y){
 		setX(x);
 		setY(y);
-		setBombs(new TreeMap<Long,Bomb>());
+		setBombs(new TreeMap<Long,List<Bomb>>());
 		setAlts(new TreeMap<Double,Double>());
 		setOwner(new Pair<Player,Integer>(null,0));
 		setProposedOwner(new HashMap<Player,Integer>());
@@ -139,14 +141,24 @@ public class GridCell {
 	}
 	
 
-	public boolean bombPresent() {
-		return(bombs.size()>0);
+	public int numBombsPresent() {
+		int count = 0;
+		for(List<Bomb> e:bombs.values()){
+			count += e.size();
+		}
+		return(count);
 	}
 	
 	public boolean addBomb(Bomb bomb) {
-		int size = bombs.size();
-		bombs.put(bomb.getExplosionTime(), bomb);
-		return (bombs.size() == (size+1));
+		int size = numBombsPresent();
+		List<Bomb> list = getBombs().get(bomb.getExplosionTime());
+		if(list == null){
+			list = new ArrayList<Bomb>();
+		}
+		list.add(bomb);
+		bombs.put(bomb.getExplosionTime(),list);
+		int size2 = numBombsPresent();
+		return (size2 == (size+1));
 	}
 
 	public void updateAltitude(double alt) {

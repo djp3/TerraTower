@@ -29,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
+import edu.uci.ics.luci.TerraTower.gameElements.Bomb;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 
@@ -51,6 +52,8 @@ public class WorldManager {
 	HashMap<String,Player> players;
 	
 	List<Tower> towers;
+	List<Bomb> bombs;
+
 	
 	public WorldManager(String password){
 		this(PasswordUtils.hashPassword(password));
@@ -62,6 +65,7 @@ public class WorldManager {
 		players = new HashMap<String,Player>();
 	
 		towers = new ArrayList<Tower>();
+		bombs = new ArrayList<Bomb>();
 	}
 	
 	
@@ -137,6 +141,16 @@ public class WorldManager {
 
 	public void stepTowerTerritoryGrowth() {
 		getTerritory().stepTowerTerritoryGrowth(10,2);
+	}
+	
+	
+
+	public int numBombsPresent(int x,int y){
+		return(territory.numBombsPresent(x,y));
+	}
+	
+	public boolean addBomb(Bomb bomb){
+		return(territory.addBomb(bomb));
 	}
 	
 }

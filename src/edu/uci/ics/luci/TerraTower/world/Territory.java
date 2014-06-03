@@ -474,8 +474,8 @@ public class Territory {
 	}
 
 
-	public boolean bombPresent(int x, int y) {
-		return(grid[x][y].bombPresent());
+	public int numBombsPresent(int x, int y) {
+		return(grid[x][y].numBombsPresent());
 	}
 
 

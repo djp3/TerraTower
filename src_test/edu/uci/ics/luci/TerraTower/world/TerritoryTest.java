@@ -252,9 +252,9 @@ public class TerritoryTest {
 	public void testBomb() {
 		
 		Territory t = new Territory(-1.0,1.0,2,-1.0,1.0,2);
-		assertTrue(!t.bombPresent(0, 0));
+		assertTrue(t.numBombsPresent(0, 0) == 0);
 		assertTrue(t.addBomb(new Bomb(new Player("name",PasswordUtils.hashPassword("password")),0, 0,5,5)));
-		assertTrue(t.bombPresent(0, 0));
+		assertTrue(t.numBombsPresent(0, 0) == 1 );
 	}
 	
 	@Test
