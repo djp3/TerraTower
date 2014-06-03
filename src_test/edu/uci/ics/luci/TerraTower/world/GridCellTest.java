@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with Utilities.  If not, see <http://www.gnu.org/licenses/>.
 */
-package edu.uci.ics.luci.TerraTower;
+package edu.uci.ics.luci.TerraTower.world;
 
 import static org.junit.Assert.*;
 
@@ -30,8 +30,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.uci.ics.luci.TerraTower.PasswordUtils;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
+import edu.uci.ics.luci.TerraTower.world.GridCell;
+import edu.uci.ics.luci.utility.datastructure.Pair;
 
 public class GridCellTest {
 
@@ -82,6 +85,55 @@ public class GridCellTest {
 	}
 	
 	@Test
+	public void testLowerTowerTerritoryLevel(){
+		GridCell a = new GridCell(0,0);
+		a.setOwner(new Pair<Player,Integer>(null,10));
+		a.lowerTowerTerritoryLevel(1, 1);
+		assertTrue(a.getOwner().getSecond() == 9);
+		a.lowerTowerTerritoryLevel(9, 1);
+		assertTrue(a.getOwner().getSecond() == 1);
+		
+		a.setOwner(new Pair<Player,Integer>(null,null));
+		a.lowerTowerTerritoryLevel(1, 1);
+		assertTrue(a.getOwner().getSecond() == 1);
+		a.lowerTowerTerritoryLevel(9, 1);
+		assertTrue(a.getOwner().getSecond() == 1);
+	}
+	
+	
+	@Test
+	public void testRaiseTowerTerritoryLevel(){
+		GridCell a = new GridCell(0,0);
+		a.setOwner(new Pair<Player,Integer>(null,10));
+		a.raiseTowerTerritoryLevel(1, 11);
+		assertTrue(a.getOwner().getSecond() == 11);
+		a.raiseTowerTerritoryLevel(9, 1);
+		assertTrue(a.getOwner().getSecond() == 1);
+		
+		a.setOwner(new Pair<Player,Integer>(null,null));
+		a.raiseTowerTerritoryLevel(1, 10);
+		assertTrue(a.getOwner().getSecond() == 10);
+		a.raiseTowerTerritoryLevel(9, 20);
+		assertTrue(a.getOwner().getSecond() == 19);
+	}
+
+	@Test
+	public void testResolveOwner(){
+		GridCell gc = new GridCell(0,0);
+		gc.getProposedOwner().clear();
+		Player a = new Player("a",PasswordUtils.hashPassword("a"));
+		Player b = new Player("b",PasswordUtils.hashPassword("a"));
+		Player c = new Player("c",PasswordUtils.hashPassword("a"));
+		
+		gc.getProposedOwner().put(a, 10);
+		gc.getProposedOwner().put(b, 11);
+		gc.getProposedOwner().put(c, 9);
+		
+		gc.resolveOwner();
+		assertTrue(gc.getOwner().getFirst().equals(b));
+	}
+	
+	@Test
 	public void testEquals(){
 		GridCell a = new GridCell(1,1);
 		GridCell b = new GridCell(1,1);
@@ -129,7 +181,20 @@ public class GridCellTest {
 		assertTrue(!a.equals(b));
 		assertTrue(!b.equals(a));
 		assertTrue(a.hashCode() != b.hashCode());
-		b.setX(a.getY());
+		b.setY(a.getY());
+		
+		assertTrue(a.equals(b));
+		a.setOwner(null);
+		assertTrue(!a.equals(b));
+		assertTrue(!b.equals(a));
+		assertTrue(a.hashCode() != b.hashCode());
+		a.setOwner(new Pair<Player,Integer>(new Player("playerName",PasswordUtils.hashPassword("playerPassword")),10));
+		assertTrue(!a.equals(b));
+		assertTrue(!b.equals(a));
+		assertTrue(a.hashCode() != b.hashCode());
+		b.setOwner(a.getOwner());
+		assertTrue(a.equals(b));
+		assertTrue(b.equals(a));
 	}
 
 

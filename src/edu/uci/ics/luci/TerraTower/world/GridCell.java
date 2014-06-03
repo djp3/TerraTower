@@ -18,14 +18,19 @@
     You should have received a copy of the GNU General Public License
     along with Utilities.  If not, see <http://www.gnu.org/licenses/>.
 */
-package edu.uci.ics.luci.TerraTower;
+package edu.uci.ics.luci.TerraTower.world;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
+import edu.uci.ics.luci.utility.datastructure.Pair;
 
 public class GridCell {
 	
@@ -43,6 +48,12 @@ public class GridCell {
 	
 	private Tower t = null;
 	private TreeMap<Double,Double> alts;
+	
+	private Pair<Player,Integer> owner;
+	private transient Map<Player,Integer> proposedOwner;
+
+
+	private transient boolean marker = false;
 	
 	public int getX() {
 		return x;
@@ -76,10 +87,36 @@ public class GridCell {
 		this.alts = alts;
 	}
 
+	public Pair<Player, Integer> getOwner() {
+		return owner;
+	}
+
+	public void setOwner(Pair<Player, Integer> owner) {
+		this.owner = owner;
+	}
+
+	public Map<Player, Integer> getProposedOwner() {
+		return proposedOwner;
+	}
+
+	public void setProposedOwner(Map<Player, Integer> proposedOwner) {
+		this.proposedOwner = proposedOwner;
+	}
+	
+	public boolean getMarker() {
+		return marker;
+	}
+
+	public void setMarker(boolean marker) {
+		this.marker = marker;
+	}
+
 	public GridCell(int x,int y){
 		setX(x);
 		setY(y);
 		setAlts(new TreeMap<Double,Double>());
+		setOwner(new Pair<Player,Integer>(null,0));
+		setProposedOwner(new HashMap<Player,Integer>());
 	}
 
 	public boolean towerPresent() {
@@ -103,11 +140,59 @@ public class GridCell {
 		return x/alts.size();
 	}
 
+
+	public void lowerTowerTerritoryLevel(int delta,int floor) {
+		Pair<Player, Integer> o = getOwner();
+		if(o != null){
+			Integer level = o.getSecond();
+			if(level != null){
+				level -= delta;
+				if(level < floor){
+					level = floor;
+				}
+			}
+			else{
+				level = floor;
+			}
+			setOwner(new Pair<Player,Integer>(o.getFirst(),level));
+		}
+	}
+	
+	public void raiseTowerTerritoryLevel(int delta,int ceiling) {
+		Pair<Player, Integer> o = getOwner();
+		if(o != null){
+			Integer level = o.getSecond();
+			if(level != null){
+				level += delta;
+				if(level > ceiling ){
+					level = ceiling;
+				}
+			}
+			else{
+				level = ceiling;
+			}
+			setOwner(new Pair<Player,Integer>(o.getFirst(),level));
+		}
+	}
+
+	public void resolveOwner() {
+		Player maxPlayer = null;
+		int max = -1;
+		for( Entry<Player, Integer> po : getProposedOwner().entrySet()){
+			if(po.getValue() > max){
+				maxPlayer = po.getKey();
+				max = po.getValue();
+			}
+		}
+		setOwner(new Pair<Player,Integer>(maxPlayer,max));
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((alts == null) ? 0 : alts.hashCode());
+		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
 		result = prime * result + ((t == null) ? 0 : t.hashCode());
 		result = prime * result + x;
 		result = prime * result + y;
@@ -133,6 +218,13 @@ public class GridCell {
 		} else if (!alts.equals(other.alts)) {
 			return false;
 		}
+		if (owner == null) {
+			if (other.owner != null) {
+				return false;
+			}
+		} else if (!owner.equals(other.owner)) {
+			return false;
+		}
 		if (t == null) {
 			if (other.t != null) {
 				return false;
@@ -148,5 +240,8 @@ public class GridCell {
 		}
 		return true;
 	}
+	
+	
+	
 
 }
