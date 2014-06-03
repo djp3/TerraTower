@@ -1,6 +1,27 @@
+/*
+	Copyright 2014
+		University of California, Irvine (c/o Donald J. Patterson)
+*/
+/*
+	This file is part of the Laboratory for Ubiquitous Computing java TerraTower game, i.e. "TerraTower"
+
+    TerraTower is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Utilities is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Utilities.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package edu.uci.ics.luci.TerraTower.world;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -8,9 +29,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.uci.ics.luci.TerraTower.world.Map;
-
-public class MapTest {
+public class TerritoryTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -33,7 +52,7 @@ public class MapTest {
 		
 		//x out of order
 		try{
-			new Map(90.0,-90.0,100,0,10,100);
+			new Territory(90.0,-90.0,100,0,10,100);
 			fail("Should throw exception");
 		}
 		catch(IllegalArgumentException e){
@@ -42,7 +61,7 @@ public class MapTest {
 		
 		//x same 
 		try{
-			new Map(90.0,90.0,100,0,10,100);
+			new Territory(90.0,90.0,100,0,10,100);
 			fail("Should throw exception");
 		}
 		catch(IllegalArgumentException e){
@@ -51,7 +70,7 @@ public class MapTest {
 		
 		//y out of order 
 		try{
-			new Map(-90.0,90.0,100,10,-10,100);
+			new Territory(-90.0,90.0,100,10,-10,100);
 			fail("Should throw exception");
 		}
 		catch(IllegalArgumentException e){
@@ -60,7 +79,7 @@ public class MapTest {
 		
 		//y same
 		try{
-			new Map(-90.0,90.0,100,10,10,100);
+			new Territory(-90.0,90.0,100,10,10,100);
 			fail("Should throw exception");
 		}
 		catch(IllegalArgumentException e){
@@ -69,7 +88,7 @@ public class MapTest {
 		
 		//bad xsplits 
 		try{
-			new Map(-90.0,90.0,-100,-10,10,100);
+			new Territory(-90.0,90.0,-100,-10,10,100);
 			fail("Should throw exception");
 		}
 		catch(IllegalArgumentException e){
@@ -78,7 +97,7 @@ public class MapTest {
 		
 		//bad ysplits 
 		try{
-			new Map(-90.0,90.0,100,-10,10,-100);
+			new Territory(-90.0,90.0,100,-10,10,-100);
 			fail("Should throw exception");
 		}
 		catch(IllegalArgumentException e){
@@ -87,7 +106,7 @@ public class MapTest {
 		
 		//good
 		try{
-			new Map(-90.0,90.0,100,-180.0,180.0,100);
+			new Territory(-90.0,90.0,100,-180.0,180.0,100);
 		}
 		catch(IllegalArgumentException e){
 			fail("Shouldn't throw exception");
@@ -96,7 +115,7 @@ public class MapTest {
 	
 	@Test
 	public void testXIndex() {
-		Map map = new Map(-90.0,90.0,2,-180.0,180.0,2);
+		Territory map = new Territory(-90.0,90.0,2,-180.0,180.0,2);
 		try{
 			map.xIndex(-90.0001);
 			fail("Should throw exception");
@@ -118,7 +137,7 @@ public class MapTest {
 	
 	@Test
 	public void testYIndex() {
-		Map map = new Map(-90.0,90.0,2,-180.0,180.0,2);
+		Territory map = new Territory(-90.0,90.0,2,-180.0,180.0,2);
 		
 		try{
 			map.yIndex(-180.00001);
@@ -143,7 +162,7 @@ public class MapTest {
 	
 	@Test
 	public void testIndex() {
-		Map map = new Map(-90.0,90.0,2,-180.0,180.0,2);
+		Territory map = new Territory(-90.0,90.0,2,-180.0,180.0,2);
 		assertEquals(0,map.index(-90, -180.0).getX());
 		assertEquals(1,map.index(90.0, -180.0).getX());
 		assertEquals(0,map.index(-90.0, 180.0).getX());
