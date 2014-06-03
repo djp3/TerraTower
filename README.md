@@ -3,6 +3,9 @@ TerraTower
 
 An augmented reality physical tower defense inspired game with a splash of capture the flag.  The game engine is in Java and the clients are made in Unity for Android or iOS.
 
+6/2/14
+* Finished implementing the Place Tower event
+
 5/30/14:
 * Went and fixed a bunch of stuff in luci-utility to support log4j v2
 * Set up the framework for the gamemap
