@@ -25,7 +25,7 @@ import net.minidev.json.JSONObject;
 public class EventHandlerResultChecker implements TTEventHandlerResultListener{
 	
 	private Object semaphore = new Object();
-	private JSONObject results;
+	private JSONObject results = null;
 	
 	public Object getSemaphore() {
 		return semaphore;

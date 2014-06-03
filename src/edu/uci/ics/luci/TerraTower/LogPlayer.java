@@ -52,7 +52,7 @@ public class LogPlayer implements Runnable{
 	private TreeMap<Long, TTEventWrapper> events;
 	private boolean realTime;
 	private long numberEventsFired;
-	private ArrayList<MyResultListener> results;
+	private ArrayList<EventHandlerResultChecker> results;
 
 	public long getNumberEventsFired() {
 		return numberEventsFired;
@@ -66,7 +66,7 @@ public class LogPlayer implements Runnable{
 		return events.size();
 	}
 
-	public ArrayList<MyResultListener> getResults() {
+	public ArrayList<EventHandlerResultChecker> getResults() {
 		return results;
 	}
 
@@ -74,7 +74,7 @@ public class LogPlayer implements Runnable{
 		this.q = q;
 		this.realTime = realTime;
 		
-		results = new ArrayList<MyResultListener>();
+		results = new ArrayList<EventHandlerResultChecker>();
 		
 		setNumberEventsFired(0);
 
@@ -88,9 +88,8 @@ public class LogPlayer implements Runnable{
 			String lineFromFile = "";
 			while ((lineFromFile = reader.readLine()) != null) {
 				JSONObject logEntry = (JSONObject) JSONValue .parse(lineFromFile);
-				long timestamp = Long.parseLong((String) logEntry.get("timestamp"));
-				TTEventWrapper ew = TTEventWrapper.fromJSON((JSONObject) logEntry.get("event_wrapper"));
-				events.put(timestamp,ew);
+				TTEventWrapper ew = TTEventWrapper.fromJSON((JSONObject) logEntry);
+				events.put(ew.getTimestamp(),ew);
 			}
 		} finally {
 			if (reader != null) {
@@ -161,17 +160,16 @@ public class LogPlayer implements Runnable{
 			if(realTime){
 				long realElapsed = System.currentTimeMillis() - replayStart;
 				long simElapsed = current.getKey() - logStart;
-				while(realElapsed < simElapsed){
+				while(simElapsed > realElapsed){
 					try {
 						Thread.sleep(simElapsed - realElapsed);
 					} catch (InterruptedException e) {
 					}
 					realElapsed = System.currentTimeMillis() - replayStart;
-					simElapsed = current.getKey() - logStart;
 				}
 			}
 			
-			MyResultListener result = new MyResultListener();
+			EventHandlerResultChecker result = new EventHandlerResultChecker();
 			TTEventWrapper eventWrapper = current.getValue();
 			eventWrapper.addResultListener(result);
 			results.add(result);
@@ -179,6 +177,7 @@ public class LogPlayer implements Runnable{
 			numberEventsFired++;
 			q.onData(current.getValue());
 		}
+		
 		
 	}
 

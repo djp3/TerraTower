@@ -20,6 +20,8 @@
 */
 package edu.uci.ics.luci.TerraTower.events;
 
+import net.minidev.json.JSONObject;
+
 
 public class TTEventCreateWorld extends TTEvent {
 
@@ -29,6 +31,11 @@ public class TTEventCreateWorld extends TTEvent {
 	
 	public TTEventCreateWorld(String worldName, byte[] worldHashedPassword) {
 		super(worldName, worldHashedPassword);
+	}
+	
+	static public TTEventCreateWorld fromJSON(JSONObject in) {
+		TTEvent tt = TTEvent.fromJSON(in);
+		return(new TTEventCreateWorld(tt.getWorldName(), tt.getWorldHashedPassword()));
 	}
 
 }
