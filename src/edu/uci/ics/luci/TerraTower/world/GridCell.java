@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import edu.uci.ics.luci.TerraTower.gameElements.Bomb;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 import edu.uci.ics.luci.utility.datastructure.Pair;
@@ -47,6 +48,7 @@ public class GridCell {
 	private int y;
 	
 	private Tower t = null;
+	private TreeMap<Long,Bomb> bombs = null;
 	private TreeMap<Double,Double> alts;
 	
 	private Pair<Player,Integer> owner;
@@ -76,6 +78,14 @@ public class GridCell {
 
 	public void setTower(Tower t) {
 		this.t = t;
+	}
+
+	public TreeMap<Long, Bomb> getBombs() {
+		return bombs;
+	}
+
+	public void setBombs(TreeMap<Long, Bomb> bombs) {
+		this.bombs = bombs;
 	}
 
 	public TreeMap<Double, Double> getAlts() {
@@ -113,6 +123,7 @@ public class GridCell {
 	public GridCell(int x,int y){
 		setX(x);
 		setY(y);
+		setBombs(new TreeMap<Long,Bomb>());
 		setAlts(new TreeMap<Double,Double>());
 		setOwner(new Pair<Player,Integer>(null,0));
 		setProposedOwner(new HashMap<Player,Integer>());
@@ -125,6 +136,17 @@ public class GridCell {
 	public boolean addTower(Tower tower) {
 		setTower(tower);
 		return towerPresent();
+	}
+	
+
+	public boolean bombPresent() {
+		return(bombs.size()>0);
+	}
+	
+	public boolean addBomb(Bomb bomb) {
+		int size = bombs.size();
+		bombs.put(bomb.getExplosionTime(), bomb);
+		return (bombs.size() == (size+1));
 	}
 
 	public void updateAltitude(double alt) {
@@ -200,6 +222,7 @@ public class GridCell {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((alts == null) ? 0 : alts.hashCode());
+		result = prime * result + ((bombs == null) ? 0 : bombs.hashCode());
 		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
 		result = prime * result + ((t == null) ? 0 : t.hashCode());
 		result = prime * result + x;
@@ -226,6 +249,13 @@ public class GridCell {
 		} else if (!alts.equals(other.alts)) {
 			return false;
 		}
+		if (bombs == null) {
+			if (other.bombs != null) {
+				return false;
+			}
+		} else if (!bombs.equals(other.bombs)) {
+			return false;
+		}
 		if (owner == null) {
 			if (other.owner != null) {
 				return false;
@@ -248,6 +278,8 @@ public class GridCell {
 		}
 		return true;
 	}
+
+
 	
 	
 	

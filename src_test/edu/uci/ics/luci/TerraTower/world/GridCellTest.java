@@ -20,7 +20,8 @@
 */
 package edu.uci.ics.luci.TerraTower.world;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.TreeMap;
 
@@ -31,9 +32,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
+import edu.uci.ics.luci.TerraTower.gameElements.Bomb;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
-import edu.uci.ics.luci.TerraTower.world.GridCell;
 import edu.uci.ics.luci.utility.datastructure.Pair;
 
 public class GridCellTest {
@@ -65,6 +66,11 @@ public class GridCellTest {
 		assertTrue(!gc.towerPresent());
 		gc.addTower(new Tower(null, x, y));
 		assertTrue(gc.towerPresent());
+		
+		assertTrue(!gc.bombPresent());
+		gc.addBomb(new Bomb(null, x, y,0,0));
+		assertTrue(gc.bombPresent());
+		
 		assertTrue(gc.getTower().getOwner()==null);
 		assertTrue(gc.getTower().getX()==x);
 		assertTrue(gc.getTower().getY()==y);
@@ -168,6 +174,15 @@ public class GridCellTest {
 		assertTrue(a.hashCode() != b.hashCode());
 		
 		b.setTower(new Tower(new Player("playerName",PasswordUtils.hashPassword("playerPassword")),0,0));
+		assertEquals(a,b);
+		assertEquals(a.hashCode(),b.hashCode());
+		
+		a.addBomb(new Bomb(new Player("playerName",PasswordUtils.hashPassword("playerPassword")),0,0,0,5));
+		assertTrue(!a.equals(b));
+		assertTrue(!b.equals(a));
+		assertTrue(a.hashCode() != b.hashCode());
+		
+		b.addBomb(new Bomb(new Player("playerName",PasswordUtils.hashPassword("playerPassword")),0,0,0,5));
 		assertEquals(a,b);
 		assertEquals(a.hashCode(),b.hashCode());
 		
