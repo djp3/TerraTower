@@ -272,10 +272,10 @@ public class TerritoryTest {
 		wm.setTerritory(territory1);
 		assertEquals(territory2,wm.getTerritory());
 		
-		assertTrue(wm.createPlayer("player"+name, PasswordUtils.hashPassword("player"+password)));
+		assertTrue(null != wm.createPlayer("player"+name, PasswordUtils.hashPassword("player"+password)));
 		assertTrue(wm.playerExists("player"+name));
 		
-		assertTrue(!wm.createPlayer("player"+name, PasswordUtils.hashPassword("player"+password)));
+		assertTrue(null == wm.createPlayer("player"+name, PasswordUtils.hashPassword("player"+password)));
 	}
 	
 	
