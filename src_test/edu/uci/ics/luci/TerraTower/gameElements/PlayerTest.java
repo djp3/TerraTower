@@ -69,7 +69,81 @@ public class PlayerTest {
 		assertEquals(player.getPlayerName(),player2.getPlayerName());
 		assertEquals(player.getTowerDelay(),player2.getTowerDelay());
 		assertEquals(player.getLastTowerPlacedTime(),player2.getLastTowerPlacedTime());
+		assertEquals(player.getLastBombPlacedTime(),player2.getLastBombPlacedTime());
+		
+		assertTrue(player.passwordGood(playerPassword));
+		assertTrue(player.passwordGood(PasswordUtils.hashPassword(playerPassword)));
+		
 		assertTrue(Arrays.equals(player.getHashedPassword(),player2.getHashedPassword()));
+	}
+	
+	@Test
+	public void testEquals() {
+		Player playera= null;
+		try{
+			playera = new Player(playerName,PasswordUtils.hashPassword(playerPassword));
+		}
+		catch(RuntimeException e){
+			fail("This shouldn't fail");
+		}
+		Player playerb = new Player(playerName,PasswordUtils.hashPassword(playerPassword));
+		
+		assertTrue(!playera.equals(null));
+		assertTrue(!playera.equals("foo"));
+		assertTrue(playera.equals(playera));
+		assertTrue(playera.hashCode() == playerb.hashCode());
+		assertTrue(playera.equals(playerb));
+		
+		playerb.setBombDelay(100);
+		assertTrue(!playera.equals(playerb));
+		assertTrue(!playerb.equals(playera));
+		assertTrue(playera.hashCode() != playerb.hashCode());
+		playerb.setBombDelay(playera.getBombDelay());
+		
+		playerb.setLastBombPlacedTime(100);
+		assertTrue(!playera.equals(playerb));
+		assertTrue(!playerb.equals(playera));
+		assertTrue(playera.hashCode() != playerb.hashCode());
+		playerb.setLastBombPlacedTime(playera.getLastBombPlacedTime());
+		
+		playerb.setLastTowerPlacedTime(100);
+		assertTrue(!playera.equals(playerb));
+		assertTrue(!playerb.equals(playera));
+		assertTrue(playera.hashCode() != playerb.hashCode());
+		playerb.setLastTowerPlacedTime(playera.getLastTowerPlacedTime());
+		
+		playerb.setTowerDelay(100);
+		assertTrue(!playera.equals(playerb));
+		assertTrue(!playerb.equals(playera));
+		assertTrue(playera.hashCode() != playerb.hashCode());
+		playerb.setTowerDelay(playera.getTowerDelay());
+		
+		playera.setPlayerName(null);
+		playerb.setPlayerName(null);
+		assertTrue(playera.equals(playerb));
+		assertTrue(playerb.equals(playera));
+		assertTrue(playera.hashCode() == playerb.hashCode());
+		playera.setPlayerName(playerName);
+		playerb.setPlayerName(playerName);
+		
+		playerb.setPlayerName("goo");
+		assertTrue(!playera.equals(playerb));
+		assertTrue(!playerb.equals(playera));
+		assertTrue(playera.hashCode() != playerb.hashCode());
+		playerb.setPlayerName(playera.getPlayerName());
+		
+		playerb.setPlayerName(null);
+		assertTrue(!playera.equals(playerb));
+		assertTrue(!playerb.equals(playera));
+		assertTrue(playera.hashCode() != playerb.hashCode());
+		playerb.setPlayerName(playera.getPlayerName());
+		
+		playerb = new Player(playerName,PasswordUtils.hashPassword(playerPassword+"x"));
+		assertTrue(!playera.equals(playerb));
+		assertTrue(!playerb.equals(playera));
+		assertTrue(playera.hashCode() != playerb.hashCode());
+		playerb = new Player(playerName,PasswordUtils.hashPassword(playerPassword));
+		
 	}
 
 }

@@ -35,6 +35,11 @@ public class Player {
 	//When the last tower was placed
 	long lastTowerPlacedTime;
 	
+	//How long this player must wait to place a new Bomb
+	long bombDelay;
+	//When the last bomb placed
+	long lastBombPlacedTime;
+	
 	
 	public String getPlayerName() {
 		return playerName;
@@ -57,6 +62,25 @@ public class Player {
 	}
 
 
+	public long getBombDelay() {
+		return bombDelay;
+	}
+
+
+	public void setBombDelay(long bombDelay) {
+		this.bombDelay = bombDelay;
+	}
+
+
+	public long getLastBombPlacedTime() {
+		return lastBombPlacedTime;
+	}
+
+
+	public void setLastBombPlacedTime(long lastBombPlacedTime) {
+		this.lastBombPlacedTime = lastBombPlacedTime;
+	}
+	
 	public long getTowerDelay() {
 		return towerDelay;
 	}
@@ -77,11 +101,28 @@ public class Player {
 	}
 
 
+
 	public Player(String playerName,byte[] hashedPassword){
 		this.setPlayerName(playerName);
 		this.setHashedPassword(hashedPassword);
 		this.setTowerDelay(GlobalsTerraTower.DEFAULT_TOWER_DELAY);
 		this.setLastTowerPlacedTime(0);
+		this.setBombDelay(GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		this.setLastBombPlacedTime(0);
+	}
+
+
+
+
+
+	
+	public boolean passwordGood(String proposedPassword) {
+		return(PasswordUtils.checkPassword(proposedPassword,hashedPassword));
+	}
+	
+
+	public boolean passwordGood(byte[] proposedPassword) {
+		return(PasswordUtils.checkPassword(proposedPassword,hashedPassword));
 	}
 
 
@@ -89,7 +130,10 @@ public class Player {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (int) (bombDelay ^ (bombDelay >>> 32));
 		result = prime * result + Arrays.hashCode(hashedPassword);
+		result = prime * result
+				+ (int) (lastBombPlacedTime ^ (lastBombPlacedTime >>> 32));
 		result = prime * result
 				+ (int) (lastTowerPlacedTime ^ (lastTowerPlacedTime >>> 32));
 		result = prime * result
@@ -111,7 +155,13 @@ public class Player {
 			return false;
 		}
 		Player other = (Player) obj;
+		if (bombDelay != other.bombDelay) {
+			return false;
+		}
 		if (!Arrays.equals(hashedPassword, other.hashedPassword)) {
+			return false;
+		}
+		if (lastBombPlacedTime != other.lastBombPlacedTime) {
 			return false;
 		}
 		if (lastTowerPlacedTime != other.lastTowerPlacedTime) {
@@ -129,18 +179,9 @@ public class Player {
 		}
 		return true;
 	}
-
-
-
 	
-	public boolean passwordGood(String proposedPassword) {
-		return(PasswordUtils.checkPassword(proposedPassword,hashedPassword));
-	}
 	
-
-	public boolean passwordGood(byte[] proposedPassword) {
-		return(PasswordUtils.checkPassword(proposedPassword,hashedPassword));
-	}
+	
 	
 
 }
