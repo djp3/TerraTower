@@ -33,6 +33,7 @@ import org.junit.Test;
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
+import edu.uci.ics.luci.utility.datastructure.Pair;
 
 public class TerritoryTest {
 
@@ -326,6 +327,327 @@ public class TerritoryTest {
 		assertTrue(!territory1.equals(territory2));
 		
 	}
+	
+
+	@Test
+	public void testStepTowerTerritoryGrowth() {
+		Territory t = new Territory(-5.0,5.0,10,-5.0,5.0,10);
+		Player player = new Player("a",PasswordUtils.hashPassword("b"));
+		Tower tower = new Tower(player,0,0);
+		t.addTower(tower);
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		Pair<Player, Integer> owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		owner = t.index(-3.5,-3.5).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(3),owner.getSecond());
+		
+		owner = t.index(-5.0,-4.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		owner = t.index(-3.5,-3.5).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(4),owner.getSecond());
+		
+		owner = t.index(-5.0,-3.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		owner = t.index(-3.5,-3.5).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-2.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		owner = t.index(-3.5,-3.5).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(3),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-1.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		owner = t.index(-3.5,-3.5).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(4),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		owner = t.index(-3.5,-3.5).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,1.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		owner = t.index(-3.5,-3.5).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+	}
+	
+	@Test
+	public void testStepTowerTerritoryGrowth2() {
+		Territory t = new Territory(-5.0,5.0,10,-5.0,5.0,10);
+		Player player = new Player("a",PasswordUtils.hashPassword("b"));
+		Tower tower = new Tower(player,5,5);
+		t.addTower(tower);
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		Pair<Player, Integer> owner = t.index(0.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(3),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(4),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+	}
+	
+	
+	@Test
+	public void testStepTowerTerritoryGrowth3() {
+		Territory t = new Territory(-5.0,5.0,10,-5.0,5.0,10);
+		Player playera = new Player("a",PasswordUtils.hashPassword("b"));
+		Player playerb = new Player("b",PasswordUtils.hashPassword("b"));
+		Tower towera = new Tower(playera,0,5);
+		Tower towerb = new Tower(playerb,5,4);
+		t.addTower(towera);
+		t.addTower(towerb);
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		Pair<Player, Integer> owner = t.index(0.0,0.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(playerb,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(playerb,owner.getFirst());
+		assertEquals(Integer.valueOf(3),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(playerb,owner.getFirst());
+		assertEquals(Integer.valueOf(4),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(playerb,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertTrue(null == owner.getFirst());
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(playerb,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(playera,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(playerb,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(playera,owner.getFirst());
+		assertEquals(Integer.valueOf(3),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(playerb,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(playera,owner.getFirst());
+		assertEquals(Integer.valueOf(4),owner.getSecond());
+		
+		
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(0.0,0.0).getOwner();
+		assertEquals(playerb,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(playera,owner.getFirst());
+		assertEquals(Integer.valueOf(5),owner.getSecond());
+		
+		
+	}
+		
 
 
 }

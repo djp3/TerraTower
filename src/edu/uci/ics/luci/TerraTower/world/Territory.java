@@ -20,10 +20,16 @@
 */
 package edu.uci.ics.luci.TerraTower.world;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import edu.uci.ics.luci.TerraTower.GridCell;
+import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
+import edu.uci.ics.luci.utility.datastructure.Pair;
 
 public class Territory {
 
@@ -36,6 +42,8 @@ public class Territory {
 	double top;
 	int numYSplits;
 	double stepY;
+	private boolean leaderBoardOutdated = true;
+	private transient Map<Player,Integer> leaderBoard;
 
 	public Territory(double left, double right, int numXSplits, double bottom,
 			double top, int numYSplits) {
@@ -71,6 +79,8 @@ public class Territory {
 				grid[x][y] = new GridCell(x, y);
 			}
 		}
+		
+		leaderBoard = new HashMap<Player,Integer>();
 
 	}
 
@@ -292,6 +302,174 @@ public class Territory {
 			return false;
 		}
 		return true;
+	}
+
+
+	public void stepTowerTerritoryGrowth(int towerMax,int towerStart) {
+		List<Tower> towerList = new ArrayList<Tower>();
+		
+		//printGrid();
+		
+		for (int x = 0; x < numXSplits; x++) {
+			for (int y = 0; y < numYSplits; y++) {
+				//Clear proposed owners
+				grid[x][y].getProposedOwner().clear();
+				
+				//Collect a list of towers
+				if(grid[x][y].towerPresent()){
+					towerList.add(grid[x][y].getTower());
+				}
+				//Lower existing ownership levels by 1 with a floor of 1
+				grid[x][y].lowerTowerTerritoryLevel(1,1);
+			}
+		}
+		//printGrid();
+		
+		//Shuffle towers so that ties are randomly resolved
+		Collections.shuffle(towerList);
+		
+		for(Tower tower: towerList){
+			
+			//Clear the steps marker for this tower
+			for (int x = 0; x < numXSplits; x++) {
+				for (int y = 0; y < numYSplits; y++) {
+					grid[x][y].setStepsTaken(Integer.MAX_VALUE);
+				}
+			}
+			
+			int x = tower.getX();
+			int y = tower.getY();
+			Pair<Player, Integer> o = grid[x][y].getOwner();
+			
+			/*If the owner of the tower doesn't own the land it sits on then the tower attempts
+			 * to start claiming land at power level "towerstart"
+			 */
+			if(o.getFirst() != tower.getOwner()){
+				stepTowerTerritoryRecurse(tower, towerStart,tower.getX(),tower.getY(),1);
+			}
+			/* If the owner of the tower does own the land, then the tower attempts to start claiming
+			 * land at one level higher (which is two because of the decay above) 
+			 */
+			else{
+				Integer level = o.getSecond();
+				level+=2;
+				stepTowerTerritoryRecurse(tower, level,tower.getX(),tower.getY(),1);
+			}
+		}
+		
+		for (int x = 0; x < numXSplits; x++) {
+			for (int y = 0; y < numYSplits; y++) {
+				//Clear proposed owners
+				grid[x][y].resolveOwner();
+				grid[x][y].raiseTowerTerritoryLevel(0,towerMax);
+			}
+		}
+		
+		leaderBoardOutdated = true;
+		//printGrid();
+	}
+
+	private void printGrid() {
+		System.out.println();
+		for (int y = 0; y < numYSplits; y++) {
+			for (int x = 0; x < numXSplits; x++) {
+				Player player = grid[x][y].getOwner().getFirst();
+				if(player == null){
+					System.out.print("\tn");
+				}
+				else{
+					System.out.print("\t"+player.getPlayerName());
+				}
+				System.out.print(":"+grid[x][y].getOwner().getSecond());
+			}
+			System.out.println();
+		}
+	}
+
+
+	private void stepTowerTerritoryRecurse(Tower tower,int level, int x, int y,int stepsTaken) {
+		if(level == 0){
+			//return;
+		}
+		if(x < 0 ){
+			return;
+		}
+		if(x >= numXSplits){
+			return;
+		}
+		if(y < 0 ){
+			return;
+		}
+		if(y >= numYSplits){
+			return;
+		}
+		if(grid[x][y].getStepsTaken()<=stepsTaken){
+			return;
+		}
+		else{
+			grid[x][y].setStepsTaken(stepsTaken);
+		}
+		
+		int proposedlevel = level;
+		Pair<Player, Integer> o = grid[x][y].getOwner();
+		if((o.getFirst() != null) &&(o.getFirst().equals(tower.getOwner()))){
+			proposedlevel = o.getSecond()+2; // Increase it to one more than decay
+			level++; //don't decrease the counter in the next step
+		}
+		else{
+			if(level > 0){
+				proposedlevel = 2; //Increase it to one more than decay
+				level = 0; //Stop allowing expansion
+			}
+			else{
+				proposedlevel = 0;
+			}
+		}
+		
+		// Check to see if the cell has a proposal for this player 
+		Map<Player, Integer> po = grid[x][y].getProposedOwner();
+		Integer pl = po.get(tower.getOwner());
+		//If no proposal make one
+		if(pl == null){
+			if(proposedlevel > 0){
+				po.put(tower.getOwner(), proposedlevel);
+			}
+		}
+		//If the proposal is too low, increase it
+		else if(pl < proposedlevel){
+			po.put(tower.getOwner(), proposedlevel);
+		}
+		else{
+			//the existing proposal is fine.
+		}
+		
+		//Recurse around
+		ArrayList<Pair<Integer, Integer>> steps = new ArrayList<Pair<Integer,Integer>>();
+		steps.add(new Pair<Integer,Integer>(x,y-1));
+		steps.add(new Pair<Integer,Integer>(x,y+1));
+		steps.add(new Pair<Integer,Integer>(x-1,y));
+		steps.add(new Pair<Integer,Integer>(x+1,y));
+		Collections.shuffle(steps);
+		for(Pair<Integer, Integer> p:steps){
+			stepTowerTerritoryRecurse(tower,level-1, p.getFirst(),p.getSecond(),stepsTaken+1);
+		}
+	}
+	
+	private void calculateLeaderBoard(){
+		leaderBoard.clear();
+		for (int x = 0; x < numXSplits; x++) {
+			for (int y = 0; y < numYSplits; y++) {
+				Pair<Player, Integer> o = grid[x][y].getOwner();
+				if(leaderBoard.containsKey(o.getFirst())){
+					Integer e = leaderBoard.get(o.getFirst());
+					leaderBoard.put(o.getFirst(), e+1);
+				}
+				else{
+					leaderBoard.put(o.getFirst(), 1);
+				}
+			}
+		}
+		leaderBoardOutdated = false;
 	}
 
 

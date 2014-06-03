@@ -134,5 +134,9 @@ public class WorldManager {
 		}
 		
 	}
+
+	public void stepTowerTerritoryGrowth() {
+		getTerritory().stepTowerTerritoryGrowth(10,2);
+	}
 	
 }

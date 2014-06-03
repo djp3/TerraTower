@@ -52,8 +52,7 @@ public class GridCell {
 	private Pair<Player,Integer> owner;
 	private transient Map<Player,Integer> proposedOwner;
 
-
-	private transient boolean marker = false;
+	private transient int stepsTaken;
 	
 	public int getX() {
 		return x;
@@ -103,12 +102,12 @@ public class GridCell {
 		this.proposedOwner = proposedOwner;
 	}
 	
-	public boolean getMarker() {
-		return marker;
+	public int getStepsTaken() {
+		return stepsTaken;
 	}
 
-	public void setMarker(boolean marker) {
-		this.marker = marker;
+	public void setStepsTaken(int stepsTaken) {
+		this.stepsTaken = stepsTaken;
 	}
 
 	public GridCell(int x,int y){
@@ -141,14 +140,18 @@ public class GridCell {
 	}
 
 
+	// for any levels above the floor lower it no lower than the floor
+	// if it starts below the floor, then leave it there.
 	public void lowerTowerTerritoryLevel(int delta,int floor) {
 		Pair<Player, Integer> o = getOwner();
 		if(o != null){
 			Integer level = o.getSecond();
 			if(level != null){
-				level -= delta;
-				if(level < floor){
-					level = floor;
+				if(level > floor){
+					level -= delta;
+					if(level < floor){
+						level = floor;
+					}
 				}
 			}
 			else{
@@ -184,7 +187,12 @@ public class GridCell {
 				max = po.getValue();
 			}
 		}
-		setOwner(new Pair<Player,Integer>(maxPlayer,max));
+		if(maxPlayer != null){
+			setOwner(new Pair<Player,Integer>(maxPlayer,max));
+		}
+		else{
+			setOwner(new Pair<Player,Integer>(null,0));
+		}
 	}
 
 	@Override

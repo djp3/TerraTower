@@ -29,6 +29,7 @@ import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.TTEventPlaceTower;
+import edu.uci.ics.luci.TerraTower.events.TTEventStepTowerTerritoryGrowth;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
 import edu.uci.ics.luci.TerraTower.events.TTEventVoid;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandler;
@@ -36,6 +37,7 @@ import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerCreatePlayer;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerPlaceTower;
+import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerStepTowerTeritoryGrowth;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerVoid;
 
 /**
@@ -99,6 +101,8 @@ public class TTEventWrapper {
 			break;
 		case PLACE_TOWER: this.setEvent(new TTEventPlaceTower((String)null, (String)null, null, null, null, null, null));
 			break;
+		case STEP_TOWER_TERRITORY_GROWTH: this.setEvent(new TTEventStepTowerTerritoryGrowth((String)null,(String)null));
+			break;
 		case VOID: this.setEvent(new TTEventVoid());
 			break;
 		default: this.setEvent(null);
@@ -115,6 +119,8 @@ public class TTEventWrapper {
 		case CREATE_PLAYER: this.setHandler(new TTEventHandlerCreatePlayer());
 			break;
 		case PLACE_TOWER: this.setHandler(new TTEventHandlerPlaceTower());
+			break;
+		case STEP_TOWER_TERRITORY_GROWTH: this.setHandler(new TTEventHandlerStepTowerTeritoryGrowth());
 			break;
 		case VOID: this.setHandler(new TTEventHandlerVoid());
 			break;
@@ -141,6 +147,9 @@ public class TTEventWrapper {
 			break;
 		case VOID: problem = (!(this.getEvent() instanceof TTEventVoid));
 							   problem |= (!(this.getHandler() instanceof TTEventHandlerVoid));
+			break;
+		case STEP_TOWER_TERRITORY_GROWTH: problem = (!(this.getEvent() instanceof TTEventStepTowerTerritoryGrowth));
+							   problem |= (!(this.getHandler() instanceof TTEventHandlerStepTowerTeritoryGrowth));
 			break;
 		default:
 			problem = true;
