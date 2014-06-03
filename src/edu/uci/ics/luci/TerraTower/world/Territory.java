@@ -20,12 +20,14 @@
 */
 package edu.uci.ics.luci.TerraTower.world;
 
+import java.util.Arrays;
+
 import edu.uci.ics.luci.TerraTower.GridCell;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 
 public class Territory {
 
-	GridCell[][] grid;
+	private GridCell[][] grid;
 	double left;
 	double right;
 	int numXSplits;
@@ -217,8 +219,83 @@ public class Territory {
 
 
 	public void updateAltitude(int xIndex, int yIndex, double alt) {
-		grid[xIndex][yIndex].updateAltitude(alt);
+		index(xIndex,yIndex).updateAltitude(alt);
 	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(bottom);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + Arrays.deepHashCode(grid);			//Special!!
+		temp = Double.doubleToLongBits(left);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + numXSplits;
+		result = prime * result + numYSplits;
+		temp = Double.doubleToLongBits(right);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(stepX);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(stepY);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(top);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Territory)) {
+			return false;
+		}
+		Territory other = (Territory) obj;
+		if (Double.doubleToLongBits(bottom) != Double
+				.doubleToLongBits(other.bottom)) {
+			return false;
+		}
+		if (!Arrays.deepEquals(grid, other.grid)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(left) != Double
+				.doubleToLongBits(other.left)) {
+			return false;
+		}
+		if (numXSplits != other.numXSplits) {
+			return false;
+		}
+		if (numYSplits != other.numYSplits) {
+			return false;
+		}
+		if (Double.doubleToLongBits(right) != Double
+				.doubleToLongBits(other.right)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(stepX) != Double
+				.doubleToLongBits(other.stepX)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(stepY) != Double
+				.doubleToLongBits(other.stepY)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(top) != Double.doubleToLongBits(other.top)) {
+			return false;
+		}
+		return true;
+	}
+
+
+	
 	
 
 }

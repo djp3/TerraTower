@@ -21,6 +21,7 @@
 package edu.uci.ics.luci.TerraTower.world;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.After;
@@ -28,6 +29,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import edu.uci.ics.luci.TerraTower.PasswordUtils;
+import edu.uci.ics.luci.TerraTower.gameElements.Player;
+import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 
 public class TerritoryTest {
 
@@ -161,7 +166,7 @@ public class TerritoryTest {
 	
 	
 	@Test
-	public void testIndex() {
+	public void testIndex1() {
 		Territory map = new Territory(-90.0,90.0,2,-180.0,180.0,2);
 		assertEquals(0,map.index(-90, -180.0).getX());
 		assertEquals(1,map.index(90.0, -180.0).getX());
@@ -173,5 +178,154 @@ public class TerritoryTest {
 		assertEquals(0,map.index(90.0, -180.0).getY());
 		assertEquals(1,map.index(90.0, 180.0).getY());
 	}
+	
+	
+	@Test
+	public void testBasic() {
+		
+		try{
+			new Territory(1.0,-1.0,10,-1.0,1.0,10);
+			fail("this should break");
+		}
+		catch(RuntimeException e){
+			//ok
+		}
+		try{
+			new Territory(-1.0,1.0,-10,-1.0,1.0,10);
+			fail("this should break");
+		}
+		catch(RuntimeException e){
+			//ok
+		}
+		try{
+			new Territory(-1.0,1.0,10,1.0,-1.0,10);
+			fail("this should break");
+		}
+		catch(RuntimeException e){
+			//ok
+		}
+		try{
+			new Territory(-1.0,1.0,10,-1.0,1.0,-10);
+			fail("this should break");
+		}
+		catch(RuntimeException e){
+			//ok
+		}
+	}
+	
+	@Test
+	public void testBounds() {
+		
+		Territory t = new Territory(-1.0,1.0,10,-1.0,1.0,10);
+		assertTrue(t.xInBounds(0.0));
+		assertTrue(!t.xInBounds(-1.5));
+		assertTrue(!t.xInBounds(1.5));
+		assertTrue(t.yInBounds(0.0));
+		assertTrue(!t.yInBounds(-1.5));
+		assertTrue(!t.yInBounds(1.5));
+	}
+	
+	@Test
+	public void testIndex() {
+		
+		Territory t = new Territory(-1.0,1.0,2,-1.0,1.0,2);
+		assertTrue(t.xIndex(-0.5)==0);
+		assertTrue(t.xIndex(1.0)==1);
+		
+		assertTrue(t.yIndex(-0.5)==0);
+		assertTrue(t.yIndex(1.0)==1);
+	}
+	
+	@Test
+	public void testTower() {
+		
+		Territory t = new Territory(-1.0,1.0,2,-1.0,1.0,2);
+		assertTrue(!t.towerPresent(0, 0));
+		assertTrue(t.addTower(new Tower(new Player("name",PasswordUtils.hashPassword("password")),0, 0)));
+		assertTrue(t.towerPresent(0, 0));
+	}
+	
+	@Test
+	public void testAlts() {
+		Territory t = new Territory(-1.0,1.0,2,-1.0,1.0,2);
+		t.updateAltitude(0, 0, 0.0);
+		t.updateAltitude(0, 0, 10.0);
+		t.updateAltitude(0, 0, 20.0);
+		assertTrue(t.index(0,0).estimateAltitude().equals(10.0));
+	}
+
+	@Test
+	public void test() {
+		
+		String name = "foo"+System.currentTimeMillis();
+		String password = "foo"+System.currentTimeMillis();
+		WorldManager wm = new WorldManager(password);
+		
+		assertTrue(wm.passwordGood(password));
+		assertTrue(!wm.passwordGood(password+"x"));
+		
+		Territory territory1 = new Territory(-1.0,1.0,10,-1.0,1.0,10);
+		Territory territory2 = new Territory(-1.0,1.0,10,-1.0,1.0,10);
+		assertTrue(territory1.equals(territory2));
+		assertEquals(territory1.hashCode(),territory2.hashCode());
+		
+		wm.setTerritory(territory1);
+		assertEquals(territory2,wm.getTerritory());
+		
+		assertTrue(wm.createPlayer("player"+name, PasswordUtils.hashPassword("player"+password)));
+		assertTrue(wm.playerExists("player"+name));
+		
+		assertTrue(!wm.createPlayer("player"+name, PasswordUtils.hashPassword("player"+password)));
+	}
+	
+	
+	@Test
+	public void testEquals() {
+		
+		Territory territory1 = new Territory(-1.0,1.0,10,-1.0,1.0,10);
+		Territory territory2 = new Territory(-1.0,1.0,10,-1.0,1.0,10);
+		assertTrue(!territory1.equals(null));
+		assertTrue(!territory1.equals("foo"));
+		assertTrue(territory1.equals(territory1));
+		assertTrue(territory1.equals(territory2));
+		assertEquals(territory1.hashCode(),territory2.hashCode());
+		
+		territory2.setBottom(-2.0);
+		assertTrue(!territory1.equals(territory2));
+		territory2.setBottom(territory1.getBottom());
+		
+		territory2.setTop(2.0);
+		assertTrue(!territory1.equals(territory2));
+		territory2.setTop(territory1.getTop());
+		
+		territory2.setLeft(-2.0);
+		assertTrue(!territory1.equals(territory2));
+		territory2.setLeft(territory1.getLeft());
+		
+		territory2.setRight(2.0);
+		assertTrue(!territory1.equals(territory2));
+		territory2.setRight(territory1.getRight());
+		
+		territory2.setStepX(20.0);
+		assertTrue(!territory1.equals(territory2));
+		territory2.setStepX(territory1.getStepX());
+		
+		territory2.setStepY(20.0);
+		assertTrue(!territory1.equals(territory2));
+		territory2.setStepY(territory1.getStepY());
+		
+		territory2.setNumXSplits(20);
+		assertTrue(!territory1.equals(territory2));
+		territory2.setNumXSplits(territory1.getNumXSplits());
+		
+		territory2.setNumYSplits(20);
+		assertTrue(!territory1.equals(territory2));
+		territory2.setNumYSplits(territory1.getNumYSplits());
+		
+		territory2.index(0,1).setX(1);
+		assertTrue(!territory1.equals(territory2));
+		
+	}
+
 
 }
