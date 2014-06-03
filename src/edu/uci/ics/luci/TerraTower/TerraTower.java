@@ -65,6 +65,7 @@ public class TerraTower {
 	 * Create Event Disruptor
 	 * @return 
 	 */
+	@SuppressWarnings("unchecked")
 	static TTEventWrapperQueuer createEventQueue(String logFile) {
 		// Executor that will be used to construct new threads for consumers
 	    Executor executor = Executors.newCachedThreadPool();

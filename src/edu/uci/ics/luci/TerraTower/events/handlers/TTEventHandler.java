@@ -54,13 +54,15 @@ public class TTEventHandler {
 		}
 		
 		//Make sure the world password is not null
+		//* We know this won't be null */
+		/*
 		if(event.getWorldHashedPassword() == null){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
 			errors.add("World can't have a null password");
 			ret.put("errors", errors);
 			return ret;
-		}
+		}*/
 		
 		//Make sure globals is not null
 		GlobalsTerraTower g = GlobalsTerraTower.getGlobalsTerraTower();
