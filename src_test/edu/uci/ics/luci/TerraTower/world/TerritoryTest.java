@@ -31,6 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
+import edu.uci.ics.luci.TerraTower.gameElements.Bomb;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 import edu.uci.ics.luci.utility.datastructure.Pair;
@@ -244,6 +245,16 @@ public class TerritoryTest {
 		assertTrue(!t.towerPresent(0, 0));
 		assertTrue(t.addTower(new Tower(new Player("name",PasswordUtils.hashPassword("password")),0, 0)));
 		assertTrue(t.towerPresent(0, 0));
+	}
+	
+	
+	@Test
+	public void testBomb() {
+		
+		Territory t = new Territory(-1.0,1.0,2,-1.0,1.0,2);
+		assertTrue(!t.bombPresent(0, 0));
+		assertTrue(t.addBomb(new Bomb(new Player("name",PasswordUtils.hashPassword("password")),0, 0,5,5)));
+		assertTrue(t.bombPresent(0, 0));
 	}
 	
 	@Test

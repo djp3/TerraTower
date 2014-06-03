@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.uci.ics.luci.TerraTower.gameElements.Bomb;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 import edu.uci.ics.luci.utility.datastructure.Pair;
@@ -473,7 +474,14 @@ public class Territory {
 	}
 
 
-	
+	public boolean bombPresent(int x, int y) {
+		return(grid[x][y].bombPresent());
+	}
+
+
+	public boolean addBomb(Bomb bomb) {
+		return(grid[bomb.getX()][bomb.getY()].addBomb(bomb));
+	}
 	
 
 }
