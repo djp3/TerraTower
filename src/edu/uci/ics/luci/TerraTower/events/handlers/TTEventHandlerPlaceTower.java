@@ -22,26 +22,31 @@ package edu.uci.ics.luci.TerraTower.events.handlers;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
-import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
-import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
+import edu.uci.ics.luci.TerraTower.events.TTEventPlaceTower;
+import edu.uci.ics.luci.TerraTower.gameElements.Tower;
+import edu.uci.ics.luci.TerraTower.world.Territory;
 
 
-public class TTEventHandlerCreateWorld extends TTEventHandler{    
+public class TTEventHandlerPlaceTower extends TTEventHandlerPlayer{
 	
+	private int xIndex ;
+	private int yIndex ;
+	private double alt;
+	private Territory territory = null;
 
-	private GlobalsTerraTower g = null;
-	private String worldName = null;
-	private byte[] worldHashedPassword = null;
-	
 	@Override
 	public JSONObject checkParameters(long eventTime, TTEvent _event) {
-		//Don't Check parent because parent checks if world exists see TTEventHandlerPlaceTower for example
-		JSONObject ret = new JSONObject();
+		//Check parent 
+		JSONObject ret = super.checkParameters(eventTime, _event);
+		if(ret != null){
+			return ret;
+		}
+		ret = new JSONObject();
 		
-		TTEventCreateWorld event = null;
-		if(_event instanceof TTEventCreateWorld){
-			event = ((TTEventCreateWorld) _event);
+		TTEventPlaceTower event = null;
+		if(_event instanceof TTEventPlaceTower){
+			event = ((TTEventPlaceTower) _event);
 		}
 		else{
 			ret.put("error","true");
@@ -50,69 +55,86 @@ public class TTEventHandlerCreateWorld extends TTEventHandler{
 			ret.put("errors", errors);
 			return ret;
 		}
+		
+		//Check that territory exists 
+		territory = wm.getTerritory();
+		if(territory == null){
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("No territory was initialized");
+			ret.put("errors", errors);
+			return ret;
+		}
+		
 
-		//Make sure the world name is not null
-		worldName = event.getWorldName();
-		if(worldName == null){
+		//Has it been too soon since last tower?
+		long elapsed = eventTime - player.getLastTowerPlacedTime();
+		if (elapsed < player.getTowerDelay()){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
-			errors.add("World can't have a null name");
+			errors.add("Last tower placed "+elapsed+" ms ago.  Need to wait: "+player.getTowerDelay());
 			ret.put("errors", errors);
 			return ret;
 		}
 		
-		//Make sure the world password is not null
-		worldHashedPassword = event.getWorldHashedPassword();
-		/*We know it's not null*/
-		/*
-		if(worldHashedPassword == null){
+
+		//Check tower placement
+		double lat = event.getLat();
+		double lng = event.getLng();
+		alt = event.getAlt();
+		//Check coordinates to see if it is in bounds
+		if(!territory.xInBounds(lng)){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
-			errors.add("World can't have a null password");
+			errors.add("Tower is out of bounds x="+lng+", "+territory.getLeft()+"< x < "+territory.getRight());
 			ret.put("errors", errors);
 			return ret;
-		}*/
-		
-		//Make sure globals is not null
-		g = GlobalsTerraTower.getGlobalsTerraTower();
-		if(g == null){
+		}
+		if(!territory.yInBounds(lat)){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
-			errors.add("Global variables have not been initiazed");
+			errors.add("Tower is out of bounds y="+lat+", "+territory.getBottom()+"< y < "+territory.getTop());
 			ret.put("errors", errors);
 			return ret;
 		}
 		
-		//Make sure world doesn't exist
-		if(g.worldExists(event.getWorldName())){
+		//Is there already a tower there?
+		xIndex = territory.xIndex(lng);
+		yIndex = territory.yIndex(lat);
+		if(wm.towerPresent(xIndex,yIndex)){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
-			errors.add("A world with name "+event.getWorldName()+" already exists");
+			errors.add("Tower already exists close to that location");
 			ret.put("errors", errors);
 			return ret;
 		}
 		
 		return null;
 	}
-	
+
 	@Override
-	public JSONObject onEvent() {
+	public JSONObject onEvent() {   
+		
 		JSONObject ret = super.onEvent();
 		if(ret.get("error").equals("true")){
 			return ret;
 		}
 		ret = new JSONObject();
-		
-		if(!g.createWorld(worldName, worldHashedPassword)){
+			
+		if(!wm.addTower(new Tower(player,xIndex,yIndex))){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
-			errors.add("Unable to create a world for an unknown reason");
+			errors.add("Unable to add tower due to an unknown reason");
 			ret.put("errors", errors);
 			return ret;
 		}
 		
-		ret.put("error", "false");
+		if(this.alt > 0.0){
+			territory.updateAltitude(xIndex,yIndex,alt);
+		}
+		
+		ret.put("error","false");
 		return ret;
 	}
-
+	
 }

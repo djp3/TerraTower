@@ -29,6 +29,8 @@ import edu.uci.ics.luci.TerraTower.gameElements.Player;
 
 public class TTEventHandlerPlayer extends TTEventHandler{
 	
+	protected Player player;
+
 	public JSONObject checkParameters(long eventTime, TTEvent _event){
 		//Check parent 
 		JSONObject ret = super.checkParameters(eventTime, _event);
@@ -83,7 +85,7 @@ public class TTEventHandlerPlayer extends TTEventHandler{
 		}
 		
 		//Is password correct?
-		Player player = wm.getPlayer(playerName, playerHashedPassword);
+		player = wm.getPlayer(playerName, playerHashedPassword);
 		if(player == null){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
@@ -97,9 +99,7 @@ public class TTEventHandlerPlayer extends TTEventHandler{
 	
 	
 	public JSONObject onEvent(){
-		JSONObject ret = new JSONObject();
-		ret.put("error","false");
-		return ret;
+		return(super.onEvent());
 	}
 
 }

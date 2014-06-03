@@ -79,7 +79,11 @@ public class TTEventHandlerCreateTerritory extends TTEventHandler{
 	@Override
 	public JSONObject onEvent()  {   
 		
-		JSONObject ret = new JSONObject();
+		JSONObject ret = super.onEvent();
+		if(ret.get("error").equals("true")){
+			return ret;
+		}
+		ret = new JSONObject();
 		
 		Territory t = new Territory(left,right,numXSplits,bottom,top,numYSplits);
 		

@@ -89,7 +89,12 @@ public class TTEventHandlerCreatePlayer extends TTEventHandler{
 	
 	@Override
 	public JSONObject onEvent() {
-		JSONObject ret = new JSONObject();
+		JSONObject ret = super.onEvent();
+		if(ret.get("error").equals("true")){
+			return ret;
+		}
+		ret = new JSONObject();
+		
 		if(!wm.createPlayer(playerName,playerHashedPassword)){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
