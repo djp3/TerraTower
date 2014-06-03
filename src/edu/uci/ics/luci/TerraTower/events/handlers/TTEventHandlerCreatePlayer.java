@@ -95,7 +95,7 @@ public class TTEventHandlerCreatePlayer extends TTEventHandler{
 		}
 		ret = new JSONObject();
 		
-		if(!wm.createPlayer(playerName,playerHashedPassword)){
+		if(wm.createPlayer(playerName,playerHashedPassword) == null){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
 			errors.add("Could not create player for unknown reason");
