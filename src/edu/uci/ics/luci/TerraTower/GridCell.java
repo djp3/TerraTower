@@ -103,4 +103,50 @@ public class GridCell {
 		return x/alts.size();
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((alts == null) ? 0 : alts.hashCode());
+		result = prime * result + ((t == null) ? 0 : t.hashCode());
+		result = prime * result + x;
+		result = prime * result + y;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof GridCell)) {
+			return false;
+		}
+		GridCell other = (GridCell) obj;
+		if (alts == null) {
+			if (other.alts != null) {
+				return false;
+			}
+		} else if (!alts.equals(other.alts)) {
+			return false;
+		}
+		if (t == null) {
+			if (other.t != null) {
+				return false;
+			}
+		} else if (!t.equals(other.t)) {
+			return false;
+		}
+		if (x != other.x) {
+			return false;
+		}
+		if (y != other.y) {
+			return false;
+		}
+		return true;
+	}
+
 }
