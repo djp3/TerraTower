@@ -86,11 +86,12 @@ public class GridCellTest {
 		GridCell a = new GridCell(1,1);
 		GridCell b = new GridCell(1,1);
 		
-		TreeMap<Double, Double> c = new TreeMap<Double,Double>();
-		TreeMap<Double, Double> d = new TreeMap<Double,Double>();
-		d.put(1.0d,1.0d);
-		System.out.println(c.hashCode());
-		System.out.println(d.hashCode());
+		//#unfortunate coincidence
+		//TreeMap<Double, Double> c = new TreeMap<Double,Double>();
+		//TreeMap<Double, Double> d = new TreeMap<Double,Double>();
+		//d.put(1.0d,1.0d);
+		//System.out.println(c.hashCode());
+		//System.out.println(d.hashCode());
 		
 		assertEquals(a,a);
 		assertTrue(!a.equals(null));

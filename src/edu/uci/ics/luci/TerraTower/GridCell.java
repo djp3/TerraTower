@@ -95,8 +95,8 @@ public class GridCell {
 		alts.put(alt,alt);
 	}
 
-	public double estimateAltitude() {
-		double x = 0;
+	public Double estimateAltitude() {
+		Double x = 0.0d;
 		for(Double a :alts.keySet()){
 			x+=a;
 		}
