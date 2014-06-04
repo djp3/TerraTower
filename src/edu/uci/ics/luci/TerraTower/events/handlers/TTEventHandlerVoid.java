@@ -20,11 +20,23 @@
 */
 package edu.uci.ics.luci.TerraTower.events.handlers;
 
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
 
 
 public class TTEventHandlerVoid extends TTEventHandler{    
+	
+
+	private boolean parametersChecked = false;
+
+	private boolean getParametersChecked() {
+		return parametersChecked;
+	}
+
+	private void setParametersChecked(boolean parametersChecked) {
+		this.parametersChecked = parametersChecked;
+	}
 	
 	@Override
 	public JSONObject checkParameters(long eventTime, TTEvent _event) {
@@ -34,13 +46,29 @@ public class TTEventHandlerVoid extends TTEventHandler{
 			return ret;
 		}
 		
-		//Always ok
+		this.setParametersChecked(true);
 		return null;
 	}
 	
 	@Override
 	public JSONObject onEvent() {
-		return(super.onEvent());
+		JSONObject ret = super.onEvent();
+		if(ret.get("error").equals("true")){
+			return ret;
+		}
+		
+		if(!this.getParametersChecked()){
+			ret = new JSONObject();
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("Parameters were not checked before calling onEvent");
+			ret.put("errors", errors);
+			return ret;
+		}
+		
+		this.setParametersChecked(false);
+		
+		return ret;
 	}
 
 }

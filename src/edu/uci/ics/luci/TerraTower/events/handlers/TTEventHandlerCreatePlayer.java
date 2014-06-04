@@ -28,10 +28,21 @@ import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
 
 public class TTEventHandlerCreatePlayer extends TTEventHandler{    
 	
+	private boolean parametersChecked = false;
 
 	private String playerName;
 	private byte[] playerHashedPassword;
 
+
+	private boolean getParametersChecked() {
+		return parametersChecked;
+	}
+
+	private void setParametersChecked(boolean parametersChecked) {
+		this.parametersChecked = parametersChecked;
+	}
+	
+	
 	@Override
 	public JSONObject checkParameters(long eventTime,TTEvent _event) {
 		//Check parent 
@@ -84,15 +95,30 @@ public class TTEventHandlerCreatePlayer extends TTEventHandler{
 			return ret;
 		}
 		
+		this.setParametersChecked(true);
+		
 		return null;
 	}
 	
 	@Override
 	public JSONObject onEvent() {
+
 		JSONObject ret = super.onEvent();
 		if(ret.get("error").equals("true")){
 			return ret;
 		}
+		
+		if(!this.getParametersChecked()){
+			ret = new JSONObject();
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("Parameters were not checked before calling onEvent");
+			ret.put("errors", errors);
+			return ret;
+		}
+		
+		this.setParametersChecked(false);
+		
 		ret = new JSONObject();
 		
 		if(wm.createPlayer(playerName,playerHashedPassword) == null){

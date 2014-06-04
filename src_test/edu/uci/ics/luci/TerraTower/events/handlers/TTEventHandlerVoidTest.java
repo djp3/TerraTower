@@ -41,6 +41,7 @@ public class TTEventHandlerVoidTest {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		Globals.setGlobals(null);
 	}
 
 	@AfterClass

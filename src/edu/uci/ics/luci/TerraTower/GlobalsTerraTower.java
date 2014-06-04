@@ -53,6 +53,10 @@ public class GlobalsTerraTower extends Globals {
 	static final long ONE_MINUTE = 60 * ONE_SECOND;
 	public static final long DEFAULT_TOWER_DELAY = 5 * ONE_MINUTE;
 	public static final long DEFAULT_BOMB_DELAY = 5 * ONE_MINUTE;
+
+	public static final long DEFAULT_BOMB_FUSE = 5 * ONE_MINUTE;
+
+	public static final int DEFAULT_TOWER_STRENGTH = 10;
 	
 
 	private static transient volatile Logger log = null;

@@ -44,6 +44,7 @@ public class TTEventHandlerCreatePlayerTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		Globals.setGlobals(null);
 	}
 
 	@AfterClass

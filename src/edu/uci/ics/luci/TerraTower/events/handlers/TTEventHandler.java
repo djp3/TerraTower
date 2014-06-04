@@ -28,12 +28,22 @@ import net.minidev.json.JSONObject;
 
 public class TTEventHandler {
 	
+	private boolean parametersChecked = false;
+	
 	protected WorldManager wm = null;
 	
 	protected WorldManager getWorldManager(){
 		return wm;
 	}
 	
+	private boolean getParametersChecked() {
+		return parametersChecked;
+	}
+
+	private void setParametersChecked(boolean parametersChecked) {
+		this.parametersChecked = parametersChecked;
+	}
+
 	/** 
 	 * 
 	 * @param eventTime
@@ -92,14 +102,28 @@ public class TTEventHandler {
 			ret.put("errors", errors);
 			return ret;
 		}
+		
+		this.setParametersChecked(true);
+		
 		return null;
 	}
 	
 	
 	public JSONObject onEvent(){
-		JSONObject ret = new JSONObject();
-		ret.put("error","false");
-		return ret;
+		if(this.getParametersChecked()){
+			this.setParametersChecked(false);
+			JSONObject ret = new JSONObject();
+			ret.put("error","false");
+			return ret;
+		}
+		else{
+			JSONObject ret = new JSONObject();
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("Parameters were not checked before calling onEvent");
+			ret.put("errors", errors);
+			return ret;
+		}
 	}
 
 }

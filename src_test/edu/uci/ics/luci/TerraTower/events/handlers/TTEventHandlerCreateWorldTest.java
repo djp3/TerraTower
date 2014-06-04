@@ -106,7 +106,13 @@ public class TTEventHandlerCreateWorldTest {
 
 		json = tt.onEvent();
 		assertTrue(json != null);
-		assertEquals("false",(String)json.get("error"));
+		try{
+			assertEquals("false",(String)json.get("error"));
+		}
+		catch(AssertionError e){
+			System.err.println(json.toJSONString());
+			throw e;
+		}
 		
 		/* World already exists */
 		json = tt.onEvent();

@@ -29,7 +29,18 @@ import edu.uci.ics.luci.TerraTower.gameElements.Player;
 
 public class TTEventHandlerPlayer extends TTEventHandler{
 	
+	private boolean parametersChecked = false;
+	
 	protected Player player;
+	
+
+	private boolean getParametersChecked() {
+		return parametersChecked;
+	}
+
+	private void setParametersChecked(boolean parametersChecked) {
+		this.parametersChecked = parametersChecked;
+	}
 
 	public JSONObject checkParameters(long eventTime, TTEvent _event){
 		//Check parent 
@@ -94,12 +105,30 @@ public class TTEventHandlerPlayer extends TTEventHandler{
 			return ret;
 		}
 		
+		this.setParametersChecked(true);
+		
 		return null;
 	}
 	
 	
 	public JSONObject onEvent(){
-		return(super.onEvent());
+
+		JSONObject ret = super.onEvent();
+		if(ret.get("error").equals("true")){
+			return ret;
+		}
+		
+		if(!this.getParametersChecked()){
+			ret = new JSONObject();
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("Parameters were not checked before calling onEvent");
+			ret.put("errors", errors);
+			return ret;
+		}
+			
+		this.setParametersChecked(false);
+		return(ret);
 	}
 
 }

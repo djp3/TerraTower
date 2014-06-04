@@ -29,10 +29,19 @@ import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 
 public class TTEventHandlerCreateWorld extends TTEventHandler{    
 	
+	private boolean parametersChecked = false;
 
 	private GlobalsTerraTower g = null;
 	private String worldName = null;
 	private byte[] worldHashedPassword = null;
+	
+	private boolean getParametersChecked() {
+		return parametersChecked;
+	}
+
+	private void setParametersChecked(boolean parametersChecked) {
+		this.parametersChecked = parametersChecked;
+	}
 	
 	@Override
 	public JSONObject checkParameters(long eventTime, TTEvent _event) {
@@ -92,15 +101,27 @@ public class TTEventHandlerCreateWorld extends TTEventHandler{
 			return ret;
 		}
 		
+		this.setParametersChecked(true);
+		
 		return null;
 	}
 	
 	@Override
 	public JSONObject onEvent() {
-		JSONObject ret = super.onEvent();
-		if(ret.get("error").equals("true")){
+		//Don't run parent because parent's parameters weren't checked
+		JSONObject ret = null;
+		
+		if(!this.getParametersChecked()){
+			ret = new JSONObject();
+			ret.put("error","true");
+			JSONArray errors = new JSONArray();
+			errors.add("Parameters were not checked before calling onEvent");
+			ret.put("errors", errors);
 			return ret;
 		}
+		
+		this.setParametersChecked(false);
+
 		ret = new JSONObject();
 		
 		if(!g.createWorld(worldName, worldHashedPassword)){
