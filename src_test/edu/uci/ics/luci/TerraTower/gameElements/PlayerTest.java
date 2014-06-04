@@ -70,6 +70,7 @@ public class PlayerTest {
 		assertEquals(player.getTowerDelay(),player2.getTowerDelay());
 		assertEquals(player.getLastTowerPlacedTime(),player2.getLastTowerPlacedTime());
 		assertEquals(player.getLastBombPlacedTime(),player2.getLastBombPlacedTime());
+		assertEquals(player.getBombFuse(),player2.getBombFuse());
 		
 		assertTrue(player.passwordGood(playerPassword));
 		assertTrue(player.passwordGood(PasswordUtils.hashPassword(playerPassword)));

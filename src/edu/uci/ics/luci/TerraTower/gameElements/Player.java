@@ -40,6 +40,9 @@ public class Player {
 	//When the last bomb placed
 	long lastBombPlacedTime;
 	
+	//How long till the bomb blows?
+	long bombFuse;
+	
 	
 	public String getPlayerName() {
 		return playerName;
@@ -99,6 +102,16 @@ public class Player {
 	public void setLastTowerPlacedTime(long lastTowerPlacedTime) {
 		this.lastTowerPlacedTime = lastTowerPlacedTime;
 	}
+	
+
+	public long getBombFuse() {
+		return bombFuse;
+	}
+
+
+	public void setBombFuse(long bombFuse) {
+		this.bombFuse = bombFuse;
+	}
 
 
 
@@ -109,6 +122,7 @@ public class Player {
 		this.setLastTowerPlacedTime(0);
 		this.setBombDelay(GlobalsTerraTower.DEFAULT_BOMB_DELAY);
 		this.setLastBombPlacedTime(0);
+		this.setBombFuse(GlobalsTerraTower.DEFAULT_BOMB_FUSE);
 	}
 
 
