@@ -23,12 +23,12 @@ package edu.uci.ics.luci.TerraTower.events.handlers;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
-import edu.uci.ics.luci.TerraTower.events.TTEventPlaceTower;
+import edu.uci.ics.luci.TerraTower.events.TTEventBuildTower;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 import edu.uci.ics.luci.TerraTower.world.Territory;
 
 
-public class TTEventHandlerPlaceTower extends TTEventHandlerPlayer{
+public class TTEventHandlerBuildTower extends TTEventHandlerPlayer{
 	
 	private boolean parametersChecked = false;
 
@@ -56,9 +56,9 @@ public class TTEventHandlerPlaceTower extends TTEventHandlerPlayer{
 		}
 		ret = new JSONObject();
 		
-		TTEventPlaceTower event = null;
-		if(_event instanceof TTEventPlaceTower){
-			event = ((TTEventPlaceTower) _event);
+		TTEventBuildTower event = null;
+		if(_event instanceof TTEventBuildTower){
+			event = ((TTEventBuildTower) _event);
 		}
 		else{
 			ret.put("error","true");

@@ -23,7 +23,7 @@ package edu.uci.ics.luci.TerraTower.events;
 import net.minidev.json.JSONObject;
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
 
-public class TTEventPlaceTower extends TTEventPlayer{
+public class TTEventDropBomb extends TTEventPlayer{
 	
 	private Double lat;
 	private Double lng;
@@ -53,11 +53,11 @@ public class TTEventPlaceTower extends TTEventPlayer{
 		this.alt = alt;
 	}
 	
-	public TTEventPlaceTower(String worldName, String worldPassword, String playerName, String playerPassword,Double lat,Double lng,Double alt){
+	public TTEventDropBomb(String worldName, String worldPassword, String playerName, String playerPassword,Double lat,Double lng,Double alt){
 		this(worldName,PasswordUtils.hashPassword(worldPassword), playerName,PasswordUtils.hashPassword(playerPassword),lat,lng,alt);
 	}
 	
-	public TTEventPlaceTower(String worldName, byte[] worldHashedPassword,String playerName, byte[] playerHashedPassword,Double lat,Double lng,Double alt){
+	public TTEventDropBomb(String worldName, byte[] worldHashedPassword,String playerName, byte[] playerHashedPassword,Double lat,Double lng,Double alt){
 		super(worldName,worldHashedPassword,playerName,playerHashedPassword);
 		this.setLat(lat);
 		this.setLng(lng);
@@ -73,7 +73,7 @@ public class TTEventPlaceTower extends TTEventPlayer{
 		return ret;
 	}
 	
-	static public TTEventPlaceTower fromJSON(JSONObject in) {
+	static public TTEventDropBomb fromJSON(JSONObject in) {
 		TTEventPlayer parent = TTEventPlayer.fromJSON(in);
 		String worldName = parent.getWorldName();
 		byte[] worldHashedPassword = parent.getWorldHashedPassword();
@@ -113,7 +113,7 @@ public class TTEventPlaceTower extends TTEventPlayer{
 		}
 		
 			
-		return(new TTEventPlaceTower(worldName,worldHashedPassword,playerName,playerHashedPassword,lat,lng,alt));
+		return(new TTEventDropBomb(worldName,worldHashedPassword,playerName,playerHashedPassword,lat,lng,alt));
 	}
 
 	@Override
@@ -134,10 +134,10 @@ public class TTEventPlaceTower extends TTEventPlayer{
 		if (!super.equals(obj)) {
 			return false;
 		}
-		if (!(obj instanceof TTEventPlaceTower)) {
+		if (!(obj instanceof TTEventDropBomb)) {
 			return false;
 		}
-		TTEventPlaceTower other = (TTEventPlaceTower) obj;
+		TTEventDropBomb other = (TTEventDropBomb) obj;
 		if (alt == null) {
 			if (other.alt != null) {
 				return false;

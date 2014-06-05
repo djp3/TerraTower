@@ -38,10 +38,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.uci.ics.luci.TerraTower.events.TTEventBurnBombFuse;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
-import edu.uci.ics.luci.TerraTower.events.TTEventPlaceTower;
+import edu.uci.ics.luci.TerraTower.events.TTEventDropBomb;
+import edu.uci.ics.luci.TerraTower.events.TTEventBuildTower;
+import edu.uci.ics.luci.TerraTower.events.TTEventStepTowerTerritoryGrowth;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
 import edu.uci.ics.luci.utility.Globals;
 
@@ -150,9 +153,72 @@ public class TTEventWrapperQueuerTest {
 		double lat = 0.0d;
 		double lng = 0.0d;
 		double alt = 0.0d;
-		TTEventPlaceTower ttEvent4 = new TTEventPlaceTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
+		TTEventBuildTower ttEvent4 = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
 		resultChecker = new ResultChecker(false);
 		event = new TTEventWrapper(TTEventType.BUILD_TOWER,ttEvent4,resultChecker);
+		events.add(event);
+		eventPublisher.onData(event);
+		synchronized(resultChecker.getSemaphore()){
+			while(resultChecker.getResultOK() == null){
+				try {
+					resultChecker.getSemaphore().wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		try{
+			assertTrue(resultChecker.getResultOK());
+		}
+		catch(AssertionError e){
+			System.err.println(resultChecker.getResults().toJSONString());
+			throw e;
+		}
+		
+		TTEventStepTowerTerritoryGrowth ttEvent5 = new TTEventStepTowerTerritoryGrowth(worldName,worldPassword);
+		resultChecker = new ResultChecker(false);
+		event = new TTEventWrapper(TTEventType.STEP_TOWER_TERRITORY_GROWTH,ttEvent5,resultChecker);
+		events.add(event);
+		eventPublisher.onData(event);
+		synchronized(resultChecker.getSemaphore()){
+			while(resultChecker.getResultOK() == null){
+				try {
+					resultChecker.getSemaphore().wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		try{
+			assertTrue(resultChecker.getResultOK());
+		}
+		catch(AssertionError e){
+			System.err.println(resultChecker.getResults().toJSONString());
+			throw e;
+		}
+		
+		TTEventDropBomb ttEvent6 = new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
+		resultChecker = new ResultChecker(false);
+		event = new TTEventWrapper(TTEventType.DROP_BOMB,ttEvent6,resultChecker);
+		events.add(event);
+		eventPublisher.onData(event);
+		synchronized(resultChecker.getSemaphore()){
+			while(resultChecker.getResultOK() == null){
+				try {
+					resultChecker.getSemaphore().wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		try{
+			assertTrue(resultChecker.getResultOK());
+		}
+		catch(AssertionError e){
+			System.err.println(resultChecker.getResults().toJSONString());
+			throw e;
+		}
+		
+		TTEventBurnBombFuse ttEvent7 = new TTEventBurnBombFuse(worldName,worldPassword);
+		resultChecker = new ResultChecker(false);
+		event = new TTEventWrapper(TTEventType.BURN_BOMB_FUSE,ttEvent7,resultChecker);
 		events.add(event);
 		eventPublisher.onData(event);
 		synchronized(resultChecker.getSemaphore()){

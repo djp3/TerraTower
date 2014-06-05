@@ -29,7 +29,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TTEventPlaceTowerTest {
+public class TTEventDropBombTest {
 	static final String worldName = "name";
 	static final String worldPassword = "password";
 	static final String playerName = "name";
@@ -55,13 +55,13 @@ public class TTEventPlaceTowerTest {
 	@Test
 	public void testEquals() {
 		
-		TTEventPlaceTower t1 = new TTEventPlaceTower(worldName,worldPassword,playerName,playerPassword,0.0,0.0,0.0);
+		TTEventDropBomb t1 = new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,0.0,0.0,0.0);
 		assertEquals(t1,t1);
 		assertTrue(!t1.equals(null));
 		assertTrue(!t1.equals("string"));
 		
-		TTEventPlaceTower t2 = new TTEventPlaceTower(worldName,worldPassword,playerName,playerPassword,5.0,5.0,5.0);
-		TTEventPlaceTower t3 = new TTEventPlaceTower(worldName,worldPassword,playerName,playerPassword,5.0,5.0,5.0);
+		TTEventDropBomb t2 = new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,5.0,5.0,5.0);
+		TTEventDropBomb t3 = new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,5.0,5.0,5.0);
 		assertTrue(t2.equals(t3));
 		assertTrue(t2.hashCode()==t3.hashCode());
 		
@@ -88,14 +88,14 @@ public class TTEventPlaceTowerTest {
 
 	@Test
 	public void testBasic() {
-		new TTEventPlaceTower(worldName,worldPassword,playerName,playerPassword,0.0,0.0,0.0);
+		new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,0.0,0.0,0.0);
 	}
 	
 	@Test
 	public void testJSON() {
-		TTEventPlaceTower t1 = new TTEventPlaceTower(worldName,worldPassword,playerName,playerPassword,0.0,0.0,0.0);
+		TTEventDropBomb t1 = new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,0.0,0.0,0.0);
 		
-		assertEquals(t1,TTEventPlaceTower.fromJSON(t1.toJSON()));
+		assertEquals(t1,TTEventDropBomb.fromJSON(t1.toJSON()));
 	}
 
 }

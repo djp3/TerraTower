@@ -33,12 +33,12 @@ import org.junit.Test;
 import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
-import edu.uci.ics.luci.TerraTower.events.TTEventPlaceBomb;
+import edu.uci.ics.luci.TerraTower.events.TTEventBuildTower;
 import edu.uci.ics.luci.TerraTower.world.Territory;
 import edu.uci.ics.luci.TerraTower.world.WorldManager;
 import edu.uci.ics.luci.utility.Globals;
 
-public class TTEventHandlerPlaceBombTest {
+public class TTEventHandlerBuildTowerTest {
 	
 	static final String worldName = "name"+System.currentTimeMillis();
 	static final String worldPassword = "password"+System.currentTimeMillis();
@@ -68,7 +68,7 @@ public class TTEventHandlerPlaceBombTest {
 
 	@Test
 	public void testParameters() {
-		TTEventHandlerPlaceBomb tt = new TTEventHandlerPlaceBomb();
+		TTEventHandlerBuildTower tt = new TTEventHandlerBuildTower();
 
 		/* Super type catches lack of globals error*/
 		TTEvent tx = new TTEvent(worldName,worldPassword);
@@ -96,7 +96,7 @@ public class TTEventHandlerPlaceBombTest {
 		assertEquals("true",(String)json.get("error"));
 		
 		/*Territory doesn't exist*/
-		TTEventPlaceBomb event = new TTEventPlaceBomb(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
+		TTEventBuildTower event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
 		json = tt.checkParameters(0,event);
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
@@ -105,48 +105,49 @@ public class TTEventHandlerPlaceBombTest {
 		wm.setTerritory(new Territory(-180.0, 180.0, 10, -90.0, 90.0, 10));
 		
 		/*Too little time */
-		event = new TTEventPlaceBomb(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-		tt.player.setLastBombPlacedTime(0);
+		event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
+		tt.player.setLastTowerPlacedTime(0);
 		json = tt.checkParameters(0,event);
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
 		
 		/*Out of bounds x */
-		event = new TTEventPlaceBomb(worldName,worldPassword,playerName,playerPassword,lat,-190.0,alt);
-		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,lat,-190.0,alt);
+		tt.player.setLastTowerPlacedTime(-1 - g.DEFAULT_TOWER_DELAY);
 		json = tt.checkParameters(0,event);
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
 		
 		/*Out of bounds x */
-		event = new TTEventPlaceBomb(worldName,worldPassword,playerName,playerPassword,-100.0,lng,alt);
-		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,-100.0,lng,alt);
+		tt.player.setLastTowerPlacedTime(-1 - g.DEFAULT_TOWER_DELAY);
 		json = tt.checkParameters(0,event);
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
 		
 		/*Ok */
-		event = new TTEventPlaceBomb(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
+		tt.player.setLastTowerPlacedTime(-1 - g.DEFAULT_TOWER_DELAY);
 		json = tt.checkParameters(0,event);
 		assertTrue(json == null);
 		
-		/* Add the bomb*/
+		/* Add the tower*/
 		json = tt.onEvent();
 		assertTrue(json != null);
 		assertEquals("false",(String)json.get("error"));
 		
-		/* ok to add another bomb */
-		event = new TTEventPlaceBomb(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		/* Fail for existing tower */
+		event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
+		tt.player.setLastTowerPlacedTime(-1 - g.DEFAULT_TOWER_DELAY);
 		json = tt.checkParameters(0,event);
-		assertTrue(json == null);
+		assertTrue(json != null);
+		assertEquals(json.get("error"),"true");
 		
 	}
 	
 	@Test
 	public void testOnEvent() {
-		TTEventHandlerPlaceBomb tt = new TTEventHandlerPlaceBomb();
+		TTEventHandlerBuildTower tt = new TTEventHandlerBuildTower();
 
 		GlobalsTerraTower g = new GlobalsTerraTower("Version test");
 		Globals.setGlobals(g);
@@ -164,33 +165,27 @@ public class TTEventHandlerPlaceBombTest {
 		WorldManager wm = g.getWorld(worldName, worldPassword);
 		wm.setTerritory(new Territory(-180.0, 180.0, 10, -90.0, 90.0, 10));
 		
-		/* Fail so we can get the player set so we can set the bomb time in the next block */
-		TTEventPlaceBomb event = new TTEventPlaceBomb(worldName,worldPassword,playerName,playerPassword,-100.0,lng,alt);
+		/* Fail so we can get the player set so we can set the tower time in the next block */
+		TTEventBuildTower event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,-100.0,lng,alt);
 		json = tt.checkParameters(0,event);
 		assertTrue(json != null);
 		
 		/*Ok */
-		event = new TTEventPlaceBomb(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
+		tt.player.setLastTowerPlacedTime(-1 - g.DEFAULT_TOWER_DELAY);
 		json = tt.checkParameters(0,event);
 		assertTrue(json == null);
 		
-		/* Add the bomb*/
+		/* Add the tower*/
 		json = tt.onEvent();
 		assertTrue(json != null);
 		assertEquals("false",(String)json.get("error"));
 		
-		/* Add the bomb again, should fail because parameters not checked*/
+		/* Fail to add a second tower*/
 		json = tt.onEvent();
 		assertTrue(json != null);
 		assertEquals("true",(String)json.get("error"));
 		
-		/*Not Ok */
-		/* add a second bomb fails because it's too fast*/
-		event = new TTEventPlaceBomb(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-		json = tt.checkParameters(0,event);
-		assertTrue(json != null);
-		assertEquals("true",(String)json.get("error"));
 		
 	}
 
