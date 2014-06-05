@@ -53,13 +53,16 @@ public class TerraTower {
 
 	private static transient volatile Logger log = null;
 
-	private static TTEventWrapperQueuer eventPublisher;
+	
 	public static Logger getLog(){
 		if(log == null){
 			log = LogManager.getLogger(TerraTower.class);
 		}
 		return log;
 	}
+	
+	
+	private static TTEventWrapperQueuer eventPublisher;
 	
 	/**
 	 * Create Event Disruptor

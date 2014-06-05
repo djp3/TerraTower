@@ -20,6 +20,7 @@
 */
 package edu.uci.ics.luci.TerraTower.gameElements;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -61,9 +62,47 @@ public class TowerTest {
 			player = new Player(playerName, PasswordUtils.hashPassword(playerPassword));
 			tower1 = new Tower(player,0,0);
 			tower2 = new Tower(player,0,0);
+			assertEquals(tower1,tower1);
 			assertEquals(tower1,tower2);
 			assertEquals(tower2,tower1);
 			assertEquals(tower1.hashCode(),tower2.hashCode());
+			
+			assertTrue(!tower1.equals(null));
+			assertTrue(!tower1.equals("string"));
+			
+			tower2.setDestroyed(true);
+			assertTrue(!tower1.equals(tower2));
+			assertTrue(!tower2.equals(tower1));
+			assertTrue(tower1.hashCode() != tower2.hashCode());
+			tower2.setDestroyed(tower1.isDestroyed());
+			
+			tower2.setOwner(null);
+			assertTrue(!tower1.equals(tower2));
+			assertTrue(!tower2.equals(tower1));
+			assertTrue(tower1.hashCode() != tower2.hashCode());
+			tower2.setOwner(tower1.getOwner());
+			
+			tower1.setOwner(null);
+			tower2.setOwner(null);
+			assertTrue(tower1.equals(tower2));
+			assertTrue(tower2.equals(tower1));
+			assertTrue(tower1.hashCode() == tower2.hashCode());
+			tower1.setOwner(player);
+			tower2.setOwner(player);
+			
+			tower2.setX(19);
+			assertTrue(!tower1.equals(tower2));
+			assertTrue(!tower2.equals(tower1));
+			assertTrue(tower1.hashCode() != tower2.hashCode());
+			tower2.setX(tower1.getX());
+			
+			tower2.setY(19);
+			assertTrue(!tower1.equals(tower2));
+			assertTrue(!tower2.equals(tower1));
+			assertTrue(tower1.hashCode() != tower2.hashCode());
+			tower2.setY(tower1.getY());
+			
+			
 		}
 		catch(RuntimeException e){
 			fail("Shouldn't throw an exception");
