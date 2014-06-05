@@ -21,12 +21,20 @@
 package edu.uci.ics.luci.TerraTower.gameElements;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
 
-public class Player {
+public class Player implements Comparable<Player>{
 	
+	private static Random r;
+	public static final Player BARBARIAN;
+	
+	static{
+		r = new Random();
+		BARBARIAN = new Player("barbarian",PasswordUtils.hashPassword("barbarian password"+r.nextInt()));
+	}
 	String playerName;
 	byte[] hashedPassword;
 	
@@ -40,7 +48,7 @@ public class Player {
 	//When the last bomb placed
 	long lastBombPlacedTime;
 	
-	//How long till the bomb blows?
+	//How long till a bomb blows?
 	long bombFuse;
 	
 	
@@ -145,6 +153,7 @@ public class Player {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (bombDelay ^ (bombDelay >>> 32));
+		result = prime * result + (int) (bombFuse ^ (bombFuse >>> 32));
 		result = prime * result + Arrays.hashCode(hashedPassword);
 		result = prime * result
 				+ (int) (lastBombPlacedTime ^ (lastBombPlacedTime >>> 32));
@@ -172,6 +181,9 @@ public class Player {
 		if (bombDelay != other.bombDelay) {
 			return false;
 		}
+		if (bombFuse != other.bombFuse) {
+			return false;
+		}
 		if (!Arrays.equals(hashedPassword, other.hashedPassword)) {
 			return false;
 		}
@@ -193,9 +205,34 @@ public class Player {
 		}
 		return true;
 	}
-	
-	
-	
-	
+
+
+	@Override
+	public int compareTo(Player o) {
+		int x;
+		
+		if(this.getPlayerName() == null){
+			if( o.getPlayerName() == null){
+				x = 0;
+			}
+			else{
+				x = 1;
+			}
+		}
+		else{
+			if(o.getPlayerName() == null){
+				x = -1;
+			}
+			else{
+				x = this.getPlayerName().compareTo(o.getPlayerName());
+				if(x == 0){
+					long a = this.getBombDelay()+this.getTowerDelay();
+					long b = o.getBombDelay()+o.getTowerDelay();
+					return (int) (a - b);
+				}
+			}
+		}
+		return x;
+	}
 
 }

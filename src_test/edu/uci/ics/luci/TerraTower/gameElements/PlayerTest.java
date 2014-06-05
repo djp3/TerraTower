@@ -20,7 +20,9 @@
 */
 package edu.uci.ics.luci.TerraTower.gameElements;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 
@@ -89,6 +91,7 @@ public class PlayerTest {
 		}
 		Player playerb = new Player(playerName,PasswordUtils.hashPassword(playerPassword));
 		
+		
 		assertTrue(!playera.equals(null));
 		assertTrue(!playera.equals("foo"));
 		assertTrue(playera.equals(playera));
@@ -120,11 +123,16 @@ public class PlayerTest {
 		playerb.setTowerDelay(playera.getTowerDelay());
 		
 		playera.setPlayerName(null);
+		assertTrue(playera.compareTo(playerb)==1);
 		playerb.setPlayerName(null);
+		assertTrue(playera.compareTo(playerb)==0);
 		assertTrue(playera.equals(playerb));
 		assertTrue(playerb.equals(playera));
 		assertTrue(playera.hashCode() == playerb.hashCode());
 		playera.setPlayerName(playerName);
+		assertTrue(playera.compareTo(playerb)==-1);
+		playerb.setPlayerName(playerName+"x");
+		assertTrue(playera.compareTo(playerb)==-1);
 		playerb.setPlayerName(playerName);
 		
 		playerb.setPlayerName("goo");
@@ -139,11 +147,19 @@ public class PlayerTest {
 		assertTrue(playera.hashCode() != playerb.hashCode());
 		playerb.setPlayerName(playera.getPlayerName());
 		
+		playerb.setBombFuse(12020);
+		assertTrue(!playera.equals(playerb));
+		assertTrue(!playerb.equals(playera));
+		assertTrue(playera.hashCode() != playerb.hashCode());
+		playerb.setBombFuse(playera.getBombFuse());
+		
 		playerb = new Player(playerName,PasswordUtils.hashPassword(playerPassword+"x"));
 		assertTrue(!playera.equals(playerb));
 		assertTrue(!playerb.equals(playera));
 		assertTrue(playera.hashCode() != playerb.hashCode());
 		playerb = new Player(playerName,PasswordUtils.hashPassword(playerPassword));
+		
+		assertTrue(playera.compareTo(playerb)==0);
 		
 	}
 
