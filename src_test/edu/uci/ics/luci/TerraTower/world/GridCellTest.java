@@ -198,6 +198,13 @@ public class GridCellTest {
 		assertTrue(a.hashCode() != b.hashCode());
 		b.setY(a.getY());
 		
+		//steps taken is transient and shouldn't affect equality
+		a.setStepsTaken(11);
+		assertTrue(a.equals(b));
+		assertTrue(b.equals(a));
+		assertTrue(a.hashCode() == b.hashCode());
+		b.setStepsTaken(a.getStepsTaken());
+		
 		assertTrue(a.equals(b));
 		a.setOwner(null);
 		assertTrue(!a.equals(b));

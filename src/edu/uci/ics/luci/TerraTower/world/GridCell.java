@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.logging.log4j.LogManager;
@@ -49,13 +50,14 @@ public class GridCell {
 	private int x;
 	private int y;
 	
-	private Tower t = null;
-	private TreeMap<Long,List<Bomb>> bombs = null;
-	private TreeMap<Double,Double> alts;
+	private Tower t;
+	private SortedMap<Long,List<Bomb>> bombs = null;
+	private SortedMap<Double,Double> alts;
 	
 	private Pair<Player,Integer> owner;
+	
+	//Used during the territory expansion as temp variables
 	private transient Map<Player,Integer> proposedOwner;
-
 	private transient int stepsTaken;
 	
 	public int getX() {
@@ -82,19 +84,19 @@ public class GridCell {
 		this.t = t;
 	}
 
-	public TreeMap<Long, List<Bomb>> getBombs() {
+	public SortedMap<Long, List<Bomb>> getBombs() {
 		return bombs;
 	}
 
-	public void setBombs(TreeMap<Long, List<Bomb>> bombs) {
+	public void setBombs(SortedMap<Long, List<Bomb>> bombs) {
 		this.bombs = bombs;
 	}
 
-	public TreeMap<Double, Double> getAlts() {
+	public SortedMap<Double, Double> getAlts() {
 		return alts;
 	}
 
-	public void setAlts(TreeMap<Double, Double> alts) {
+	public void setAlts(SortedMap<Double, Double> alts) {
 		this.alts = alts;
 	}
 
@@ -127,6 +129,11 @@ public class GridCell {
 		setY(y);
 		setBombs(new TreeMap<Long,List<Bomb>>());
 		setAlts(new TreeMap<Double,Double>());
+		setTower(null);
+		resetOwner();
+	}
+
+	public void resetOwner() {
 		setOwner(new Pair<Player,Integer>(null,0));
 		setProposedOwner(new HashMap<Player,Integer>());
 	}
