@@ -47,6 +47,7 @@ public class GridCell {
 		return log;
 	}
 	
+	
 	private int x;
 	private int y;
 	
@@ -134,7 +135,7 @@ public class GridCell {
 	}
 
 	public void resetOwner() {
-		setOwner(new Pair<Player,Integer>(null,0));
+		setOwner(new Pair<Player,Integer>(Player.BARBARIAN,0));
 		setProposedOwner(new HashMap<Player,Integer>());
 	}
 
