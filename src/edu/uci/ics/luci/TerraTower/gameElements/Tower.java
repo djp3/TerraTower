@@ -25,6 +25,7 @@ public class Tower {
 	Player owner;
 	int x;
 	int y;
+	boolean destroyed = false;
 	
 	public Player getOwner() {
 		return owner;
@@ -50,6 +51,14 @@ public class Tower {
 		this.y = y;
 	}
 
+	public boolean isDestroyed() {
+		return destroyed;
+	}
+
+	public void setDestroyed(boolean destroyed) {
+		this.destroyed = destroyed;
+	}
+
 	public Tower(Player owner,int x, int y){
 		this.setOwner(owner);
 		this.setX(x);
@@ -60,6 +69,7 @@ public class Tower {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (destroyed ? 1231 : 1237);
 		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
 		result = prime * result + x;
 		result = prime * result + y;
@@ -78,6 +88,9 @@ public class Tower {
 			return false;
 		}
 		Tower other = (Tower) obj;
+		if (destroyed != other.destroyed) {
+			return false;
+		}
 		if (owner == null) {
 			if (other.owner != null) {
 				return false;
@@ -93,6 +106,7 @@ public class Tower {
 		}
 		return true;
 	}
+
 
 
 }
