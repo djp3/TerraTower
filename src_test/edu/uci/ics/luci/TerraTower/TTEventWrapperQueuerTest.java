@@ -152,7 +152,7 @@ public class TTEventWrapperQueuerTest {
 		double alt = 0.0d;
 		TTEventPlaceTower ttEvent4 = new TTEventPlaceTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
 		resultChecker = new ResultChecker(false);
-		event = new TTEventWrapper(TTEventType.PLACE_TOWER,ttEvent4,resultChecker);
+		event = new TTEventWrapper(TTEventType.BUILD_TOWER,ttEvent4,resultChecker);
 		events.add(event);
 		eventPublisher.onData(event);
 		synchronized(resultChecker.getSemaphore()){

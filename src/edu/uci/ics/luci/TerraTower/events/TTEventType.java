@@ -5,16 +5,20 @@ public enum TTEventType{
 	CREATE_WORLD,
 	CREATE_TERRITORY,
 	CREATE_PLAYER,
-	PLACE_TOWER,
-	STEP_TOWER_TERRITORY_GROWTH;
+	BUILD_TOWER,
+	STEP_TOWER_TERRITORY_GROWTH,
+	DROP_BOMB,
+	BURN_FUSE;
 	
 	public static String toString(TTEventType x){
 		switch (x){
 			case CREATE_WORLD: return "CREATE_WORLD";
 			case CREATE_TERRITORY: return "CREATE_TERRITORY";
 			case CREATE_PLAYER: return "CREATE_PLAYER";
-			case PLACE_TOWER: return "PLACE_TOWER";
+			case BUILD_TOWER: return "BUILD_TOWER";
 			case STEP_TOWER_TERRITORY_GROWTH: return "STEP_TOWER_TERRITORY_GROWTH";
+			case BURN_FUSE: return "BURN_FUSE";
+			case DROP_BOMB: return "DROP_BOMB";
 			default: return "VOID";
 		}
 	}
@@ -24,8 +28,10 @@ public enum TTEventType{
 			case "CREATE_WORLD": return CREATE_WORLD;
 			case "CREATE_TERRITORY": return CREATE_TERRITORY;
 			case "CREATE_PLAYER": return CREATE_PLAYER;
-			case "PLACE_TOWER": return PLACE_TOWER;
+			case "BUILD_TOWER": return BUILD_TOWER;
 			case "STEP_TOWER_TERRITORY_GROWTH": return STEP_TOWER_TERRITORY_GROWTH;
+			case "BURN_FUSE": return BURN_FUSE;
+			case "DROP_BOMB": return DROP_BOMB;
 			default: return VOID;
 		}
 	}

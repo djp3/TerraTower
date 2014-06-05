@@ -99,7 +99,7 @@ public class TTEventWrapper {
 			break;
 		case CREATE_PLAYER: this.setEvent(new TTEventCreatePlayer((String)null, (String)null, null, null));
 			break;
-		case PLACE_TOWER: this.setEvent(new TTEventPlaceTower((String)null, (String)null, null, null, null, null, null));
+		case BUILD_TOWER: this.setEvent(new TTEventPlaceTower((String)null, (String)null, null, null, null, null, null));
 			break;
 		case STEP_TOWER_TERRITORY_GROWTH: this.setEvent(new TTEventStepTowerTerritoryGrowth((String)null,(String)null));
 			break;
@@ -118,7 +118,7 @@ public class TTEventWrapper {
 			break;
 		case CREATE_PLAYER: this.setHandler(new TTEventHandlerCreatePlayer());
 			break;
-		case PLACE_TOWER: this.setHandler(new TTEventHandlerPlaceTower());
+		case BUILD_TOWER: this.setHandler(new TTEventHandlerPlaceTower());
 			break;
 		case STEP_TOWER_TERRITORY_GROWTH: this.setHandler(new TTEventHandlerStepTowerTeritoryGrowth());
 			break;
@@ -142,7 +142,7 @@ public class TTEventWrapper {
 		case CREATE_WORLD: problem = (!(this.getEvent() instanceof TTEventCreateWorld));
 							   problem |= (!(this.getHandler() instanceof TTEventHandlerCreateWorld));
 			break;
-		case PLACE_TOWER: problem = (!(this.getEvent() instanceof TTEventPlaceTower));
+		case BUILD_TOWER: problem = (!(this.getEvent() instanceof TTEventPlaceTower));
 							   problem |= (!(this.getHandler() instanceof TTEventHandlerPlaceTower));
 			break;
 		case VOID: problem = (!(this.getEvent() instanceof TTEventVoid));
@@ -266,7 +266,7 @@ public class TTEventWrapper {
 				break;
 			case CREATE_PLAYER: event = TTEventCreatePlayer.fromJSON((JSONObject)in.get("event"));
 				break;
-			case PLACE_TOWER: event = TTEventPlaceTower.fromJSON((JSONObject)in.get("event"));
+			case BUILD_TOWER: event = TTEventPlaceTower.fromJSON((JSONObject)in.get("event"));
 				break;
 			default:event = null;
 				break;
