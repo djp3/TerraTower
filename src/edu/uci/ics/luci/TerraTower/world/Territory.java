@@ -26,6 +26,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.SortedMap;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.uci.ics.luci.TerraTower.gameElements.Bomb;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
@@ -33,6 +39,19 @@ import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 import edu.uci.ics.luci.utility.datastructure.Pair;
 
 public class Territory {
+	
+	private static transient volatile Logger log = null;
+	public static Logger getLog(){
+		if(log == null){
+			log = LogManager.getLogger(Territory.class);
+		}
+		return log;
+	}
+	
+	static Random r;
+	static{
+		r = new Random();
+	}
 
 	private GridCell[][] grid;
 	double left;
@@ -48,6 +67,7 @@ public class Territory {
 
 	public Territory(double left, double right, int numXSplits, double bottom,
 			double top, int numYSplits) {
+		
 		if (left >= right) {
 			throw new IllegalArgumentException("left must be less than right");
 		}
@@ -137,6 +157,17 @@ public class Territory {
 	public GridCell index(double x, double y) {
 		return grid[xIndex(x)][yIndex(y)];
 	}
+
+
+	/*
+	private WorldManager getWorldManager() {
+		return parent;
+	}
+
+
+	private void setWorldManager(WorldManager parent) {
+		this.parent = parent;
+	}*/
 
 
 	public double getLeft() {
@@ -307,6 +338,12 @@ public class Territory {
 
 
 	public void stepTowerTerritoryGrowth(int towerMax,int towerStart) {
+		stepTowerTerritoryGrowth(towerMax,towerStart,false);
+	}
+	
+	
+	
+	public void stepTowerTerritoryGrowth(int towerMax,int towerStart,boolean withRandom) {
 		List<Tower> towerList = new ArrayList<Tower>();
 		
 		//printGrid();
@@ -316,12 +353,19 @@ public class Territory {
 				//Clear proposed owners
 				grid[x][y].getProposedOwner().clear();
 				
+				
 				//Collect a list of towers
 				if(grid[x][y].towerPresent()){
 					towerList.add(grid[x][y].getTower());
 				}
 				//Lower existing ownership levels by 1 with a floor of 1
 				grid[x][y].lowerTowerTerritoryLevel(1,1);
+				
+				//Add the current owner as a proposed owner in case it's no longer supported by a tower
+				Pair<Player, Integer> owner = grid[x][y].getOwner();
+				Map<Player, Integer> p = new HashMap<Player,Integer>();
+				p.put(owner.getFirst(),owner.getSecond());
+				grid[x][y].setProposedOwner(p);
 			}
 		}
 		//printGrid();
@@ -346,7 +390,7 @@ public class Territory {
 			 * to start claiming land at power level "towerstart"
 			 */
 			if(o.getFirst() != tower.getOwner()){
-				stepTowerTerritoryRecurse(tower, towerStart,tower.getX(),tower.getY(),1);
+				stepTowerTerritoryRecurse(tower, towerStart,tower.getX(),tower.getY(),1,withRandom);
 			}
 			/* If the owner of the tower does own the land, then the tower attempts to start claiming
 			 * land at one level higher (which is two because of the decay above) 
@@ -354,7 +398,7 @@ public class Territory {
 			else{
 				Integer level = o.getSecond();
 				level+=2;
-				stepTowerTerritoryRecurse(tower, level,tower.getX(),tower.getY(),1);
+				stepTowerTerritoryRecurse(tower, level,tower.getX(),tower.getY(),1,withRandom);
 			}
 		}
 		
@@ -370,25 +414,48 @@ public class Territory {
 		//printGrid();
 	}
 
-	private void printGrid() {
+	void printGrid() {
 		System.out.println();
 		for (int y = 0; y < numYSplits; y++) {
 			for (int x = 0; x < numXSplits; x++) {
 				Player player = grid[x][y].getOwner().getFirst();
 				if(player == null){
-					System.out.print("\tn");
+					System.out.print("\t ");
 				}
 				else{
-					System.out.print("\t"+player.getPlayerName());
+					System.out.print("\t"+player.getPlayerName().substring(0, 1));
 				}
-				System.out.print(":"+grid[x][y].getOwner().getSecond());
+				if(grid[x][y].towerPresent()){
+					System.out.print("<t>");
+				}
+				else{
+					System.out.print("...");
+				}
+				if(grid[x][y].numBombsPresent() != 0 ){
+					System.out.print("<"+grid[x][y].numBombsPresent()+">");
+				}
+				else{
+					System.out.print("...");
+				}
+				
+				
+				if(grid[x][y].getOwner().getSecond() != 0 ){
+					System.out.print(" "+grid[x][y].getOwner().getSecond());
+				}
+				else{
+					System.out.print(" ");
+				}
 			}
 			System.out.println();
+		}
+		List<Pair<Integer, Player>> l = this.getLeaderBoard();
+		for(Pair<Integer, Player> p:l){
+			System.out.println(p.getSecond().getPlayerName()+":"+p.getFirst());
 		}
 	}
 
 
-	private void stepTowerTerritoryRecurse(Tower tower,int level, int x, int y,int stepsTaken) {
+	private void stepTowerTerritoryRecurse(Tower tower,int level, int x, int y,int stepsTaken,boolean withRandom) {
 		if(level == 0){
 			//return;
 		}
@@ -450,27 +517,49 @@ public class Territory {
 		steps.add(new Pair<Integer,Integer>(x,y+1));
 		steps.add(new Pair<Integer,Integer>(x-1,y));
 		steps.add(new Pair<Integer,Integer>(x+1,y));
+		if(withRandom){
+			if(r.nextDouble()<0.707){
+				steps.add(new Pair<Integer,Integer>(x+1,y+1));
+			}
+			if(r.nextDouble()<0.707){
+				steps.add(new Pair<Integer,Integer>(x-1,y+1));
+			}
+			if(r.nextDouble()<0.707){
+				steps.add(new Pair<Integer,Integer>(x-1,y-1));
+			}
+			if(r.nextDouble()<0.707){
+				steps.add(new Pair<Integer,Integer>(x+1,y-1));
+			}
+		}
 		Collections.shuffle(steps);
 		for(Pair<Integer, Integer> p:steps){
-			stepTowerTerritoryRecurse(tower,level-1, p.getFirst(),p.getSecond(),stepsTaken+1);
+			stepTowerTerritoryRecurse(tower,level-1, p.getFirst(),p.getSecond(),stepsTaken+1, withRandom);
 		}
 	}
 	
-	private void calculateLeaderBoard(){
-		leaderBoard.clear();
-		for (int x = 0; x < numXSplits; x++) {
-			for (int y = 0; y < numYSplits; y++) {
-				Pair<Player, Integer> o = grid[x][y].getOwner();
-				if(leaderBoard.containsKey(o.getFirst())){
-					Integer e = leaderBoard.get(o.getFirst());
-					leaderBoard.put(o.getFirst(), e+1);
-				}
-				else{
-					leaderBoard.put(o.getFirst(), 1);
+	public List<Pair<Integer, Player>> getLeaderBoard(){
+		if(leaderBoardOutdated){
+			leaderBoard.clear();
+			for (int x = 0; x < numXSplits; x++) {
+				for (int y = 0; y < numYSplits; y++) {
+					Pair<Player, Integer> o = grid[x][y].getOwner();
+					if(leaderBoard.containsKey(o.getFirst())){
+						Integer e = leaderBoard.get(o.getFirst());
+						leaderBoard.put(o.getFirst(), e+1);
+					}
+					else{
+						leaderBoard.put(o.getFirst(), 1);
+					}
 				}
 			}
+			leaderBoardOutdated = false;
 		}
-		leaderBoardOutdated = false;
+		List<Pair<Integer,Player>> ret = new ArrayList<Pair<Integer,Player>>();
+		for(Entry<Player, Integer> e :leaderBoard.entrySet()){
+			ret.add(new Pair<Integer,Player>(e.getValue(),e.getKey()));
+		}
+		Collections.sort(ret,Collections.reverseOrder());
+		return(ret);
 	}
 
 
@@ -481,6 +570,69 @@ public class Territory {
 
 	public boolean addBomb(Bomb bomb) {
 		return(grid[bomb.getX()][bomb.getY()].addBomb(bomb));
+	}
+
+
+	public void burnBombFuse(long eventTime) {
+		for (int x = 0; x < numXSplits; x++) {
+			for (int y = 0; y < numYSplits; y++) {
+				if(grid[x][y].numBombsPresent() > 0){
+					SortedMap<Long, List<Bomb>> bombs = grid[x][y].getBombs();
+					//Go through all bombs that should be exploded
+					for(List<Bomb> e :bombs.headMap(eventTime+1).values()){
+						for(Bomb b: e){
+							if(!b.isExploded()){
+								for(int bx = (b.getX() - b.getStrength()); bx<= (b.getX() + b.getStrength()); bx++ ){
+									if((bx >= 0) && (bx < this.getNumXSplits())){
+										for(int by = (b.getY() - b.getStrength()); by<= (b.getY() + b.getStrength()); by++ ){
+											if((by >= 0) && (by < this.getNumYSplits())){
+												if(inRange(bx,by,b.getX(),b.getY(),b.getStrength())){
+													b.setExploded(true);
+													effectBombDamage(bx,by);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					//Remove bombs that have expired
+					grid[x][y].setBombs(bombs.tailMap(eventTime+1));
+				}
+				//Remove towers that have been destroyed
+				if(grid[x][y].towerPresent()){
+					Tower tower = grid[x][y].getTower();
+					if(tower.isDestroyed()){
+						grid[x][y].setTower(null);
+					}
+				}
+			}
+		}
+		
+	}
+
+
+	private void effectBombDamage(int x, int y) {
+		leaderBoardOutdated = true;
+		grid[x][y].resetOwner();
+		if(grid[x][y].towerPresent()){
+			Tower tower = grid[x][y].getTower();
+			tower.setDestroyed(true);
+		}
+	}
+
+
+	public static boolean inRange(int bx, int by, int x, int y, int strength) {
+		int dx = (bx - x);
+		int dy = (by - y);
+		int d = strength;
+		if((dx*dx+dy*dy)< (d*d)){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 	
 

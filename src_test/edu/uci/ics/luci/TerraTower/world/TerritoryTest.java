@@ -24,6 +24,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -357,7 +359,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(2),owner.getSecond());
 		
 		owner = t.index(-3.5,-3.5).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		
@@ -371,7 +373,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(2),owner.getSecond());
 		
 		owner = t.index(-3.5,-3.5).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		
@@ -458,7 +460,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(2),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		
@@ -468,7 +470,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(3),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		
@@ -478,7 +480,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(4),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		
@@ -488,7 +490,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(5),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		
@@ -498,7 +500,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(5),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		
@@ -508,7 +510,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(5),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		t.stepTowerTerritoryGrowth(5, 2);
@@ -517,7 +519,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(5),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		t.stepTowerTerritoryGrowth(5, 2);
@@ -526,7 +528,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(5),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		t.stepTowerTerritoryGrowth(5, 2);
@@ -535,7 +537,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(5),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		t.stepTowerTerritoryGrowth(5, 2);
@@ -544,7 +546,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(5),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		t.stepTowerTerritoryGrowth(5, 2);
@@ -570,11 +572,11 @@ public class TerritoryTest {
 		
 		t.stepTowerTerritoryGrowth(5, 2);
 		Pair<Player, Integer> owner = t.index(0.0,0.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		t.stepTowerTerritoryGrowth(5, 2);
@@ -583,7 +585,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(2),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		
@@ -593,7 +595,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(3),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		
@@ -603,7 +605,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(4),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		
@@ -613,7 +615,7 @@ public class TerritoryTest {
 		assertEquals(Integer.valueOf(5),owner.getSecond());
 		
 		owner = t.index(-5.0,-5.0).getOwner();
-		assertTrue(null == owner.getFirst());
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
 		assertEquals(Integer.valueOf(0),owner.getSecond());
 		
 		
@@ -658,7 +660,232 @@ public class TerritoryTest {
 		
 		
 	}
+	
+	@Test
+	public void testInRange() {
 		
+		assertTrue(Territory.inRange(0,0, 0, 0, 10));
+		assertTrue(Territory.inRange(1,0, 0, 0, 10));
+		assertTrue(Territory.inRange(1,1, 5, 5, 10));
+		assertTrue(Territory.inRange(-1,-1, 5, 5, 10));
+		assertTrue(Territory.inRange(9,9, 5, 5, 10));
+		
+		assertTrue(!Territory.inRange(1,1, 0, 0, 1));
+		assertTrue(!Territory.inRange(-1,-1, 0, 0, 1));
+		assertTrue(!Territory.inRange(1,-1, 0, 0, 1));
+		assertTrue(!Territory.inRange(-1,1, 0, 0, 1));
+		
+	}
+	
 
+	@Test
+	public void testBurnBombFuse() {
+		/*Make a map */
+		Territory t = new Territory(-5.0,5.0,10,-5.0,5.0,10);
+		
+		/*Make two players*/
+		Player playera = new Player("a",PasswordUtils.hashPassword("b"));
+		Player playerb = new Player("b",PasswordUtils.hashPassword("b"));
+		
+		/*Give them each a tower*/
+		Tower towera = new Tower(playera,0,5);
+		Tower towerb = new Tower(playerb,5,4);
+		
+		/*Put the towers on the map */
+		t.addTower(towera);
+		t.addTower(towerb);
+		
+		/*Make sure the ownership is null */
+		Pair<Player, Integer> owner = t.index(5.0,0.0).getOwner();
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
+		assertTrue(owner.getSecond() == 0);
+		
+		/* Run the towers for a bit */
+		for(int i = 0 ; i < 20 ; i++){
+			//t.printGrid();
+			t.stepTowerTerritoryGrowth(5, 2);
+		}
+		
+		/* Check ownership */
+		owner = t.index(-5.0,0.0).getOwner();
+		assertTrue(owner.getFirst() == playera);
+		assertTrue(owner.getSecond() == 5);
+		
+		/* Blow up non-existent bombs */
+		t.burnBombFuse(0);
+		assertTrue(!towera.isDestroyed());
+		assertTrue(!towerb.isDestroyed());
+		
+		/* Check ownership */
+		owner = t.index(-5.0,0.0).getOwner();
+		assertTrue(owner.getFirst() == playera);
+		assertTrue(owner.getSecond() == 5);
+		
+		/* Blow up a bomb */
+		Bomb bomb = new Bomb(playera, 0, 5, 0, 1);
+		t.addBomb(bomb);
+		t.burnBombFuse(0);
+		assertTrue(bomb.isExploded());
+		
+		assertTrue(towera.isDestroyed());
+		assertTrue(!towerb.isDestroyed());
+		
+		/* Check ownership */
+		owner = t.index(-5.0,0.0).getOwner();
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
+		assertTrue(owner.getSecond() == 0);
+		//t.printGrid();
+		
+		bomb = new Bomb(playera, 0, 5, 2, 5);
+		t.addBomb(bomb);
+		t.burnBombFuse(0);
+		assertTrue(towera.isDestroyed());
+		assertTrue(!towerb.isDestroyed());
+		assertTrue(!bomb.isExploded());
+		
+		t.burnBombFuse(1);
+		assertTrue(towera.isDestroyed());
+		assertTrue(!towerb.isDestroyed());
+		assertTrue(!bomb.isExploded());
+		
+		t.burnBombFuse(2);
+		assertTrue(towera.isDestroyed());
+		assertTrue(!towerb.isDestroyed());
+		assertTrue(bomb.isExploded());
+		//t.printGrid();
+		
+		bomb = new Bomb(playera, 0, 5, 4, 7);
+		t.addBomb(bomb);
+		t.burnBombFuse(3);
+		assertTrue(towera.isDestroyed());
+		assertTrue(!towerb.isDestroyed());
+		assertTrue(!bomb.isExploded());
+		
+		t.burnBombFuse(4);
+		assertTrue(towera.isDestroyed());
+		assertTrue(towerb.isDestroyed());
+		assertTrue(bomb.isExploded());
+		//t.printGrid();
+
+		
+	}
+	
+	
+	@Test
+	public void testBlowUpBombsAndRegrow() {
+		/*Make a map */
+		Territory t = new Territory(-5.0,5.0,10,-5.0,5.0,10);
+		
+		/*Make two players*/
+		Player playerx = new Player("x",PasswordUtils.hashPassword("b"));
+		Player playero = new Player("o",PasswordUtils.hashPassword("b"));
+		
+		/*Give them each a tower*/
+		Tower towera = new Tower(playerx,0,5);
+		Tower towerb = new Tower(playero,5,4);
+		
+		/*Put the towers on the map */
+		t.addTower(towera);
+		t.addTower(towerb);
+		
+		/*Make sure the ownership is null */
+		Pair<Player, Integer> owner = t.index(5.0,0.0).getOwner();
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
+		assertTrue(owner.getSecond() == 0);
+		
+		/* Make sure only barbarians have territory */
+		List<Pair<Integer, Player>> l = t.getLeaderBoard();
+		assertTrue(l.size() == 1);
+		assertTrue(l.get(0).getSecond().equals(Player.BARBARIAN));
+		assertTrue(l.get(0).getFirst().equals(100));
+		
+		/* Run the towers for a bit */
+		for(int i = 0 ; i < 20 ; i++){
+			//t.printGrid();
+			t.stepTowerTerritoryGrowth(5, 2,true);
+		}
+		
+		/* Make sure territory is owned correctly*/
+		l = t.getLeaderBoard();
+		assertTrue(l.size() == 2);
+		assertTrue(l.get(0).getSecond().equals(playero));
+		assertTrue(l.get(0).getFirst()> l.get(1).getFirst());
+		assertTrue(l.get(1).getSecond().equals(playerx));
+		
+		/* Check ownership */
+		owner = t.index(-5.0,0.0).getOwner();
+		assertTrue(owner.getFirst() == playerx);
+		assertTrue(owner.getSecond() == 5);
+		
+		/* Blow up a bomb */
+		//t.printGrid();
+		Bomb bomb = new Bomb(playerx, 0, 5, 4, 7);
+		t.addBomb(bomb);
+		t.burnBombFuse(4);
+		assertTrue(towera.isDestroyed());
+		assertTrue(towerb.isDestroyed());
+		assertTrue(bomb.isExploded());
+		//t.printGrid();
+		
+		/* Check ownership */
+		owner = t.index(-5.0,0.0).getOwner();
+		assertTrue(owner.getFirst().equals(Player.BARBARIAN));
+		assertTrue(owner.getSecond() == 0);
+		
+		/* Check ownership */
+		owner = t.index(5.0,5.0).getOwner();
+		assertTrue(owner.getFirst() == playero);
+		assertTrue(owner.getSecond() == 5);
+		
+		/* Run the towers for a bit */
+		/* Places unsupported by a tower should dwindle to a 1 */
+		for(int i = 0 ; i < 20 ; i++){
+			//t.printGrid();
+			t.stepTowerTerritoryGrowth(5, 2);
+		}
+		
+		/* Check ownership */
+		owner = t.index(-5.0,0.0).getOwner();
+		assertTrue(owner.getFirst().equals(Player.BARBARIAN));
+		assertTrue(owner.getSecond() == 0);
+		
+		/* Check ownership */
+		owner = t.index(5.0,5.0).getOwner();
+		assertTrue(owner.getFirst() == playero);
+		assertTrue(owner.getSecond() == 1);
+		
+		
+		/*Add a tower */
+		towera = new Tower(playerx,0,5);
+		
+		/*Put the towers on the map */
+		t.addTower(towera);
+		
+		/* Run the towers for a bit */
+		/* Watch a reclaim the whole board */
+		for(int i = 0 ; i < 20 ; i++){
+			//t.printGrid();
+			t.stepTowerTerritoryGrowth(5, 2);
+		}
+		
+		/* Check ownership */
+		owner = t.index(-5.0,0.0).getOwner();
+		assertTrue(owner.getFirst() == playerx);
+		assertTrue(owner.getSecond() == 5);
+		
+		/* Check ownership */
+		owner = t.index(5.0,5.0).getOwner();
+		assertTrue(owner.getFirst() == playerx);
+		assertTrue(owner.getSecond() == 5);
+		
+		//t.printGrid();
+		/* Make sure territory is owned correctly*/
+		l = t.getLeaderBoard();
+		assertTrue(l.size() == 1);
+		assertTrue(l.get(0).getSecond().equals(playerx));
+		assertTrue(l.get(0).getFirst().equals(100));
+	}
+	
+	
 
 }
