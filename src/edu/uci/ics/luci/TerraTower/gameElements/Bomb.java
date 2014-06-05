@@ -27,6 +27,7 @@ public class Bomb {
 	int y;
 	long explosionTime;
 	int strength;
+	boolean exploded;
 	
 	public Player getOwner() {
 		return owner;
@@ -68,18 +69,28 @@ public class Bomb {
 		this.strength = strength;
 	}
 
+	public boolean isExploded() {
+		return exploded;
+	}
+
+	public void setExploded(boolean exploded) {
+		this.exploded = exploded;
+	}
+
 	public Bomb(Player owner,int x, int y,long explosionTime,int strength){
 		this.setOwner(owner);
 		this.setX(x);
 		this.setY(y);
 		this.setExplosionTime(explosionTime);
 		this.setStrength(strength);
+		this.setExploded(false);
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (exploded ? 1231 : 1237);
 		result = prime * result
 				+ (int) (explosionTime ^ (explosionTime >>> 32));
 		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
@@ -101,6 +112,9 @@ public class Bomb {
 			return false;
 		}
 		Bomb other = (Bomb) obj;
+		if (exploded != other.exploded) {
+			return false;
+		}
 		if (explosionTime != other.explosionTime) {
 			return false;
 		}

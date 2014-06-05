@@ -83,6 +83,15 @@ public class BombTest {
 			assertTrue(!bomb2.equals(bomb1));
 			bomb2.setOwner(bomb1.getOwner());
 			
+			Player owner = bomb2.getOwner();
+			bomb2.setOwner(null);
+			bomb1.setOwner(null);
+			assertTrue(bomb1.equals(bomb2));
+			assertTrue(bomb2.equals(bomb1));
+			assertEquals(bomb1.hashCode(),bomb2.hashCode());
+			bomb2.setOwner(owner);
+			bomb1.setOwner(owner);
+			
 			bomb2.setX(1);
 			assertTrue(!bomb1.equals(bomb2));
 			assertTrue(!bomb2.equals(bomb1));
@@ -92,6 +101,11 @@ public class BombTest {
 			assertTrue(!bomb1.equals(bomb2));
 			assertTrue(!bomb2.equals(bomb1));
 			bomb2.setY(bomb1.getY());
+			
+			bomb2.setExploded(true);
+			assertTrue(!bomb1.equals(bomb2));
+			assertTrue(!bomb2.equals(bomb1));
+			bomb2.setExploded(bomb1.isExploded());
 		}
 		catch(RuntimeException e){
 			fail("Shouldn't throw an exception");
