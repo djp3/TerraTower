@@ -153,4 +153,9 @@ public class WorldManager {
 		return(territory.addBomb(bomb));
 	}
 	
+
+	public void burnBombFuse(long eventTime) {
+		getTerritory().burnBombFuse(eventTime);
+	}
+	
 }

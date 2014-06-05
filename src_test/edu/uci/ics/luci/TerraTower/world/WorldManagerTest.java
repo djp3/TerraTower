@@ -93,6 +93,7 @@ public class WorldManagerTest {
 		
 		Territory territory = new Territory(-1.0, 1.0, 2, -1.0, 1.0, 2);
 		wm.setTerritory(territory);
+		assertEquals(territory,wm.getTerritory());
 		assertTrue(!wm.towerPresent(0, 0));
 		Player player = wm.createPlayer("player"+name, PasswordUtils.hashPassword(password));
 		Tower t = new Tower(player,0,0);
