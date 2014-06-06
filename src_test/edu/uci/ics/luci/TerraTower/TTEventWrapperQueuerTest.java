@@ -40,12 +40,14 @@ import org.junit.Test;
 
 import edu.uci.ics.luci.TerraTower.events.TTEventBurnBombFuse;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreatePowerUp;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.TTEventDropBomb;
 import edu.uci.ics.luci.TerraTower.events.TTEventBuildTower;
 import edu.uci.ics.luci.TerraTower.events.TTEventStepTowerTerritoryGrowth;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
+import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 import edu.uci.ics.luci.utility.Globals;
 
 public class TTEventWrapperQueuerTest {
@@ -219,6 +221,30 @@ public class TTEventWrapperQueuerTest {
 		TTEventBurnBombFuse ttEvent7 = new TTEventBurnBombFuse(worldName,worldPassword);
 		resultChecker = new ResultChecker(false);
 		event = new TTEventWrapper(TTEventType.BURN_BOMB_FUSE,ttEvent7,resultChecker);
+		events.add(event);
+		eventPublisher.onData(event);
+		synchronized(resultChecker.getSemaphore()){
+			while(resultChecker.getResultOK() == null){
+				try {
+					resultChecker.getSemaphore().wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		try{
+			assertTrue(resultChecker.getResultOK());
+		}
+		catch(AssertionError e){
+			System.err.println(resultChecker.getResults().toJSONString());
+			throw e;
+		}
+		
+		
+
+		PowerUp pup = new PowerUp("code",-1000L,-1000L,-1000L,false);
+		TTEventCreatePowerUp ttEvent8 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		resultChecker = new ResultChecker(false);
+		event = new TTEventWrapper(TTEventType.CREATE_POWER_UP,ttEvent8,resultChecker);
 		events.add(event);
 		eventPublisher.onData(event);
 		synchronized(resultChecker.getSemaphore()){

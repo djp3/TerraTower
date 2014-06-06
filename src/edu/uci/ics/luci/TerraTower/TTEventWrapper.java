@@ -27,6 +27,7 @@ import net.minidev.json.JSONObject;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
 import edu.uci.ics.luci.TerraTower.events.TTEventBurnBombFuse;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreatePowerUp;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.TTEventDropBomb;
@@ -37,12 +38,14 @@ import edu.uci.ics.luci.TerraTower.events.TTEventVoid;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandler;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerBurnBombFuse;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerCreatePlayer;
+import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerCreatePowerUp;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerDropBomb;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerBuildTower;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerStepTowerTeritoryGrowth;
 import edu.uci.ics.luci.TerraTower.events.handlers.TTEventHandlerVoid;
+import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 
 /**
  * Setting the eventType and the event is required
@@ -103,6 +106,9 @@ public class TTEventWrapper {
 			break;
 		case CREATE_PLAYER: this.setEvent(new TTEventCreatePlayer((String)null, (String)null, null, null));
 			break;
+		case CREATE_POWER_UP: 	PowerUp pup = new PowerUp("",0L,0L,0L,false);
+								this.setEvent(new TTEventCreatePowerUp((String)null, (String)null, pup));
+			break;
 		case BUILD_TOWER: this.setEvent(new TTEventBuildTower((String)null, (String)null, null, null, null, null, null));
 			break;
 		case STEP_TOWER_TERRITORY_GROWTH: this.setEvent(new TTEventStepTowerTerritoryGrowth((String)null,(String)null));
@@ -125,6 +131,8 @@ public class TTEventWrapper {
 		case CREATE_TERRITORY: this.setHandler(new TTEventHandlerCreateTerritory());
 			break;
 		case CREATE_PLAYER: this.setHandler(new TTEventHandlerCreatePlayer());
+			break;
+		case CREATE_POWER_UP: this.setHandler(new TTEventHandlerCreatePowerUp());
 			break;
 		case BUILD_TOWER: this.setHandler(new TTEventHandlerBuildTower());
 			break;
@@ -153,6 +161,9 @@ public class TTEventWrapper {
 			break;
 		case CREATE_WORLD: problem = (!(this.getEvent() instanceof TTEventCreateWorld));
 							   problem |= (!(this.getHandler() instanceof TTEventHandlerCreateWorld));
+			break;
+		case CREATE_POWER_UP: problem = (!(this.getEvent() instanceof TTEventCreatePowerUp));
+							   problem |= (!(this.getHandler() instanceof TTEventHandlerCreatePowerUp));
 			break;
 		case BUILD_TOWER: problem = (!(this.getEvent() instanceof TTEventBuildTower));
 							   problem |= (!(this.getHandler() instanceof TTEventHandlerBuildTower));
@@ -283,6 +294,8 @@ public class TTEventWrapper {
 			case CREATE_TERRITORY: event = TTEventCreateTerritory.fromJSON((JSONObject)in.get("event"));
 				break;
 			case CREATE_PLAYER: event = TTEventCreatePlayer.fromJSON((JSONObject)in.get("event"));
+				break;
+			case CREATE_POWER_UP: event = TTEventCreatePowerUp.fromJSON((JSONObject)in.get("event"));
 				break;
 			case BUILD_TOWER: event = TTEventBuildTower.fromJSON((JSONObject)in.get("event"));
 				break;

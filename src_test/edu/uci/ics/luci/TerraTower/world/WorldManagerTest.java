@@ -31,6 +31,7 @@ import org.junit.Test;
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
 import edu.uci.ics.luci.TerraTower.gameElements.Bomb;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
+import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 
 public class WorldManagerTest {
@@ -119,6 +120,22 @@ public class WorldManagerTest {
 		assertTrue(wm.addBomb(b));
 		
 		assertTrue(wm.numBombsPresent(0, 0) == 2);
+	}
+	
+	
+	@Test
+	public void testPowerUp() {
+		
+		String name = "foo"+System.currentTimeMillis();
+		String password = "foo"+System.currentTimeMillis();
+		WorldManager wm = new WorldManager(password);
+		
+		assertTrue(!wm.powerUpExists("code"));
+		PowerUp pup = new PowerUp("code",0L,0L,0L,false);
+		assertTrue(wm.createPowerUp(pup)!= null);
+		assertTrue(wm.powerUpExists("code"));
+		assertTrue(wm.getPowerUp("code").getBombDelayDelta() == 0L);
+		assertTrue(wm.createPowerUp(pup)== null);
 	}
 
 }

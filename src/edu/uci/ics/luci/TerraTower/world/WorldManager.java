@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
 import edu.uci.ics.luci.TerraTower.gameElements.Bomb;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
+import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 
 public class WorldManager {
@@ -53,6 +54,7 @@ public class WorldManager {
 	
 	List<Tower> towers;
 	List<Bomb> bombs;
+	HashMap<String,PowerUp> powerUps;
 
 	
 	public WorldManager(String password){
@@ -66,6 +68,8 @@ public class WorldManager {
 	
 		towers = new ArrayList<Tower>();
 		bombs = new ArrayList<Bomb>();
+		
+		powerUps = new HashMap<String,PowerUp>();
 	}
 	
 	
@@ -138,6 +142,24 @@ public class WorldManager {
 		}
 		
 	}
+	
+	public boolean powerUpExists(String code) {
+		return(powerUps.containsKey(code));
+	}
+
+	public PowerUp createPowerUp(PowerUp pup){
+		if(powerUpExists(pup.getCode())){
+			return null;
+		}
+		powerUps.put(pup.getCode(), pup);
+		return pup;
+	}
+	
+	public PowerUp getPowerUp(String code){
+		PowerUp pup= powerUps.get(code);
+		return(pup);
+	}
+	
 
 	public void stepTowerTerritoryGrowth() {
 		getTerritory().stepTowerTerritoryGrowth(10,2);
