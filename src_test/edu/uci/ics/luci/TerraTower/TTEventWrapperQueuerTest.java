@@ -45,6 +45,7 @@ import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.TTEventDropBomb;
 import edu.uci.ics.luci.TerraTower.events.TTEventBuildTower;
+import edu.uci.ics.luci.TerraTower.events.TTEventRedeemPowerUp;
 import edu.uci.ics.luci.TerraTower.events.TTEventStepTowerTerritoryGrowth;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
 import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
@@ -245,6 +246,28 @@ public class TTEventWrapperQueuerTest {
 		TTEventCreatePowerUp ttEvent8 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
 		resultChecker = new ResultChecker(false);
 		event = new TTEventWrapper(TTEventType.CREATE_POWER_UP,ttEvent8,resultChecker);
+		events.add(event);
+		eventPublisher.onData(event);
+		synchronized(resultChecker.getSemaphore()){
+			while(resultChecker.getResultOK() == null){
+				try {
+					resultChecker.getSemaphore().wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		try{
+			assertTrue(resultChecker.getResultOK());
+		}
+		catch(AssertionError e){
+			System.err.println(resultChecker.getResults().toJSONString());
+			throw e;
+		}
+		
+		
+		TTEventRedeemPowerUp ttEvent9 = new TTEventRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,"code");
+		resultChecker = new ResultChecker(false);
+		event = new TTEventWrapper(TTEventType.REDEEM_POWER_UP,ttEvent9,resultChecker);
 		events.add(event);
 		eventPublisher.onData(event);
 		synchronized(resultChecker.getSemaphore()){
