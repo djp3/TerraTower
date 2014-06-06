@@ -30,8 +30,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import edu.uci.ics.luci.TerraTower.PasswordUtils;
-
 public class PowerUpTest {
 	
 	final static String code = "alkdsfj";
@@ -51,14 +49,31 @@ public class PowerUpTest {
 	@After
 	public void tearDown() throws Exception {
 	}
+	
+	@Test
+	public void testNulls() {
+		PowerUp powerUpA;
+		PowerUp powerUpB;
+		try{
+			powerUpA = new PowerUp(null,null,null,null,false);
+			powerUpB = new PowerUp(null,null,null,null,false);
+			assertTrue(powerUpA.equals(powerUpB));
+			assertTrue(powerUpB.equals(powerUpA));
+			assertTrue(powerUpA.hashCode() == powerUpB.hashCode());
+		}
+		catch(RuntimeException e){
+			fail("Shouldn't throw an exception");
+		}
+	}
+
 
 	@Test
 	public void test() {
 		PowerUp powerUpA;
 		PowerUp powerUpB;
 		try{
-			powerUpA = new PowerUp(code, -1000L,-1000L,-1000L);
-			powerUpB = new PowerUp(code, -1000L,-1000L,-1000L);
+			powerUpA = new PowerUp(code, -1000L,-1000L,-1000L,false);
+			powerUpB = new PowerUp(code, -1000L,-1000L,-1000L,false);
 			
 			assertTrue(!powerUpA.equals(null));
 			assertTrue(!powerUpA.equals("foo"));
@@ -66,48 +81,64 @@ public class PowerUpTest {
 			assertTrue(powerUpA.equals(powerUpB));
 			assertTrue(powerUpB.equals(powerUpA));
 			assertTrue(powerUpA.hashCode() == powerUpB.hashCode());
+			assertEquals(powerUpB,PowerUp.fromJSON(powerUpB.toJSON()));
 			
-			powerUpB.setBombDelayDelta(0);
+			powerUpB.setBombDelayDelta(0L);
 			assertTrue(!powerUpA.equals(powerUpB));
 			assertTrue(!powerUpB.equals(powerUpA));
 			assertTrue(powerUpA.hashCode() != powerUpB.hashCode());
+			assertEquals(powerUpB,PowerUp.fromJSON(powerUpB.toJSON()));
 			powerUpB.setBombDelayDelta(powerUpA.getBombDelayDelta());
 			
-			powerUpB.setTowerDelayDelta(0);
+			powerUpB.setTowerDelayDelta(0L);
 			assertTrue(!powerUpA.equals(powerUpB));
 			assertTrue(!powerUpB.equals(powerUpA));
 			assertTrue(powerUpA.hashCode() != powerUpB.hashCode());
+			assertEquals(powerUpB,PowerUp.fromJSON(powerUpB.toJSON()));
 			powerUpB.setTowerDelayDelta(powerUpA.getTowerDelayDelta());
 			
-			powerUpB.setBombFuseDelta(0);
+			powerUpB.setBombFuseDelta(0L);
 			assertTrue(!powerUpA.equals(powerUpB));
 			assertTrue(!powerUpB.equals(powerUpA));
 			assertTrue(powerUpA.hashCode() != powerUpB.hashCode());
+			assertEquals(powerUpB,PowerUp.fromJSON(powerUpB.toJSON()));
 			powerUpB.setBombFuseDelta(powerUpA.getBombFuseDelta());
 			
 			powerUpB.setCode("hello");
 			assertTrue(!powerUpA.equals(powerUpB));
 			assertTrue(!powerUpB.equals(powerUpA));
 			assertTrue(powerUpA.hashCode() != powerUpB.hashCode());
+			assertEquals(powerUpB,PowerUp.fromJSON(powerUpB.toJSON()));
 			powerUpB.setCode(powerUpA.getCode());
 			
-			powerUpB.setCode(null);
+			powerUpB.setCode(null); //Null is captured and turned to ""
 			assertTrue(!powerUpA.equals(powerUpB));
 			assertTrue(!powerUpB.equals(powerUpA));
 			assertTrue(powerUpA.hashCode() != powerUpB.hashCode());
+			assertTrue(powerUpB.equals(PowerUp.fromJSON(powerUpB.toJSON())));
 			powerUpB.setCode(powerUpA.getCode());
 			
+			powerUpA.setRedeemed(false);
+			powerUpB.setRedeemed(true);
+			assertTrue(!powerUpA.equals(powerUpB));
+			assertTrue(!powerUpB.equals(powerUpA));
+			assertTrue(powerUpA.hashCode() != powerUpB.hashCode());
+			assertEquals(powerUpB,PowerUp.fromJSON(powerUpB.toJSON()));
+			powerUpB.setRedeemed(powerUpA.getRedeemed());
+			
 			powerUpA.setCode(null);
-			powerUpB.setCode(null);
+			powerUpB.setCode(null);//Nulls get translated to ""
 			assertTrue(powerUpA.equals(powerUpB));
 			assertTrue(powerUpB.equals(powerUpA));
 			assertTrue(powerUpA.hashCode() == powerUpB.hashCode());
+			assertTrue(powerUpB.equals(PowerUp.fromJSON(powerUpB.toJSON())));
 			powerUpA.setCode("code");
 			powerUpB.setCode("code");
 			
 			assertTrue(powerUpA.equals(powerUpB));
 			assertTrue(powerUpB.equals(powerUpA));
 			assertTrue(powerUpA.hashCode() == powerUpB.hashCode());
+			assertEquals(powerUpB,PowerUp.fromJSON(powerUpB.toJSON()));
 			
 		}
 		catch(RuntimeException e){
