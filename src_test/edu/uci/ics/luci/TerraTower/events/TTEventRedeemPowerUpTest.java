@@ -59,6 +59,7 @@ public class TTEventRedeemPowerUpTest {
 		assertEquals(t1,t1);
 		assertTrue(!t1.equals(null));
 		assertTrue(!t1.equals("string"));
+		assertTrue(!t1.equals(new TTEventPlayer(worldName,worldPassword,playerName,playerPassword)));
 		
 		TTEventRedeemPowerUp t2 = new TTEventRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,"code");
 		TTEventRedeemPowerUp t3 = new TTEventRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,"code");

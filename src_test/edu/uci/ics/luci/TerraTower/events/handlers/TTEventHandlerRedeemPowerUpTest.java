@@ -33,8 +33,10 @@ import org.junit.Test;
 import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreatePowerUp;
 import edu.uci.ics.luci.TerraTower.events.TTEventDropBomb;
 import edu.uci.ics.luci.TerraTower.events.TTEventRedeemPowerUp;
+import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 import edu.uci.ics.luci.TerraTower.world.Territory;
 import edu.uci.ics.luci.TerraTower.world.WorldManager;
 import edu.uci.ics.luci.utility.Globals;
@@ -99,96 +101,167 @@ public class TTEventHandlerRedeemPowerUpTest {
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
 		
-		WorldManager wm = g.getWorld(worldName, worldPassword);
-		wm.setTerritory(new Territory(-180.0, 180.0, 10, -90.0, 90.0, 10));
+		/*Power Up is null */
+		event = new TTEventRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,null);
+		json = tt.checkParameters(0,event);
+		assertTrue(json != null);
+		assertEquals(json.get("error"),"true");
 		
-//		/*Too little time */
-//		event = new TTEventHandlerRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-//		tt.player.setLastBombPlacedTime(0);
-//		json = tt.checkParameters(0,event);
-//		assertTrue(json != null);
-//		assertEquals(json.get("error"),"true");
-//		
-//		/*Out of bounds x */
-//		event = new TTEventHandlerRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,lat,-190.0,alt);
-//		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
-//		json = tt.checkParameters(0,event);
-//		assertTrue(json != null);
-//		assertEquals(json.get("error"),"true");
-//		
-//		/*Out of bounds x */
-//		event = new TTEventHandlerRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,-100.0,lng,alt);
-//		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
-//		json = tt.checkParameters(0,event);
-//		assertTrue(json != null);
-//		assertEquals(json.get("error"),"true");
-//		
-//		/*Ok */
-//		event = new TTEventHandlerRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-//		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
-//		json = tt.checkParameters(0,event);
-//		assertTrue(json == null);
-//		
-//		/* Add the bomb*/
-//		json = tt.onEvent();
-//		assertTrue(json != null);
-//		assertEquals("false",(String)json.get("error"));
-//		
-//		/* ok to add another bomb */
-//		event = new TTEventHandlerRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-//		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
-//		json = tt.checkParameters(0,event);
-//		assertTrue(json == null);
+		/* Create a used up  power Up */
+		TTEventHandlerCreatePowerUp tt3 = new TTEventHandlerCreatePowerUp();
+		
+		PowerUp pup = new PowerUp("code",-1000L,-100L,-1000L,true);
+		TTEventCreatePowerUp event3 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		json = tt3.checkParameters(0,event3);
+		try{
+			assertTrue(json == null);
+		}
+		catch(AssertionError e){
+			System.out.println(json.toJSONString());
+			throw e;
+		}
+		
+		json = tt3.onEvent();
+		assertTrue(json != null);
+		try{
+			assertEquals("false",(String)json.get("error"));
+		}
+		catch(AssertionError e){
+			System.err.println(json.toJSONString());
+			throw e;
+		}
+		
+		/*Fail because power up is used up*/
+		event = new TTEventRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,"code");
+		json = tt.checkParameters(0,event);
+		assertTrue(json != null);
+		assertEquals(json.get("error"),"true");
+		
+		/* Create a good up power Up */
+		tt3 = new TTEventHandlerCreatePowerUp();
+		
+		pup = new PowerUp("code2",-1000L,-100L,-1000L,false);
+		event3 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		json = tt3.checkParameters(0,event3);
+		try{
+			assertTrue(json == null);
+		}
+		catch(AssertionError e){
+			System.out.println(json.toJSONString());
+			throw e;
+		}
+		
+		json = tt3.onEvent();
+		assertTrue(json != null);
+		try{
+			assertEquals("false",(String)json.get("error"));
+		}
+		catch(AssertionError e){
+			System.err.println(json.toJSONString());
+			throw e;
+		}
+		
+		/*OK!*/
+		event = new TTEventRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,"code2");
+		json = tt.checkParameters(0,event);
+		assertTrue(json == null);
 		
 	}
 	
 	@Test
 	public void testOnEvent() {
-//		TTEventRedeemPowerUp tt = new TTEventRedeemPowerUp();
-//
-//		GlobalsTerraTower g = new GlobalsTerraTower("Version test");
-//		Globals.setGlobals(g);
-//		g.createWorld(worldName, worldPassword);
-//		
-//		/* Create a player */
-//		TTEventHandlerCreatePlayer tt2 = new TTEventHandlerCreatePlayer();
-//		TTEventCreatePlayer event2 = new TTEventCreatePlayer(worldName,worldPassword,playerName,playerPassword);
-//		JSONObject json = tt2.checkParameters(0,event2);
-//		assertTrue(json == null);
-//		json = tt2.onEvent();
-//		assertTrue(json != null);
-//		assertEquals("false",(String)json.get("error"));
-//		
-//		WorldManager wm = g.getWorld(worldName, worldPassword);
-//		wm.setTerritory(new Territory(-180.0, 180.0, 10, -90.0, 90.0, 10));
-//		
-//		/* Fail so we can get the player set so we can set the bomb time in the next block */
-//		TTEventHandlerRedeemPowerUp event = new TTEventHandlerRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,-100.0,lng,alt);
-//		json = tt.checkParameters(0,event);
-//		assertTrue(json != null);
-//		
-//		/*Ok */
-//		event = new TTEventHandlerRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-//		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
-//		json = tt.checkParameters(0,event);
-//		assertTrue(json == null);
-//		
-//		/* Add the bomb*/
-//		json = tt.onEvent();
-//		assertTrue(json != null);
-//		assertEquals("false",(String)json.get("error"));
-//		
-//		/* Add the bomb again, should fail because parameters not checked*/
-//		json = tt.onEvent();
-//		assertTrue(json != null);
-//		assertEquals("true",(String)json.get("error"));
-//		
-//		/*Not Ok */
-//		/* add a second bomb fails because it's too fast*/
-//		event = new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-//		json = tt.checkParameters(0,event);
-//		assertTrue(json != null);
-//		assertEquals("true",(String)json.get("error"));
+		TTEventHandlerRedeemPowerUp tt = new TTEventHandlerRedeemPowerUp();
+
+		GlobalsTerraTower g = new GlobalsTerraTower("Version test");
+		Globals.setGlobals(g);
+		g.createWorld(worldName, worldPassword);
+		
+		/* Create a player */
+		TTEventHandlerCreatePlayer tt2 = new TTEventHandlerCreatePlayer();
+		TTEventCreatePlayer event2 = new TTEventCreatePlayer(worldName,worldPassword,playerName,playerPassword);
+		JSONObject json = tt2.checkParameters(0,event2);
+		assertTrue(json == null);
+		json = tt2.onEvent();
+		assertTrue(json != null);
+		assertEquals("false",(String)json.get("error"));
+		
+		/* Create 2 good up power Ups */
+		TTEventHandlerCreatePowerUp tt3 = new TTEventHandlerCreatePowerUp();
+		
+		PowerUp pup1 = new PowerUp("code2",-1000L,-1000L,-1000L,false);
+		TTEventCreatePowerUp event3 = new TTEventCreatePowerUp(worldName,worldPassword,pup1);
+		json = tt3.checkParameters(0,event3);
+		try{
+			assertTrue(json == null);
+		}
+		catch(AssertionError e){
+			System.out.println(json.toJSONString());
+			throw e;
+		}
+		
+		json = tt3.onEvent();
+		assertTrue(json != null);
+		try{
+			assertEquals("false",(String)json.get("error"));
+		}
+		catch(AssertionError e){
+			System.err.println(json.toJSONString());
+			throw e;
+		}
+		
+		PowerUp pup2 = new PowerUp("code3",-GlobalsTerraTower.DEFAULT_TOWER_DELAY,
+				-GlobalsTerraTower.DEFAULT_BOMB_DELAY,
+				-GlobalsTerraTower.DEFAULT_BOMB_FUSE,
+				false);
+		event3 = new TTEventCreatePowerUp(worldName,worldPassword,pup2);
+		json = tt3.checkParameters(0,event3);
+		try{
+			assertTrue(json == null);
+		}
+		catch(AssertionError e){
+			System.out.println(json.toJSONString());
+			throw e;
+		}
+		
+		json = tt3.onEvent();
+		assertTrue(json != null);
+		try{
+			assertEquals("false",(String)json.get("error"));
+		}
+		catch(AssertionError e){
+			System.err.println(json.toJSONString());
+			throw e;
+		}
+		
+		/*OK!*/
+		TTEventRedeemPowerUp event = new TTEventRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,"code2");
+		json = tt.checkParameters(0,event);
+		assertTrue(json == null);
+		
+		long bombDelay = tt.player.getBombDelay();
+		long bombFuse = tt.player.getBombFuse();
+		long towerDelay = tt.player.getTowerDelay();
+		
+		json = tt.onEvent();
+		assertTrue(json != null);
+		assertEquals("false",(String)json.get("error"));
+		
+		assertTrue(bombDelay - tt.player.getBombDelay() == 1000L);
+		assertTrue(bombFuse - tt.player.getBombFuse() == 1000L);
+		assertTrue(towerDelay - tt.player.getTowerDelay() == 1000L);
+		
+		/*OK!*/
+		event = new TTEventRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,"code3");
+		json = tt.checkParameters(0,event);
+		assertTrue(json == null);
+		
+		json = tt.onEvent();
+		assertTrue(json != null);
+		assertEquals("false",(String)json.get("error"));
+		
+		assertTrue(tt.player.getBombDelay() == 0L);
+		assertTrue(tt.player.getBombFuse() == 0L);
+		assertTrue(tt.player.getTowerDelay() == 0L);
 		
 	}
 
