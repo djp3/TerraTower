@@ -66,5 +66,37 @@ public class TTEventCreatePowerUp extends TTEvent{
 		}
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((powerUp == null) ? 0 : powerUp.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof TTEventCreatePowerUp)) {
+			return false;
+		}
+		TTEventCreatePowerUp other = (TTEventCreatePowerUp) obj;
+		if (powerUp == null) {
+			if (other.powerUp != null) {
+				return false;
+			}
+		} else if (!powerUp.equals(other.powerUp)) {
+			return false;
+		}
+		return true;
+	}
+	
+	
+
 
 }

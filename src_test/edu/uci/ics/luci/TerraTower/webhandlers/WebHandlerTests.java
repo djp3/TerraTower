@@ -112,7 +112,7 @@ public class WebHandlerTests {
 			requestHandlerRegistry.put("drop_bomb", new HandlerDropBomb(eventPublisher));
 			requestHandlerRegistry.put("redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
 			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(GlobalsTerraTower.getGlobalsTerraTower().getWorld(worldName, worldPassword).getTerritory()));
-			requestHandlerRegistry.put("get_gamestate", new HandlerGetGameState(GlobalsTerraTower.getGlobalsTerraTower().getWorld(worldName, worldPassword).getTerritory()));
+			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState(GlobalsTerraTower.getGlobalsTerraTower().getWorld(worldName, worldPassword).getTerritory()));
 			requestHandlerRegistry.put("shutdown", new HandlerShutdown(Globals.getGlobals()));
 			
 			RequestDispatcher requestDispatcher = new RequestDispatcher(requestHandlerRegistry);
@@ -543,6 +543,175 @@ public class WebHandlerTests {
 		} catch (ClassCastException e) {
 			fail("Bad JSON Response");
 		}
+		
+		
+		
+		
+		/* Drop a bomb*/
+		responseString = null;
+		try {
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("world_name", worldName);
+			params.put("world_password", worldPassword);
+			params.put("player_name", playerName);
+			params.put("player_password", playerPassword);
+			params.put("lat", "0.0");
+			params.put("lng", "0.0");
+			params.put("alt", "10.0");
+
+			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/drop_bomb", false, params, 30 * 1000);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			fail("Bad URL");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("IO Exception"+e);
+		}
+		//System.out.println(responseString);
+		
+
+		response = null;
+		try {
+			response = (JSONObject) JSONValue.parse(responseString);
+			assertEquals("false",response.get("error"));
+		} catch (ClassCastException e) {
+			fail("Bad JSON Response");
+		}
+		
+		
+		
+		
+		
+		/* Game State without a player password */
+		responseString = null;
+		try {
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("world_name", worldName);
+			params.put("world_password", worldPassword);
+			params.put("player_name", playerName);
+
+			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/get_game_state", false, params, 30 * 1000);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			fail("Bad URL");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("IO Exception"+e);
+		}
+		//System.out.println(responseString);
+		
+
+		response = null;
+		try {
+			response = (JSONObject) JSONValue.parse(responseString);
+			assertEquals("true",response.get("error"));
+		} catch (ClassCastException e) {
+			fail("Bad JSON Response");
+		} catch (AssertionError e){
+			System.err.println(response.toJSONString());
+			throw e;
+		}
+		
+		
+		
+		
+		
+		/* Game State */
+		responseString = null;
+		try {
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("world_name", worldName);
+			params.put("world_password", worldPassword);
+			params.put("player_name", playerName);
+			params.put("player_password", playerPassword);
+
+			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/get_game_state", false, params, 30 * 1000);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			fail("Bad URL");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("IO Exception"+e);
+		}
+		//System.out.println(responseString);
+		
+
+		response = null;
+		try {
+			response = (JSONObject) JSONValue.parse(responseString);
+			assertEquals("false",response.get("error"));
+		} catch (ClassCastException e) {
+			fail("Bad JSON Response");
+		} catch (AssertionError e){
+			System.err.println(response.toJSONString());
+			throw e;
+		}
+		
+		
+		
+		
+		
+		
+		/* Get Leader Board*/
+		responseString = null;
+		try {
+			HashMap<String, String> params = new HashMap<String, String>();
+
+			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/get_leader_board", false, params, 30 * 1000);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			fail("Bad URL");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("IO Exception"+e);
+		}
+		//System.out.println(responseString);
+		
+
+		response = null;
+		try {
+			response = (JSONObject) JSONValue.parse(responseString);
+			assertEquals("false",response.get("error"));
+		} catch (ClassCastException e) {
+			fail("Bad JSON Response");
+		} catch (AssertionError e){
+			System.err.println(response.toJSONString());
+			throw e;
+		}
+		
+		
+		/* Redeem a power up*/
+		responseString = null;
+		try {
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("world_name", worldName);
+			params.put("world_password", worldPassword);
+			params.put("player_name", playerName);
+			params.put("player_password", playerPassword);
+			params.put("code", "code");
+
+			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/redeem_power_up", false, params, 30 * 1000);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			fail("Bad URL");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("IO Exception"+e);
+		}
+		//System.out.println(responseString);
+		
+
+		response = null;
+		try {
+			response = (JSONObject) JSONValue.parse(responseString);
+			assertEquals("false",response.get("error"));
+		} catch (ClassCastException e) {
+			fail("Bad JSON Response");
+		} catch (AssertionError e){
+			System.err.println(response.toJSONString());
+			throw e;
+		}
+		
 		
 		
 		

@@ -23,7 +23,6 @@ package edu.uci.ics.luci.TerraTower.events.handlers;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
-import edu.uci.ics.luci.TerraTower.events.TTEventStepTowerTerritoryGrowth;
 
 
 public class TTEventHandlerStepTowerTeritoryGrowth extends TTEventHandler{    
@@ -46,6 +45,7 @@ public class TTEventHandlerStepTowerTeritoryGrowth extends TTEventHandler{
 		if(ret != null){
 			return ret;
 		}
+		/*
 		ret = new JSONObject();
 				
 		TTEventStepTowerTerritoryGrowth event = null;
@@ -58,7 +58,7 @@ public class TTEventHandlerStepTowerTeritoryGrowth extends TTEventHandler{
 			errors.add("Internal error, event type mismatch\n"+this.getClass().getCanonicalName()+" was called with "+_event.getClass().getCanonicalName());
 			ret.put("errors", errors);
 			return ret;
-		}
+		}*/
 		
 		this.setParametersChecked(true);
 

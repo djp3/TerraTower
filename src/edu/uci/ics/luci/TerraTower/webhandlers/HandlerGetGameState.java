@@ -87,6 +87,7 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 					jCell.put("right",""+((x+1)*territory.getStepX()+territory.getLeft()));
 					jCell.put("top",""+((y+1)*territory.getStepX()+territory.getBottom()));
 					jCell.put("bottom",""+((y)*territory.getStepX()+territory.getBottom()));
+					jCell.put("alt",""+cell.estimateAltitude());
 					jCell.put("land_owner", cell.getOwner().getFirst().getPlayerName());
 					jCell.put("land_claim", cell.getOwner().getSecond());
 					if(cell.towerPresent()){
