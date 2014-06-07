@@ -157,6 +157,10 @@ public class Territory {
 	public GridCell index(double x, double y) {
 		return grid[xIndex(x)][yIndex(y)];
 	}
+	
+	public GridCell index(int x, int y) {
+		return grid[x][y];
+	}
 
 
 	/*

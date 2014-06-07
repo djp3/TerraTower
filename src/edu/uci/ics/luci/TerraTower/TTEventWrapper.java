@@ -213,7 +213,7 @@ public class TTEventWrapper {
 	}
 	
 	
-	TTEventWrapper(TTEventType eventType,TTEvent event,TTEventHandlerResultListener resultListener){
+	public TTEventWrapper(TTEventType eventType,TTEvent event,TTEventHandlerResultListener resultListener){
 		this(System.currentTimeMillis(),eventType,event,resultListener);
 	}
 

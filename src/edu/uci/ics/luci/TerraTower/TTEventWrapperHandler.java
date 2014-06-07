@@ -51,7 +51,8 @@ public class TTEventWrapperHandler implements EventHandler<TTEventWrapper> {
 		if(handler != null){
 			result = handler.checkParameters(timestamp,event);
 			if(result == null){
-				result = handler.onEvent();
+				JSONObject result2 = handler.onEvent();
+				result = result2;
 			}
 		}
 		

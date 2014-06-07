@@ -20,7 +20,7 @@
 */
 
 
-package edu.uci.ics.luci.TerraTower;
+package edu.uci.ics.luci.TerraTower.webhandlers;
 
 
 import static org.junit.Assert.assertEquals;
@@ -40,6 +40,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
+import edu.uci.ics.luci.TerraTower.TerraTower;
+import edu.uci.ics.luci.TerraTower.webhandlers.HandlerShutdown;
 import edu.uci.ics.luci.utility.Globals;
 import edu.uci.ics.luci.utility.webserver.AccessControl;
 import edu.uci.ics.luci.utility.webserver.HandlerAbstract;

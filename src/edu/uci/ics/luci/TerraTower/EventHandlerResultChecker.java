@@ -42,5 +42,16 @@ public class EventHandlerResultChecker implements TTEventHandlerResultListener{
 			semaphore.notifyAll();
 		}
 	}
+
+	public void block() {
+		synchronized(getSemaphore()){
+			while(getResults() == null){
+				try {
+					getSemaphore().wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+	}
 	
 }

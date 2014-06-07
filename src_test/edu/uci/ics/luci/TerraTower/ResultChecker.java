@@ -21,7 +21,7 @@ public class ResultChecker implements TTEventHandlerResultListener{
 		return results;
 	}
 
-	ResultChecker(boolean expectError){
+	public ResultChecker(boolean expectError){
 		if(expectError){
 			this.expect = "true";
 		}

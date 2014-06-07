@@ -69,7 +69,6 @@ public class TTEventWrapperQueuerTest {
 	public void tearDown() throws Exception {
 	}
 	
-	
 
 	@Test
 	public void testLogging() {

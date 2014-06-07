@@ -38,6 +38,12 @@ import com.lmax.disruptor.dsl.Disruptor;
 
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
+import edu.uci.ics.luci.TerraTower.webhandlers.HandlerBuildTower;
+import edu.uci.ics.luci.TerraTower.webhandlers.HandlerDropBomb;
+import edu.uci.ics.luci.TerraTower.webhandlers.HandlerGetGameState;
+import edu.uci.ics.luci.TerraTower.webhandlers.HandlerGetLeaderBoard;
+import edu.uci.ics.luci.TerraTower.webhandlers.HandlerRedeemPowerUp;
+import edu.uci.ics.luci.TerraTower.webhandlers.HandlerShutdown;
 import edu.uci.ics.luci.utility.Globals;
 import edu.uci.ics.luci.utility.webserver.AccessControl;
 import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
@@ -49,7 +55,7 @@ import edu.uci.ics.luci.utility.webserver.handlers.HandlerVersion;
 public class TerraTower {
 	private static int port = 9020;
 	
-	final static String VERSION="0.1";
+	public final static String VERSION="0.1";
 
 	private static transient volatile Logger log = null;
 
@@ -69,7 +75,7 @@ public class TerraTower {
 	 * @return 
 	 */
 	@SuppressWarnings("unchecked")
-	static TTEventWrapperQueuer createEventQueue(String logFile) {
+	public static TTEventWrapperQueuer createEventQueue(String logFile) {
 		// Executor that will be used to construct new threads for consumers
 	    Executor executor = Executors.newCachedThreadPool();
 	
@@ -110,7 +116,8 @@ public class TerraTower {
 		
 		String worldName = config.getString("world.name"); 
 		String worldPassword = config.getString("world.password"); 
-		TTEventWrapper wrapper = new TTEventWrapper(TTEventType.CREATE_WORLD, new TTEventCreateWorld(worldName,worldPassword),new EventHandlerResultChecker());
+		EventHandlerResultChecker rc = new EventHandlerResultChecker();
+		TTEventWrapper wrapper = new TTEventWrapper(TTEventType.CREATE_WORLD, new TTEventCreateWorld(worldName,worldPassword),rc);
 		eventPublisher.onData(wrapper);
 		
 		/*
@@ -124,6 +131,9 @@ public class TerraTower {
 
 	
 
+		// Wait for everything to finish processing
+		rc.block();
+		
 		WebServer ws = null;
 		HashMap<String, HandlerAbstract> requestHandlerRegistry;
 
@@ -131,8 +141,12 @@ public class TerraTower {
 			requestHandlerRegistry = new HashMap<String, HandlerAbstract>();
 			requestHandlerRegistry.put("", new HandlerVersion(VERSION));
 			requestHandlerRegistry.put("version", new HandlerVersion(VERSION));
-			requestHandlerRegistry.put("shutdown",
-					new HandlerShutdown(Globals.getGlobals()));
+			requestHandlerRegistry.put("build_tower", new HandlerBuildTower(eventPublisher));
+			requestHandlerRegistry.put("drop_bomb", new HandlerDropBomb(eventPublisher));
+			requestHandlerRegistry.put("redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
+			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(GlobalsTerraTower.getGlobalsTerraTower().getWorld(worldName, worldPassword).getTerritory()));
+			requestHandlerRegistry.put("get_gamestate", new HandlerGetGameState(GlobalsTerraTower.getGlobalsTerraTower().getWorld(worldName, worldPassword).getTerritory()));
+			requestHandlerRegistry.put("shutdown", new HandlerShutdown(Globals.getGlobals()));
 
 			RequestDispatcher dispatcher = new RequestDispatcher(
 					requestHandlerRegistry);
