@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using MiniJSON;
 
 /** This file is 
- * VERSION: 1.0 6/9/2014 11:00am
+ * VERSION: 1.1 6/9/2014 11:00am
  */
 public class MyNetworkHelper : MonoBehaviour {
 
@@ -107,101 +107,75 @@ public class MyNetworkHelper : MonoBehaviour {
 	}
 
 
-	/* This executes an upload of the already stored Tower point,  the tower point will be cleared after successful */
-	public Dictionary<string,object> uploadTowerPoint(string worldName,string worldPassword,string playerName,string playerPassword){
+	/* This executes an upload of the already stored Tower point,  the tower point will be cleared after success.  The callback is executed with the response,
+	 mostly so that debug messages can be captured */
+	public Dictionary<string,object> uploadTowerPoint(string worldName,string worldPassword,string playerName,string playerPassword,Action<Dictionary<string,object>> callback){
 		WWW www;
 
-		if (towerPoint != null){				
-			string u = REST_URL+"/build_tower";
+		if (towerPoint != null) {				
+			string u = REST_URL + "/build_tower";
 			u += "?world_name=" + WWW.EscapeURL (worldName);
 			u += "&world_password=" + WWW.EscapeURL (worldPassword);
 			u += "&player_name=" + WWW.EscapeURL (playerName);
 			u += "&player_password=" + WWW.EscapeURL (playerPassword);
-			u += "&lat=" + WWW.EscapeURL (towerPoint.lat+"");
-			u += "&lng=" + WWW.EscapeURL (towerPoint.lng+"");
-			u += "&alt=" + WWW.EscapeURL (towerPoint.alt+"");
+			u += "&lat=" + WWW.EscapeURL (towerPoint.lat + "");
+			u += "&lng=" + WWW.EscapeURL (towerPoint.lng + "");
+			u += "&alt=" + WWW.EscapeURL (towerPoint.alt + "");
 			www = new WWW (u);
-			StartCoroutine (WaitForRequest (www));
-			if(www.error == null){
-				//Everything went ok
-				towerPoint = null;
-				var dict = Json.Deserialize(www.text) as Dictionary<string,object>;
-				return dict;
-			}
-			else{
-				var dict = new Dictionary<string,object>();
-				dict.Add("error","true");
-				return dict;
-			}
+			StartCoroutine (WaitForRequest (www, callback));
+		} else {
+			var ret = new Dictionary<string,object> ();
+			ret.Add ("error", "false");
+			callback(ret);
 		}
-		var ret = new Dictionary<string,object>();
-		ret.Add("error","false");
-		return ret;
 	}
 
 
-	/* This executes an upload of the already stored bomb point,  the bomb point will be cleared after successful upload*/
-	public Dictionary<string,object> uploadBombPoint(string worldName,string worldPassword,string playerName,string playerPassword){
+	/* This executes an upload of the already stored bomb point,  the bomb point will be cleared after successful upload.  The callback is executed with the response,
+	 mostly so that debug messages can be captured */
+	public void uploadBombPoint(string worldName,string worldPassword,string playerName,string playerPassword,Action<Dictionary<string,object>> callback){
 		WWW www;
 
-		if (bombPoint != null){				
-			string u = REST_URL+"/drop_bomb";
+		if (bombPoint != null) {				
+			string u = REST_URL + "/drop_bomb";
 			u += "?world_name=" + WWW.EscapeURL (worldName);
 			u += "&world_password=" + WWW.EscapeURL (worldPassword);
 			u += "&player_name=" + WWW.EscapeURL (playerName);
 			u += "&player_password=" + WWW.EscapeURL (playerPassword);
-			u += "&lat=" + WWW.EscapeURL (bombPoint.lat+"");
-			u += "&lng=" + WWW.EscapeURL (bombPoint.lng+"");
-			u += "&alt=" + WWW.EscapeURL (bombPoint.alt+"");
+			u += "&lat=" + WWW.EscapeURL (bombPoint.lat + "");
+			u += "&lng=" + WWW.EscapeURL (bombPoint.lng + "");
+			u += "&alt=" + WWW.EscapeURL (bombPoint.alt + "");
 			www = new WWW (u);
-			StartCoroutine (WaitForRequest (www));
-			if(www.error == null){
-				//Everything went ok
-				bombPoint = null;
-				var dict = Json.Deserialize(www.text) as Dictionary<string,object>;
-				return dict;
-			}
-			else{
-				var dict = new Dictionary<string,object>();
-				dict.Add("error","true");
-				return dict;
-			}
+			StartCoroutine (WaitForBombRequest (www, callback));
+
+		} else {
+			var ret = new Dictionary<string,object> ();
+			ret.Add ("error", "false");
+			callback(ret);
 		}
-		var ret = new Dictionary<string,object>();
-		ret.Add("error","false");
-		return ret;
 	}
 
 
 
-	/* This executes an upload of the already stored power up code,  the code will be cleared after successful upload*/
-	public Dictionary<string,object> uploadCode(string worldName,string worldPassword,string playerName,string playerPassword){
+	/* This executes an upload of the already stored power up code,  the code will be cleared after successful upload. The callback is executed with the response,
+	 mostly so that debug messages can be captured */
+	public void uploadCode(string worldName,string worldPassword,string playerName,string playerPassword,Action<Dictionary<string,object>> callback){
 		WWW www;
 		
-		if (storedCode != null){				
-			string u = REST_URL+"/redeem_power_up";
+		if (storedCode != null) {				
+			string u = REST_URL + "/redeem_power_up";
 			u += "?world_name=" + WWW.EscapeURL (worldName);
 			u += "&world_password=" + WWW.EscapeURL (worldPassword);
 			u += "&player_name=" + WWW.EscapeURL (playerName);
 			u += "&player_password=" + WWW.EscapeURL (playerPassword);
 			u += "&code=" + WWW.EscapeURL (storedCode);
 			www = new WWW (u);
-			StartCoroutine (WaitForRequest (www));
-			if(www.error == null){
-				//Everything went ok
-				storedCode = null;
-				var dict = Json.Deserialize(www.text) as Dictionary<string,object>;
-				return dict;
-			}
-			else{
-				var dict = new Dictionary<string,object>();
-				dict.Add("error","true");
-				return dict;
-			}
+			StartCoroutine (WaitForCodeRequest (www, callback));
+		} else {
+			var ret = new Dictionary<string,object> ();
+			ret.Add ("error", "false");
+			callback(ret);
 		}
-		var ret = new Dictionary<string,object>();
-		ret.Add("error","false");
-		return ret;
 	}
 
 
@@ -228,7 +202,6 @@ public class MyNetworkHelper : MonoBehaviour {
 	{
 		yield return www;
 
-		
 		// check for errors
 		if (www.error == null) {
 			//Debug.Log ("WWW Ok!: " + www.text);
@@ -238,6 +211,7 @@ public class MyNetworkHelper : MonoBehaviour {
 		} else {
 			//Debug.Log ("WWW Error: " + www.error);
 			var dict = new Dictionary<string,object>();
+			dict.Add("errors","Couldn't upload point - network error?");
 			dict.Add("error","true");
 			callback(dict);
 		}   
@@ -247,15 +221,68 @@ public class MyNetworkHelper : MonoBehaviour {
 
 	
 	
-	private IEnumerator WaitForRequest (WWW www)
+	private IEnumerator WaitForCodeRequest (WWW www,Action<Dictionary<string,object>> callback)
 	{
 		yield return www;
 		
 		// check for errors
 		if (www.error == null) {
-			Debug.Log ("WWW Ok!: " + www.text);
+			var dict = Json.Deserialize(www.text) as Dictionary<string,object>;
+			object _result;
+			dict.TryGetValue("error",out _result);
+			if(_result.ToString().Equals ("false")){
+				storedCode = null;
+			}
+			callback(dict);
 		} else {
-			Debug.Log ("WWW Error: " + www.error);
+			var dict = new Dictionary<string,object>();
+			dict.Add("errors","Couldn't upload code - network error?");
+			dict.Add("error","true");
+			callback(dict);
+		}    
+	}
+
+	private IEnumerator WaitForBombRequest (WWW www,Action<Dictionary<string,object>> callback)
+	{
+		yield return www;
+		
+		// check for errors
+		if (www.error == null) {
+			var dict = Json.Deserialize(www.text) as Dictionary<string,object>;
+			object _result;
+			dict.TryGetValue("error",out _result);
+			if(_result.ToString().Equals ("false")){
+				bombPoint = null;
+			}
+			callback(dict);
+
+		} else {
+			var dict = new Dictionary<string,object>();
+			dict.Add("errors","Couldn't upload bomb - network error?");
+			dict.Add("error","true");
+			callback(dict);
+		}    
+	}
+
+	private IEnumerator WaitForTowerRequest (WWW www,Action<Dictionary<string,object>> callback)
+	{
+		yield return www;
+		
+		// check for errors
+		if (www.error == null) {
+			var dict = Json.Deserialize(www.text) as Dictionary<string,object>;
+			object _result;
+			dict.TryGetValue("error",out _result);
+			if(_result.ToString().Equals ("false")){
+				tower = null;
+			}
+			callback(dict);
+			
+		} else {
+			var dict = new Dictionary<string,object>();
+			dict.Add("errors","Couldn't upload tower - network error?");
+			dict.Add("error","true");
+			callback(dict);
 		}    
 	}
 }
