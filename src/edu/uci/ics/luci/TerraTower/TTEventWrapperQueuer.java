@@ -32,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.dsl.Disruptor;
 
 import edu.uci.ics.luci.utility.Quittable;
 
@@ -48,13 +49,14 @@ public class TTEventWrapperQueuer implements Quittable{
     private final RingBuffer<TTEventWrapper> ringBuffer;
 	private BufferedWriter logWriter = null;
 	private boolean quitting  = false;
+	private Disruptor<TTEventWrapper> disruptor;
 
 	/** Constructor that doesn't log to a file
 	 * 
 	 * @param ringBuffer
 	 */
-    public TTEventWrapperQueuer(RingBuffer<TTEventWrapper> ringBuffer){
-    	this(ringBuffer,null);
+    public TTEventWrapperQueuer(Disruptor<TTEventWrapper> disruptor, RingBuffer<TTEventWrapper> ringBuffer){
+    	this(disruptor,ringBuffer,null);
     }
     
     /** Constructor that logs to a file
@@ -62,8 +64,15 @@ public class TTEventWrapperQueuer implements Quittable{
      * @param ringBuffer
      * @param logFileName
      */
-    public TTEventWrapperQueuer(RingBuffer<TTEventWrapper> ringBuffer,String logFileName)
+    public TTEventWrapperQueuer(Disruptor<TTEventWrapper> disruptor,RingBuffer<TTEventWrapper> ringBuffer,String logFileName)
     {
+    	if(disruptor == null){
+    		getLog().fatal("disruptor can't be null");
+    		throw new IllegalArgumentException("disruptor can't be null");
+    	}
+    	
+        this.disruptor = disruptor;
+        
     	if(ringBuffer == null){
     		getLog().fatal("ringBuffer can't be null");
     		throw new IllegalArgumentException("ringBuffer can't be null");
@@ -129,6 +138,10 @@ public class TTEventWrapperQueuer implements Quittable{
 					} catch (IOException e) {
 					}
 					logWriter = null;
+				}
+				if(disruptor != null){
+					disruptor.shutdown();
+					disruptor = null;
 				}
 			}
 		}

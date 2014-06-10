@@ -161,8 +161,8 @@ public class WorldManager {
 	}
 	
 
-	public void stepTowerTerritoryGrowth() {
-		getTerritory().stepTowerTerritoryGrowth(10,2);
+	public void stepTowerTerritoryGrowth(boolean withRandom) {
+		getTerritory().stepTowerTerritoryGrowth(10,2,withRandom);
 	}
 	
 	

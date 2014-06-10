@@ -58,10 +58,12 @@ public class Territory {
 	double right;
 	int numXSplits;
 	double stepX;
+	double stepXMeters;
 	double bottom;
 	double top;
 	int numYSplits;
 	double stepY;
+	double stepYMeters;
 	private boolean leaderBoardOutdated = true;
 	private transient Map<Player,Integer> leaderBoard;
 
@@ -87,6 +89,11 @@ public class Territory {
 		this.setNumXSplits(numXSplits);
 
 		this.setStepX((right - left) / numXSplits);
+		
+		double xdistance = Haversine.haversine(bottom, left, bottom, right);
+		this.setStepXMeters(xdistance/numXSplits);
+		double ydistance = Haversine.haversine(bottom, left, top, left);
+		this.setStepYMeters(ydistance/numYSplits);
 
 		this.setBottom(bottom);
 		this.setTop(top);
@@ -213,7 +220,16 @@ public class Territory {
 		this.stepX = stepX;
 	}
 
+	
+	public double getStepXMeters() {
+		return stepXMeters;
+	}
 
+
+	public void setStepXMeters(double stepXMeters) {
+		this.stepXMeters = stepXMeters;
+	}
+	
 	public double getBottom() {
 		return bottom;
 	}
@@ -252,6 +268,16 @@ public class Territory {
 	public void setStepY(double stepY) {
 		this.stepY = stepY;
 	}
+	
+	
+	public double getStepYMeters() {
+		return stepYMeters;
+	}
+
+
+	public void setStepYMeters(double stepYMeters) {
+		this.stepYMeters = stepYMeters;
+	}
 
 
 	public boolean towerPresent(int x, int y) {
@@ -269,76 +295,7 @@ public class Territory {
 	}
 
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		long temp;
-		temp = Double.doubleToLongBits(bottom);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + Arrays.deepHashCode(grid);			//Special!!
-		temp = Double.doubleToLongBits(left);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + numXSplits;
-		result = prime * result + numYSplits;
-		temp = Double.doubleToLongBits(right);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(stepX);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(stepY);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(top);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		return result;
-	}
-
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Territory)) {
-			return false;
-		}
-		Territory other = (Territory) obj;
-		if (Double.doubleToLongBits(bottom) != Double
-				.doubleToLongBits(other.bottom)) {
-			return false;
-		}
-		if (!Arrays.deepEquals(grid, other.grid)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(left) != Double
-				.doubleToLongBits(other.left)) {
-			return false;
-		}
-		if (numXSplits != other.numXSplits) {
-			return false;
-		}
-		if (numYSplits != other.numYSplits) {
-			return false;
-		}
-		if (Double.doubleToLongBits(right) != Double
-				.doubleToLongBits(other.right)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(stepX) != Double
-				.doubleToLongBits(other.stepX)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(stepY) != Double
-				.doubleToLongBits(other.stepY)) {
-			return false;
-		}
-		if (Double.doubleToLongBits(top) != Double.doubleToLongBits(other.top)) {
-			return false;
-		}
-		return true;
-	}
+	
 
 
 	public void stepTowerTerritoryGrowth(int towerMax,int towerStart) {
@@ -462,6 +419,10 @@ public class Territory {
 	private void stepTowerTerritoryRecurse(Tower tower,int level, int x, int y,int stepsTaken,boolean withRandom) {
 		if(level == 0){
 			//return;
+		}
+		//panic
+		if(stepsTaken > 300){
+			return;
 		}
 		if(x < 0 ){
 			return;
@@ -638,6 +599,95 @@ public class Territory {
 			return false;
 		}
 	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(bottom);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + Arrays.deepHashCode(grid);			//Special!!
+		result = prime * result + (leaderBoardOutdated ? 1231 : 1237);
+		temp = Double.doubleToLongBits(left);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + numXSplits;
+		result = prime * result + numYSplits;
+		temp = Double.doubleToLongBits(right);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(stepX);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(stepXMeters);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(stepY);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(stepYMeters);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(top);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Territory)) {
+			return false;
+		}
+		Territory other = (Territory) obj;
+		if (Double.doubleToLongBits(bottom) != Double
+				.doubleToLongBits(other.bottom)) {
+			return false;
+		}
+		if (!Arrays.deepEquals(grid, other.grid)) {
+			return false;
+		}
+		if (leaderBoardOutdated != other.leaderBoardOutdated) {
+			return false;
+		}
+		if (Double.doubleToLongBits(left) != Double
+				.doubleToLongBits(other.left)) {
+			return false;
+		}
+		if (numXSplits != other.numXSplits) {
+			return false;
+		}
+		if (numYSplits != other.numYSplits) {
+			return false;
+		}
+		if (Double.doubleToLongBits(right) != Double
+				.doubleToLongBits(other.right)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(stepX) != Double
+				.doubleToLongBits(other.stepX)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(stepXMeters) != Double
+				.doubleToLongBits(other.stepXMeters)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(stepY) != Double
+				.doubleToLongBits(other.stepY)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(stepYMeters) != Double
+				.doubleToLongBits(other.stepYMeters)) {
+			return false;
+		}
+		if (Double.doubleToLongBits(top) != Double.doubleToLongBits(other.top)) {
+			return false;
+		}
+		return true;
+	}
+	
 	
 
 }

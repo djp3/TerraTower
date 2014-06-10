@@ -86,7 +86,7 @@ public class TTEventHandlerStepTowerTeritoryGrowth extends TTEventHandler{
 		
 		ret = new JSONObject();
 		
-		wm.stepTowerTerritoryGrowth();
+		wm.stepTowerTerritoryGrowth(true);
 		ret.put("error", "false");
 		return ret;
 	}

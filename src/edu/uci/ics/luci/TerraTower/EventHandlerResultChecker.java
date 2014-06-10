@@ -37,9 +37,14 @@ public class EventHandlerResultChecker implements TTEventHandlerResultListener{
 
 	@Override
 	public void onFinish(JSONObject result) {
-		synchronized(semaphore){
-			results = result;
-			semaphore.notifyAll();
+		synchronized(getSemaphore()){
+			if(result == null){
+				results = new JSONObject();
+			}
+			else{
+				results = result;
+			}
+			getSemaphore().notifyAll();
 		}
 	}
 
