@@ -363,6 +363,9 @@ public class MyGUITemplate : MonoBehaviour
 			myNetworkHelper.refreshGameState(worldName,worldPassword,playerName,playerPassword,refreshGameStateInGUI);
 		}
 
+		// This turns the gyro on and off.  You can set it as you see fit
+		Input.gyro.enabled = true;
+
 		// TODO: Implement the rest of the GUI
 
 
