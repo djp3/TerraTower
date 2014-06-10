@@ -31,32 +31,34 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
+import edu.uci.ics.luci.TerraTower.TTEventWrapperQueuer;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.world.Territory;
+import edu.uci.ics.luci.TerraTower.world.WorldManager;
 import edu.uci.ics.luci.utility.datastructure.Pair;
 import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
 import edu.uci.ics.luci.utility.webserver.RequestDispatcher.HTTPRequest;
-import edu.uci.ics.luci.utility.webserver.handlers.HandlerVersion;
 
-public class HandlerGetLeaderBoard extends HandlerAbstract{
+public class HandlerGetLeaderBoard extends HandlerAbstractWorld{
+	
 	
 	private static transient volatile Logger log = null;
 	public static Logger getLog(){
 		if(log == null){
-			log = LogManager.getLogger(HandlerVersion.class);
+			log = LogManager.getLogger(HandlerGetLeaderBoard.class);
 		}
 		return log;
 	}
-
-	private Territory territory;
-
-	public HandlerGetLeaderBoard(Territory territory) {
-		this.territory = territory;
+	
+	public HandlerGetLeaderBoard(TTEventWrapperQueuer eventPublisher) {
+		super(eventPublisher);
 	}
+
 
 	@Override
 	public HandlerAbstract copy() {
-		return new HandlerGetLeaderBoard(this.territory);
+		return new HandlerGetLeaderBoard(getEventPublisher());
 	}
 	
 	/**
@@ -70,10 +72,32 @@ public class HandlerGetLeaderBoard extends HandlerAbstract{
 
 		JSONArray errors = new JSONArray();
 		
-		List<Pair<Integer, Player>> leaderBoard = territory.getLeaderBoard();
-		if(leaderBoard == null){
-			errors.add("Problem handling "+restFunction+": leader board was null");
+		errors.addAll(getWorldParameters(restFunction,parameters));
+		
+		GlobalsTerraTower globalsTerraTower = GlobalsTerraTower.getGlobalsTerraTower();
+		List<Pair<Integer, Player>> leaderBoard = null;
+		if(globalsTerraTower == null){
+			errors.add("Problem handling "+restFunction+": globals was null");
 		}
+		else{
+			WorldManager world = globalsTerraTower.getWorld(getWorldName(), getWorldPassword());
+			if(world == null){
+				errors.add("Problem handling "+restFunction+": world manager was null");
+			}
+			else{
+				Territory territory = world.getTerritory();
+				if(territory == null){
+					errors.add("Problem handling "+restFunction+": territory was null");
+				}
+				else{
+					leaderBoard = territory.getLeaderBoard();
+					if(leaderBoard == null){
+						errors.add("Problem handling "+restFunction+": leader board was null");
+					}
+				}
+			}
+		}
+		
 		
 		JSONObject ret = new JSONObject();
 		if(errors.size() != 0){

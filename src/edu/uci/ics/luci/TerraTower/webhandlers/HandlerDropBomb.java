@@ -82,6 +82,7 @@ public class HandlerDropBomb extends HandlerAbstractLocation {
 			TTEventDropBomb tt = new TTEventDropBomb(getWorldName(),getWorldPassword(),getPlayerName(),getPlayerPassword(),getLat(),getLng(),getAlt());
 			ret = this.queueEvent(TTEventType.DROP_BOMB, tt);
 		}
+		getLog().debug(ret.toJSONString());
 		
 		pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toString()).getBytes());
 		return pair;

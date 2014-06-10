@@ -57,7 +57,7 @@ public class DisruptorTest
         // Get the ring buffer from the Disruptor to be used for publishing.
         RingBuffer<TTEventWrapper> ringBuffer = disruptor.getRingBuffer();
 
-        TTEventWrapperQueuer producer = new TTEventWrapperQueuer(ringBuffer);
+        TTEventWrapperQueuer producer = new TTEventWrapperQueuer(disruptor,ringBuffer);
 
         TTEventWrapper event = new TTEventWrapper(TTEventType.VOID,new TTEventVoid(),(TTEventHandlerResultListener)null);
         for (int i = 0 ; i< 25000;i++)

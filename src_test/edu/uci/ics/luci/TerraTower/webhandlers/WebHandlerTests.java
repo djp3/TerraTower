@@ -111,8 +111,8 @@ public class WebHandlerTests {
 			requestHandlerRegistry.put("build_tower", new HandlerBuildTower(eventPublisher));
 			requestHandlerRegistry.put("drop_bomb", new HandlerDropBomb(eventPublisher));
 			requestHandlerRegistry.put("redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
-			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(GlobalsTerraTower.getGlobalsTerraTower().getWorld(worldName, worldPassword).getTerritory()));
-			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState(GlobalsTerraTower.getGlobalsTerraTower().getWorld(worldName, worldPassword).getTerritory()));
+			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
+			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState());
 			requestHandlerRegistry.put("shutdown", new HandlerShutdown(Globals.getGlobals()));
 			
 			RequestDispatcher requestDispatcher = new RequestDispatcher(requestHandlerRegistry);
@@ -130,7 +130,7 @@ public class WebHandlerTests {
 		String logFileName = "test/test_"+this.getClass().getCanonicalName();     
 		
 		GlobalsTerraTower globals = new GlobalsTerraTower(TEST_VERSION);
-		Globals.setGlobals(globals);
+		GlobalsTerraTower.setGlobals(globals);
 		globals.setTesting(true);
 		
 		TTEventWrapperQueuer eventPublisher = TerraTower.createEventQueue(logFileName);     
@@ -656,7 +656,9 @@ public class WebHandlerTests {
 		responseString = null;
 		try {
 			HashMap<String, String> params = new HashMap<String, String>();
-
+			params.put("world_name", worldName);
+			params.put("world_password", worldPassword);
+			
 			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/get_leader_board", false, params, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();

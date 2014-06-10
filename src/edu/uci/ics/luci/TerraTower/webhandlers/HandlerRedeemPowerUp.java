@@ -36,14 +36,13 @@ import edu.uci.ics.luci.TerraTower.events.TTEventType;
 import edu.uci.ics.luci.utility.datastructure.Pair;
 import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
 import edu.uci.ics.luci.utility.webserver.RequestDispatcher.HTTPRequest;
-import edu.uci.ics.luci.utility.webserver.handlers.HandlerVersion;
 
 public class HandlerRedeemPowerUp extends HandlerAbstractPlayer {
 	
 	private static transient volatile Logger log = null;
 	public static Logger getLog(){
 		if(log == null){
-			log = LogManager.getLogger(HandlerVersion.class);
+			log = LogManager.getLogger(HandlerRedeemPowerUp.class);
 		}
 		return log;
 	}
