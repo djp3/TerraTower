@@ -382,9 +382,6 @@ public class MyGUITemplate : MonoBehaviour
 				fracJourney = 0.0f;
 			}
 			// TODO: Update the copy of location stored in this class with the current location
-			lastLng = myLocation.getLng();
-			lastLat = myLocation.getLat();
-			lastAlt = myLocation.getAlt();
 		} else {
 			if (fracJourney <= 1.0f) {
 				fracJourney += 0.001f;
