@@ -17,3 +17,4 @@ test/*
 #vim editor files
 *.swp
 
+UnityTerraTowerClient/UnityTerraTowerClient/Temp/*
