@@ -158,7 +158,7 @@ public class WebHandlerTests {
 			throw e;
 		}
 		
-		TTEventCreateTerritory ttEvent2 = new TTEventCreateTerritory(worldName,worldPassword,-180.0,180.0,10,-90.0,90.0,10);
+		TTEventCreateTerritory ttEvent2 = new TTEventCreateTerritory(worldName,worldPassword,-117.8442599,-117.8411751,100,33.6446338,33.6472217,100);
 		resultChecker = new ResultChecker(false);
 		event = new TTEventWrapper(TTEventType.CREATE_TERRITORY,ttEvent2,resultChecker);
 		events.add(event);
@@ -521,8 +521,8 @@ public class WebHandlerTests {
 			params.put("world_password", worldPassword);
 			params.put("player_name", playerName);
 			params.put("player_password", playerPassword);
-			params.put("lat", "0.0");
-			params.put("lng", "0.0");
+			params.put("lat", "33.645");
+			params.put("lng", "-117.842");
 			params.put("alt", "10.0");
 
 			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/build_tower", false, params, 30 * 1000);
@@ -555,8 +555,8 @@ public class WebHandlerTests {
 			params.put("world_password", worldPassword);
 			params.put("player_name", playerName);
 			params.put("player_password", playerPassword);
-			params.put("lat", "0.0");
-			params.put("lng", "0.0");
+			params.put("lat", "33.645");
+			params.put("lng", "-117.842");
 			params.put("alt", "10.0");
 
 			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/drop_bomb", false, params, 30 * 1000);
@@ -633,7 +633,7 @@ public class WebHandlerTests {
 			e.printStackTrace();
 			fail("IO Exception"+e);
 		}
-		//System.out.println(responseString);
+		//System.err.println(responseString);
 		
 
 		response = null;
