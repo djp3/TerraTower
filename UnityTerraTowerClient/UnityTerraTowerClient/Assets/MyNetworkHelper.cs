@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using MiniJSON;
 
 /** This file is 
- * VERSION: 1.1 6/9/2014 11:00am
+ * VERSION: 1.2 6/9/2014 18:00
  */
 public class MyNetworkHelper : MonoBehaviour {
 
@@ -109,7 +109,7 @@ public class MyNetworkHelper : MonoBehaviour {
 
 	/* This executes an upload of the already stored Tower point,  the tower point will be cleared after success.  The callback is executed with the response,
 	 mostly so that debug messages can be captured */
-	public Dictionary<string,object> uploadTowerPoint(string worldName,string worldPassword,string playerName,string playerPassword,Action<Dictionary<string,object>> callback){
+	public void uploadTowerPoint(string worldName,string worldPassword,string playerName,string playerPassword,Action<Dictionary<string,object>> callback){
 		WWW www;
 
 		if (towerPoint != null) {				
@@ -122,7 +122,7 @@ public class MyNetworkHelper : MonoBehaviour {
 			u += "&lng=" + WWW.EscapeURL (towerPoint.lng + "");
 			u += "&alt=" + WWW.EscapeURL (towerPoint.alt + "");
 			www = new WWW (u);
-			StartCoroutine (WaitForRequest (www, callback));
+			StartCoroutine (WaitForTowerRequest (www, callback));
 		} else {
 			var ret = new Dictionary<string,object> ();
 			ret.Add ("error", "false");
@@ -274,7 +274,7 @@ public class MyNetworkHelper : MonoBehaviour {
 			object _result;
 			dict.TryGetValue("error",out _result);
 			if(_result.ToString().Equals ("false")){
-				tower = null;
+				towerPoint = null;
 			}
 			callback(dict);
 			
