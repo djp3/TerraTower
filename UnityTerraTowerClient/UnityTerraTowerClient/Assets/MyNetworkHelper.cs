@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using MiniJSON;
 
 /** This file is 
- * VERSION: 1.3 6/10/2014 0:00
+ * VERSION: 1.4 6/10/2014 9:10
  */
 public class MyNetworkHelper : MonoBehaviour {
 
@@ -176,6 +176,40 @@ public class MyNetworkHelper : MonoBehaviour {
 	 * The signature of the callback function should be like:
 	 * 	private void callback(Dictionary<string,object> state){}
 	 * when that function is called back it will receive a Dictionary with data about the world map. */
+	/* The callback function will be passed a Dictionary that contains a represenation of this data:
+	{
+    "error": "false",
+    "data": {
+        "result": [
+            {
+                "tower": "unknown",
+                "index_y": "0",
+                "index_x": "0",
+                "land_claim": 0,
+                "alt": "NaN",
+                "bomb": "unknown",
+                "land_owner": "barbarian"
+            },
+     <Lots more in between>
+            {
+                "tower": "unknown",
+                "index_y": "99",
+                "index_x": "99",
+                "land_claim": 0,
+                "alt": "NaN",
+                "bomb": "unknown",
+                "land_owner": "barbarian"
+            }
+        ],
+        "origin_x": -117.8442599,
+        "step_y_meters": 2.8784265193993077,
+        "step_x_meters": 2.8563645736418612,
+        "num_x_splits": 100,
+        "num_y_splits": 100,
+        "origin_y": 33.6446338
+    }
+}
+*/
 	public void refreshGameState(string worldName,string worldPassword,string playerName,string playerPassword,Action<Dictionary<string,object>> callback){
 		WWW www;
 		
