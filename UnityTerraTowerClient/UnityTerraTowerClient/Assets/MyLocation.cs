@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 
+/* Version 1.1 6/11/14 */
 public class MyLocation : MonoBehaviour {
 			
 	private bool working;
@@ -11,12 +12,18 @@ public class MyLocation : MonoBehaviour {
 	private float lastAlt;
 
 	/* When mock locations is true the apparent movement is from north east to south west, from low altitude to high altude, over span seconds */
-	public bool mockLocations = false;
+	public bool mockLocations;  //Set in the UI
 	private long mockLocationCount = 0L;
-	private float east = -117.8411751f;
-	private float west = -117.8442599f;
-	private float north = 33.6472217f;
-	private float south = 33.6446338f;
+	//private float east = -117.8411751f;
+	//private float west = -117.8442599f;
+	//private float north = 33.6472217f;
+	//private float south = 33.6446338f;
+
+	private float north = 33.6358538f;
+	private float east = -117.8372621f;
+	private float south = 33.635025f;
+	private float west = -117.8384372f;
+
 	private float low = 10f;
 	private float high = 100f;
 	private float span = 600f;
