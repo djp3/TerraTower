@@ -1,3 +1,4 @@
+![Tower with boy looking at it](http://upload.wikimedia.org/wikipedia/commons/c/cb/Broadway_tower_edit.jpg)
 TerraTower
 ==========
 
