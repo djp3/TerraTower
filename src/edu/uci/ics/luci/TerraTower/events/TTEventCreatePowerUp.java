@@ -22,60 +22,127 @@ package edu.uci.ics.luci.TerraTower.events;
 
 import net.minidev.json.JSONObject;
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
-import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 
 public class TTEventCreatePowerUp extends TTEvent{
 	
-	private PowerUp powerUp;
+	private String code;
+	private long towerDelayDelta;
+	private long bombDelayDelta;
+	private long bombFuseDelta;
 	
-	public PowerUp getPowerUp() {
-		return powerUp;
+
+	public synchronized String getCode() {
+		return code;
 	}
 
-	public void setPowerUp(PowerUp pu) {
-		this.powerUp = pu;
+	public synchronized void setCode(String code) {
+		this.code = code;
 	}
 
-	public TTEventCreatePowerUp(String worldName, String worldPassword, PowerUp pup){
-		this(worldName,PasswordUtils.hashPassword(worldPassword), pup);
+	public synchronized long getTowerDelayDelta() {
+		return towerDelayDelta;
+	}
+
+	public synchronized void setTowerDelayDelta(long towerDelayDelta) {
+		this.towerDelayDelta = towerDelayDelta;
+	}
+
+	public synchronized long getBombDelayDelta() {
+		return bombDelayDelta;
+	}
+
+	public synchronized void setBombDelayDelta(long bombDelayDelta) {
+		this.bombDelayDelta = bombDelayDelta;
+	}
+
+	public synchronized long getBombFuseDelta() {
+		return bombFuseDelta;
+	}
+
+	public synchronized void setBombFuseDelta(long bombFuseDelta) {
+		this.bombFuseDelta = bombFuseDelta;
+	}
+
+	public TTEventCreatePowerUp(String worldName, String worldPassword, String code, long towerDelayDelta, long bombDelayDelta, long bombFuseDelta){
+		this(worldName,PasswordUtils.hashPassword(worldPassword), code,towerDelayDelta,bombDelayDelta,bombFuseDelta);
 	}
 	
-	public TTEventCreatePowerUp(String worldName, byte[] worldHashedPassword,PowerUp pup){
+	public TTEventCreatePowerUp(String worldName, byte[] worldHashedPassword, String code, long towerDelayDelta, long bombDelayDelta, long bombFuseDelta){
 		super(worldName,worldHashedPassword);
-		this.setPowerUp(pup);
+		this.setCode(code);
+		this.setTowerDelayDelta(towerDelayDelta);
+		this.setBombDelayDelta(bombDelayDelta);
+		this.setBombFuseDelta(bombFuseDelta);
 	}
 
 	@Override
-	public JSONObject toJSON() {
+	public synchronized JSONObject toJSON() {
 		JSONObject ret = super.toJSON();
-		ret.put("power_up", this.getPowerUp().toJSON());
+		ret.put("code", this.getCode());
+		ret.put("tower_delay_delta", this.getTowerDelayDelta()+"");
+		ret.put("bomb_delay_delta", this.getBombDelayDelta()+"");
+		ret.put("bomb_fuse_delta", this.getBombFuseDelta()+"");
 		return ret;
 	}
 	
-	static public TTEventCreatePowerUp fromJSON(JSONObject in) {
+	static public synchronized TTEventCreatePowerUp fromJSON(JSONObject in) {
 		TTEventPlayer parent = TTEventPlayer.fromJSON(in);
 		String worldName = parent.getWorldName();
 		byte[] worldHashedPassword = parent.getWorldHashedPassword();
-		JSONObject _powerUp = (JSONObject) in.get("power_up");
-		if(_powerUp == null){
-			return(new TTEventCreatePowerUp(worldName,worldHashedPassword,null));
+		
+		String code =  (String) in.get("code");
+		long towerDelayDelta = 0L;
+		String _towerDelayDelta =  (String) in.get("tower_delay_delta");
+		if(_towerDelayDelta != null){
+			try{
+				towerDelayDelta = Long.parseLong(_towerDelayDelta);
+			}
+			catch(NumberFormatException e){
+				//null it is then.
+			}
 		}
-		else{
-			PowerUp pup = PowerUp.fromJSON(_powerUp);
-			return(new TTEventCreatePowerUp(worldName,worldHashedPassword,pup));
+		
+		long bombDelayDelta = 0L;
+		String _bombDelayDelta =  (String) in.get("bomb_delay_delta");
+		if(_bombDelayDelta != null){
+			try{
+				bombDelayDelta = Long.parseLong(_bombDelayDelta);
+			}
+			catch(NumberFormatException e){
+				//null it is then.
+			}
 		}
+		
+		long bombFuseDelta = 0L;
+		String _bombFuseDelta =  (String) in.get("bomb_fuse_delta");
+		if(_bombFuseDelta != null){
+			try{
+				bombFuseDelta = Long.parseLong(_bombFuseDelta);
+			}
+			catch(NumberFormatException e){
+				//null it is then.
+			}
+		}
+		
+		return(new TTEventCreatePowerUp(worldName,worldHashedPassword,code,towerDelayDelta,bombDelayDelta,bombFuseDelta));
 	}
 
 	@Override
-	public int hashCode() {
+	public synchronized int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((powerUp == null) ? 0 : powerUp.hashCode());
+		result = prime * result
+				+ (int) (bombDelayDelta ^ (bombDelayDelta >>> 32));
+		result = prime * result
+				+ (int) (bombFuseDelta ^ (bombFuseDelta >>> 32));
+		result = prime * result + ((code == null) ? 0 : code.hashCode());
+		result = prime * result
+				+ (int) (towerDelayDelta ^ (towerDelayDelta >>> 32));
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public synchronized boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -86,17 +153,25 @@ public class TTEventCreatePowerUp extends TTEvent{
 			return false;
 		}
 		TTEventCreatePowerUp other = (TTEventCreatePowerUp) obj;
-		if (powerUp == null) {
-			if (other.powerUp != null) {
+		if (bombDelayDelta != other.getBombDelayDelta()) {
+			return false;
+		}
+		if (bombFuseDelta != other.getBombFuseDelta()) {
+			return false;
+		}
+		if (code == null) {
+			if (other.getCode()!= null) {
 				return false;
 			}
-		} else if (!powerUp.equals(other.powerUp)) {
+		} else if (!code.equals(other.getCode())) {
+			return false;
+		}
+		if (towerDelayDelta != other.getTowerDelayDelta()) {
 			return false;
 		}
 		return true;
 	}
-	
-	
+
 
 
 }

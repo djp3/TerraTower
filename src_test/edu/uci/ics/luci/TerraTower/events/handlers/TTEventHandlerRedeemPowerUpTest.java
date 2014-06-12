@@ -34,11 +34,7 @@ import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreatePowerUp;
-import edu.uci.ics.luci.TerraTower.events.TTEventDropBomb;
 import edu.uci.ics.luci.TerraTower.events.TTEventRedeemPowerUp;
-import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
-import edu.uci.ics.luci.TerraTower.world.Territory;
-import edu.uci.ics.luci.TerraTower.world.WorldManager;
 import edu.uci.ics.luci.utility.Globals;
 
 public class TTEventHandlerRedeemPowerUpTest {
@@ -107,41 +103,10 @@ public class TTEventHandlerRedeemPowerUpTest {
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
 		
-		/* Create a used up  power Up */
+		/* Create a good up power Up */
 		TTEventHandlerCreatePowerUp tt3 = new TTEventHandlerCreatePowerUp();
 		
-		PowerUp pup = new PowerUp("code",-1000L,-100L,-1000L,true);
-		TTEventCreatePowerUp event3 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
-		json = tt3.checkParameters(0,event3);
-		try{
-			assertTrue(json == null);
-		}
-		catch(AssertionError e){
-			System.out.println(json.toJSONString());
-			throw e;
-		}
-		
-		json = tt3.onEvent();
-		assertTrue(json != null);
-		try{
-			assertEquals("false",(String)json.get("error"));
-		}
-		catch(AssertionError e){
-			System.err.println(json.toJSONString());
-			throw e;
-		}
-		
-		/*Fail because power up is used up*/
-		event = new TTEventRedeemPowerUp(worldName,worldPassword,playerName,playerPassword,"code");
-		json = tt.checkParameters(0,event);
-		assertTrue(json != null);
-		assertEquals(json.get("error"),"true");
-		
-		/* Create a good up power Up */
-		tt3 = new TTEventHandlerCreatePowerUp();
-		
-		pup = new PowerUp("code2",-1000L,-100L,-1000L,false);
-		event3 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		TTEventCreatePowerUp event3 = new TTEventCreatePowerUp(worldName,worldPassword,"code2",-1000L,-100L,-1000L);
 		json = tt3.checkParameters(0,event3);
 		try{
 			assertTrue(json == null);
@@ -188,8 +153,7 @@ public class TTEventHandlerRedeemPowerUpTest {
 		/* Create 2 good up power Ups */
 		TTEventHandlerCreatePowerUp tt3 = new TTEventHandlerCreatePowerUp();
 		
-		PowerUp pup1 = new PowerUp("code2",-1000L,-1000L,-1000L,false);
-		TTEventCreatePowerUp event3 = new TTEventCreatePowerUp(worldName,worldPassword,pup1);
+		TTEventCreatePowerUp event3 = new TTEventCreatePowerUp(worldName,worldPassword,"code2",-1000L,-1000L,-1000L);
 		json = tt3.checkParameters(0,event3);
 		try{
 			assertTrue(json == null);
@@ -209,11 +173,9 @@ public class TTEventHandlerRedeemPowerUpTest {
 			throw e;
 		}
 		
-		PowerUp pup2 = new PowerUp("code3",-GlobalsTerraTower.DEFAULT_TOWER_DELAY,
+		event3 = new TTEventCreatePowerUp(worldName,worldPassword,"code3",-GlobalsTerraTower.DEFAULT_TOWER_DELAY,
 				-GlobalsTerraTower.DEFAULT_BOMB_DELAY,
-				-GlobalsTerraTower.DEFAULT_BOMB_FUSE,
-				false);
-		event3 = new TTEventCreatePowerUp(worldName,worldPassword,pup2);
+				-GlobalsTerraTower.DEFAULT_BOMB_FUSE);
 		json = tt3.checkParameters(0,event3);
 		try{
 			assertTrue(json == null);

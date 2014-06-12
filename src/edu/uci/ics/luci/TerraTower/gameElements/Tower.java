@@ -22,40 +22,40 @@ package edu.uci.ics.luci.TerraTower.gameElements;
 
 public class Tower {
 	
-	Player owner;
-	int x;
-	int y;
-	boolean destroyed = false;
+	private Player owner;
+	private int x;
+	private int y;
+	private boolean destroyed = false;
 	
-	public Player getOwner() {
+	public synchronized  Player getOwner() {
 		return owner;
 	}
 
-	public void setOwner(Player owner) {
+	public synchronized  void setOwner(Player owner) {
 		this.owner = owner;
 	}
 
-	public int getX() {
+	public synchronized  int getX() {
 		return x;
 	}
 
-	public void setX(int x) {
+	public synchronized  void setX(int x) {
 		this.x = x;
 	}
 
-	public int getY() {
+	public synchronized  int getY() {
 		return y;
 	}
 
-	public void setY(int y) {
+	public synchronized  void setY(int y) {
 		this.y = y;
 	}
 
-	public boolean isDestroyed() {
+	public synchronized  boolean isDestroyed() {
 		return destroyed;
 	}
 
-	public void setDestroyed(boolean destroyed) {
+	public synchronized  void setDestroyed(boolean destroyed) {
 		this.destroyed = destroyed;
 	}
 
@@ -66,7 +66,7 @@ public class Tower {
 	}
 
 	@Override
-	public int hashCode() {
+	public synchronized  int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (destroyed ? 1231 : 1237);
@@ -77,7 +77,7 @@ public class Tower {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public synchronized  boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -88,20 +88,20 @@ public class Tower {
 			return false;
 		}
 		Tower other = (Tower) obj;
-		if (destroyed != other.destroyed) {
+		if (destroyed != other.isDestroyed()) {
 			return false;
 		}
 		if (owner == null) {
-			if (other.owner != null) {
+			if (other.getOwner()!= null) {
 				return false;
 			}
-		} else if (!owner.equals(other.owner)) {
+		} else if (!owner.equals(other.getOwner())) {
 			return false;
 		}
-		if (x != other.x) {
+		if (x != other.getX()) {
 			return false;
 		}
-		if (y != other.y) {
+		if (y != other.getY()) {
 			return false;
 		}
 		return true;

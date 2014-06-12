@@ -49,10 +49,10 @@ public class PowerUp {
 		this.setRedeemed(redeemed);
 	}
 	
-	public String getCode() {
+	public synchronized  String getCode() {
 		return code;
 	}
-	public void setCode(String code) {
+	public synchronized  void setCode(String code) {
 		if(code == null){
 			this.code = "";
 			getLog().warn("Setting code to \"\" instead of null");
@@ -62,10 +62,10 @@ public class PowerUp {
 		}
 		
 	}
-	public long getTowerDelayDelta() {
+	public synchronized  long getTowerDelayDelta() {
 		return towerDelayDelta;
 	}
-	public void setTowerDelayDelta(Long towerDelayDelta) {
+	public synchronized  void setTowerDelayDelta(Long towerDelayDelta) {
 		if(towerDelayDelta == null){
 			this.towerDelayDelta = 0;
 			getLog().warn("Setting tower delay delta to 0 instead of null");
@@ -74,10 +74,10 @@ public class PowerUp {
 			this.towerDelayDelta = towerDelayDelta;
 		}
 	}
-	public long getBombDelayDelta() {
+	public synchronized  long getBombDelayDelta() {
 		return bombDelayDelta;
 	}
-	public void setBombDelayDelta(Long bombDelayDelta) {
+	public synchronized  void setBombDelayDelta(Long bombDelayDelta) {
 		if(bombDelayDelta == null){
 			this.bombDelayDelta = 0;
 			getLog().warn("Setting bomb delay delta to 0 instead of null");
@@ -86,10 +86,10 @@ public class PowerUp {
 			this.bombDelayDelta = bombDelayDelta;
 		}
 	}
-	public long getBombFuseDelta() {
+	public synchronized  long getBombFuseDelta() {
 		return bombFuseDelta;
 	}
-	public void setBombFuseDelta(Long bombFuseDelta) {
+	public synchronized  void setBombFuseDelta(Long bombFuseDelta) {
 		if(bombFuseDelta == null){
 			this.bombFuseDelta = 0;
 			getLog().warn("Setting bomb fuse delta to 0 instead of null");
@@ -98,14 +98,14 @@ public class PowerUp {
 			this.bombFuseDelta = bombFuseDelta;
 		}
 	}
-	public boolean getRedeemed() {
+	public synchronized  boolean getRedeemed() {
 		return redeemed;
 	}
-	public void setRedeemed(boolean redeemed) {
+	public synchronized  void setRedeemed(boolean redeemed) {
 		this.redeemed = redeemed;
 	}
 	
-	public JSONObject toJSON() {
+	public synchronized  JSONObject toJSON() {
 		JSONObject ret = new JSONObject();
 		ret.put("code", this.getCode());
 		ret.put("tower_delay_delta", this.getTowerDelayDelta()+"");
@@ -115,7 +115,7 @@ public class PowerUp {
 		return ret;
 	}
 	
-	static public PowerUp fromJSON(JSONObject in) {
+	static public synchronized PowerUp fromJSON(JSONObject in) {
 		String code =  (String) in.get("code");
 		Long towerDelayDelta = null;
 		String _towerDelayDelta =  (String) in.get("tower_delay_delta");
@@ -164,7 +164,7 @@ public class PowerUp {
 
 
 	@Override
-	public int hashCode() {
+	public synchronized  int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
@@ -179,7 +179,7 @@ public class PowerUp {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public synchronized  boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -190,23 +190,23 @@ public class PowerUp {
 			return false;
 		}
 		PowerUp other = (PowerUp) obj;
-		if (bombDelayDelta != other.bombDelayDelta) {
+		if (bombDelayDelta != other.getBombDelayDelta()) {
 			return false;
 		}
-		if (bombFuseDelta != other.bombFuseDelta) {
+		if (bombFuseDelta != other.getBombFuseDelta()) {
 			return false;
 		}
 		if (code == null) {
-			if (other.code != null) {
+			if (other.getCode()!= null) {
 				return false;
 			}
-		} else if (!code.equals(other.code)) {
+		} else if (!code.equals(other.getCode())) {
 			return false;
 		}
-		if (redeemed != other.redeemed) {
+		if (redeemed != other.getRedeemed()) {
 			return false;
 		}
-		if (towerDelayDelta != other.towerDelayDelta) {
+		if (towerDelayDelta != other.getTowerDelayDelta()) {
 			return false;
 		}
 		return true;

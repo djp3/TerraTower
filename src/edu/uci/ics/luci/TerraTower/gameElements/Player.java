@@ -52,72 +52,71 @@ public class Player implements Comparable<Player>{
 	long bombFuse;
 	
 	
-	public String getPlayerName() {
+	public synchronized  String getPlayerName() {
 		return playerName;
 	}
 
 
-	public void setPlayerName(String playerName) {
+	public synchronized  void setPlayerName(String playerName) {
 		this.playerName = playerName;
 	}
 
 
-	public byte[] getHashedPassword() {
+	public synchronized  byte[] getHashedPassword() {
 		return(Arrays.copyOf(hashedPassword,hashedPassword.length));
 	}
 
 
-	private void setHashedPassword(byte[] hashedPassword) {
+	private synchronized void setHashedPassword(byte[] hashedPassword) {
 		this.hashedPassword = Arrays.copyOf(hashedPassword,hashedPassword.length);
-		
 	}
 
 
-	public long getBombDelay() {
+	public synchronized  long getBombDelay() {
 		return bombDelay;
 	}
 
 
-	public void setBombDelay(long bombDelay) {
+	public synchronized  void setBombDelay(long bombDelay) {
 		this.bombDelay = bombDelay;
 	}
 
 
-	public long getLastBombPlacedTime() {
+	public synchronized  long getLastBombPlacedTime() {
 		return lastBombPlacedTime;
 	}
 
 
-	public void setLastBombPlacedTime(long lastBombPlacedTime) {
+	public synchronized  void setLastBombPlacedTime(long lastBombPlacedTime) {
 		this.lastBombPlacedTime = lastBombPlacedTime;
 	}
 	
-	public long getTowerDelay() {
+	public synchronized  long getTowerDelay() {
 		return towerDelay;
 	}
 
 
-	public void setTowerDelay(long towerDelay) {
+	public synchronized  void setTowerDelay(long towerDelay) {
 		this.towerDelay = towerDelay;
 	}
 
 
-	public long getLastTowerPlacedTime() {
+	public synchronized  long getLastTowerPlacedTime() {
 		return lastTowerPlacedTime;
 	}
 
 
-	public void setLastTowerPlacedTime(long lastTowerPlacedTime) {
+	public synchronized  void setLastTowerPlacedTime(long lastTowerPlacedTime) {
 		this.lastTowerPlacedTime = lastTowerPlacedTime;
 	}
 	
 
-	public long getBombFuse() {
+	public synchronized  long getBombFuse() {
 		return bombFuse;
 	}
 
 
-	public void setBombFuse(long bombFuse) {
+	public synchronized  void setBombFuse(long bombFuse) {
 		this.bombFuse = bombFuse;
 	}
 
@@ -138,18 +137,18 @@ public class Player implements Comparable<Player>{
 
 
 	
-	public boolean passwordGood(String proposedPassword) {
+	public synchronized  boolean passwordGood(String proposedPassword) {
 		return(PasswordUtils.checkPassword(proposedPassword,hashedPassword));
 	}
 	
 
-	public boolean passwordGood(byte[] proposedPassword) {
+	public synchronized  boolean passwordGood(byte[] proposedPassword) {
 		return(PasswordUtils.checkPassword(proposedPassword,hashedPassword));
 	}
 
 
 	@Override
-	public int hashCode() {
+	public synchronized  int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (bombDelay ^ (bombDelay >>> 32));
@@ -167,7 +166,7 @@ public class Player implements Comparable<Player>{
 
 
 	@Override
-	public boolean equals(Object obj) {
+	public synchronized  boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -178,29 +177,29 @@ public class Player implements Comparable<Player>{
 			return false;
 		}
 		Player other = (Player) obj;
-		if (bombDelay != other.bombDelay) {
+		if (bombDelay != other.getBombDelay()) {
 			return false;
 		}
-		if (bombFuse != other.bombFuse) {
+		if (bombFuse != other.getBombFuse()) {
 			return false;
 		}
-		if (!Arrays.equals(hashedPassword, other.hashedPassword)) {
+		if (!Arrays.equals(hashedPassword, other.getHashedPassword())) {
 			return false;
 		}
-		if (lastBombPlacedTime != other.lastBombPlacedTime) {
+		if (lastBombPlacedTime != other.getLastBombPlacedTime()) {
 			return false;
 		}
-		if (lastTowerPlacedTime != other.lastTowerPlacedTime) {
+		if (lastTowerPlacedTime != other.getLastTowerPlacedTime()) {
 			return false;
 		}
 		if (playerName == null) {
-			if (other.playerName != null) {
+			if (other.getPlayerName() != null) {
 				return false;
 			}
-		} else if (!playerName.equals(other.playerName)) {
+		} else if (!playerName.equals(other.getPlayerName())) {
 			return false;
 		}
-		if (towerDelay != other.towerDelay) {
+		if (towerDelay != other.getTowerDelay()) {
 			return false;
 		}
 		return true;
@@ -208,7 +207,7 @@ public class Player implements Comparable<Player>{
 
 
 	@Override
-	public int compareTo(Player o) {
+	public synchronized  int compareTo(Player o) {
 		int x;
 		
 		if(this.getPlayerName() == null){

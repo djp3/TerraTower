@@ -17,7 +17,4 @@ public class Haversine {
         return R * c;
     }
     
-    public static void main(String[] args) {
-        System.out.println(haversine(36.12, -86.67, 33.94, -118.40));
-    }
 }

@@ -22,14 +22,13 @@ package edu.uci.ics.luci.TerraTower.events;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 
 public class TTEventCreatePowerUpTest {
 	static final String worldName = "name";
@@ -57,14 +56,13 @@ public class TTEventCreatePowerUpTest {
 	@Test
 	public void testEquals() {
 		
-		PowerUp pup = new PowerUp("code",-1000L,-1000L,-1000L,false);
-		TTEventCreatePowerUp t1 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		TTEventCreatePowerUp t1 = new TTEventCreatePowerUp(worldName,worldPassword,"code",-1000L,-1000L,-1000L);
 		assertEquals(t1,t1);
 		assertTrue(!t1.equals(null));
 		assertTrue(!t1.equals("string"));
 		
-		TTEventCreatePowerUp t2 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
-		TTEventCreatePowerUp t3 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		TTEventCreatePowerUp t2 = new TTEventCreatePowerUp(worldName,worldPassword,"code",-1000L,-1000L,-1000L);
+		TTEventCreatePowerUp t3 = new TTEventCreatePowerUp(worldName,worldPassword,"code",-1000L,-1000L,-1000L);
 		assertTrue(t2.equals(t3));
 		assertTrue(t2.hashCode()==t3.hashCode());
 		
@@ -72,14 +70,17 @@ public class TTEventCreatePowerUpTest {
 
 	@Test
 	public void testBasic() {
-		PowerUp pup = new PowerUp("code",-1000L,-1000L,-1000L,false);
-		new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		try{
+			new TTEventCreatePowerUp(worldName,worldPassword,"code",-1000L,-1000L,-1000L);
+		}
+		catch(RuntimeException e){
+			fail("Should not have failed");
+		}
 	}
 	
 	@Test
 	public void testJSON() {
-		PowerUp pup = new PowerUp("code",-1000L,-1000L,-1000L,false);
-		TTEventCreatePowerUp t1 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		TTEventCreatePowerUp t1 = new TTEventCreatePowerUp(worldName,worldPassword,"code",-1000L,-1000L,-1000L);
 		
 		assertEquals(t1,TTEventCreatePowerUp.fromJSON(t1.toJSON()));
 	}

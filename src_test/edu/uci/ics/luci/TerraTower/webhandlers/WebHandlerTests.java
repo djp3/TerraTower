@@ -55,9 +55,7 @@ import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
 import edu.uci.ics.luci.TerraTower.gameElements.Player;
-import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
-import edu.uci.ics.luci.TerraTower.webhandlers.HandlerShutdown;
 import edu.uci.ics.luci.TerraTower.world.Territory;
 import edu.uci.ics.luci.utility.Globals;
 import edu.uci.ics.luci.utility.datastructure.Pair;
@@ -118,7 +116,7 @@ public class WebHandlerTests {
 			requestHandlerRegistry.put("drop_bomb", new HandlerDropBomb(eventPublisher));
 			requestHandlerRegistry.put("redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
 			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
-			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState());
+			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState(false));
 			requestHandlerRegistry.put("shutdown", new HandlerShutdown(Globals.getGlobals()));
 			
 			RequestDispatcher requestDispatcher = new RequestDispatcher(requestHandlerRegistry);
@@ -208,8 +206,7 @@ public class WebHandlerTests {
 		}
 		
 		
-		PowerUp pup = new PowerUp("code",-1000L,-1000L,-1000L,false);
-		TTEventCreatePowerUp ttEvent8 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		TTEventCreatePowerUp ttEvent8 = new TTEventCreatePowerUp(worldName,worldPassword,"code",-1000L,-1000L,-1000L);
 		resultChecker = new ResultChecker(false);
 		event = new TTEventWrapper(TTEventType.CREATE_POWER_UP,ttEvent8,resultChecker);
 		events.add(event);
@@ -621,8 +618,9 @@ public class WebHandlerTests {
 		
 		
 		/* Deal with rate limit */
-		System.out.print("Waiting 60 seconds to defeat rate limit");
-		for(int i = 0 ; i < 60;i++){
+		/*
+		System.out.print("Waiting 30 seconds to defeat rate limit");
+		for(int i = 0 ; i < 30;i++){
 			try {
 				Thread.sleep(1*1000);
 				System.out.print(".");
@@ -631,6 +629,7 @@ public class WebHandlerTests {
 		}
 		
 		System.out.println(".");
+		*/
 		
 		/* Game State */
 		responseString = null;

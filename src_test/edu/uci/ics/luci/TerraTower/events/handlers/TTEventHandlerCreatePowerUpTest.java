@@ -33,7 +33,6 @@ import org.junit.Test;
 import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreatePowerUp;
-import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 import edu.uci.ics.luci.utility.Globals;
 
 public class TTEventHandlerCreatePowerUpTest {
@@ -84,15 +83,14 @@ public class TTEventHandlerCreatePowerUpTest {
 		
 		
 		/*Null Power Up*/
-		TTEventCreatePowerUp event = new TTEventCreatePowerUp(worldName,worldPassword,null);
+		TTEventCreatePowerUp event = new TTEventCreatePowerUp(worldName,worldPassword,null,-1000L,-100L,-1000L);
 		json = tt.checkParameters(0,event);
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
 		
 		
 		/*Ok! */
-		PowerUp pup = new PowerUp("code",-1000L,-100L,-1000L,false);
-		event = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		event = new TTEventCreatePowerUp(worldName,worldPassword,"code",-1000L,-100L,-1000L);
 		json = tt.checkParameters(0,event);
 		assertTrue(json == null);
 	}
@@ -101,6 +99,11 @@ public class TTEventHandlerCreatePowerUpTest {
 	
 	@Test
 	public void testOnEvent() {
+		GlobalsTerraTower g = new GlobalsTerraTower("Version test");
+		Globals.setGlobals(g);
+		g.createWorld(worldName, worldPassword);
+
+		
 		TTEventHandlerCreatePowerUp tt = new TTEventHandlerCreatePowerUp();
 		
 		/* Fail for not checking parameters */
@@ -109,8 +112,7 @@ public class TTEventHandlerCreatePowerUpTest {
 		assertEquals("true",(String)json.get("error"));
 	
 		/*Ok! */
-		PowerUp pup = new PowerUp("code",-1000L,-100L,-1000L,false);
-		TTEventCreatePowerUp event = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		TTEventCreatePowerUp event = new TTEventCreatePowerUp(worldName,worldPassword,"code",-1000L,-100L,-1000L);
 		json = tt.checkParameters(0,event);
 		try{
 			assertTrue(json == null);
@@ -131,8 +133,7 @@ public class TTEventHandlerCreatePowerUpTest {
 		}
 		
 		/*Not Ok! pup exists!*/
-		pup = new PowerUp("code",-1000L,-100L,-1000L,false);
-		event = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		event = new TTEventCreatePowerUp(worldName,worldPassword,"code",-1000L,-100L,-1000L);
 		json = tt.checkParameters(0,event);
 		try{
 			assertTrue(json != null);

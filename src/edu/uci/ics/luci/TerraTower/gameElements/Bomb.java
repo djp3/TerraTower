@@ -29,51 +29,51 @@ public class Bomb {
 	int strength;
 	boolean exploded;
 	
-	public Player getOwner() {
+	public synchronized  Player getOwner() {
 		return owner;
 	}
 
-	public void setOwner(Player owner) {
+	public synchronized  void setOwner(Player owner) {
 		this.owner = owner;
 	}
 
-	public int getX() {
+	public synchronized  int getX() {
 		return x;
 	}
 
-	public void setX(int x) {
+	public synchronized  void setX(int x) {
 		this.x = x;
 	}
 
-	public int getY() {
+	public synchronized  int getY() {
 		return y;
 	}
 
-	public void setY(int y) {
+	public synchronized  void setY(int y) {
 		this.y = y;
 	}
 
-	public long getExplosionTime() {
+	public synchronized  long getExplosionTime() {
 		return explosionTime;
 	}
 
-	public void setExplosionTime(long explosionTime) {
+	public synchronized void setExplosionTime(long explosionTime) {
 		this.explosionTime = explosionTime;
 	}
 
-	public int getStrength() {
+	public synchronized  int getStrength() {
 		return strength;
 	}
 
-	public void setStrength(int strength) {
+	public synchronized void setStrength(int strength) {
 		this.strength = strength;
 	}
 
-	public boolean isExploded() {
+	public synchronized  boolean isExploded() {
 		return exploded;
 	}
 
-	public void setExploded(boolean exploded) {
+	public synchronized  void setExploded(boolean exploded) {
 		this.exploded = exploded;
 	}
 
@@ -87,7 +87,7 @@ public class Bomb {
 	}
 
 	@Override
-	public int hashCode() {
+	public synchronized  int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (exploded ? 1231 : 1237);
@@ -101,7 +101,7 @@ public class Bomb {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public synchronized boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -112,26 +112,26 @@ public class Bomb {
 			return false;
 		}
 		Bomb other = (Bomb) obj;
-		if (exploded != other.exploded) {
+		if (exploded != other.isExploded()) {
 			return false;
 		}
-		if (explosionTime != other.explosionTime) {
+		if (explosionTime != other.getExplosionTime()) {
 			return false;
 		}
 		if (owner == null) {
-			if (other.owner != null) {
+			if (other.getOwner() != null) {
 				return false;
 			}
-		} else if (!owner.equals(other.owner)) {
+		} else if (!owner.equals(other.getOwner())) {
 			return false;
 		}
-		if (strength != other.strength) {
+		if (strength != other.getStrength()) {
 			return false;
 		}
-		if (x != other.x) {
+		if (x != other.getX()) {
 			return false;
 		}
-		if (y != other.y) {
+		if (y != other.getY()) {
 			return false;
 		}
 		return true;

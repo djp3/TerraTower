@@ -21,6 +21,7 @@
 package edu.uci.ics.luci.TerraTower.world;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,95 +62,95 @@ public class GridCell {
 	private transient Map<Player,Integer> proposedOwner;
 	private transient int stepsTaken;
 	
-	public int getX() {
+	public synchronized int getX() {
 		return x;
 	}
 
-	public void setX(int x) {
+	public synchronized void setX(int x) {
 		this.x = x;
 	}
 
-	public int getY() {
+	public synchronized  int getY() {
 		return y;
 	}
 
-	public void setY(int y) {
+	public synchronized void setY(int y) {
 		this.y = y;
 	}
 
-	public Tower getTower() {
+	public synchronized  Tower getTower() {
 		return t;
 	}
 
-	public void setTower(Tower t) {
+	public synchronized  void setTower(Tower t) {
 		this.t = t;
 	}
 
-	public SortedMap<Long, List<Bomb>> getBombs() {
+	public synchronized  SortedMap<Long, List<Bomb>> getBombs() {
 		return bombs;
 	}
 
-	public void setBombs(SortedMap<Long, List<Bomb>> bombs) {
+	public synchronized  void setBombs(SortedMap<Long, List<Bomb>> bombs) {
 		this.bombs = bombs;
 	}
 
-	public SortedMap<Double, Double> getAlts() {
+	public synchronized  SortedMap<Double, Double> getAlts() {
 		return alts;
 	}
 
-	public void setAlts(SortedMap<Double, Double> alts) {
+	public synchronized  void setAlts(SortedMap<Double, Double> alts) {
 		this.alts = alts;
 	}
 
-	public Pair<Player, Integer> getOwner() {
+	public synchronized  Pair<Player, Integer> getOwner() {
 		return owner;
 	}
 
-	public void setOwner(Pair<Player, Integer> owner) {
+	public synchronized  void setOwner(Pair<Player, Integer> owner) {
 		this.owner = owner;
 	}
 
-	public Map<Player, Integer> getProposedOwner() {
+	public synchronized  Map<Player, Integer> getProposedOwner() {
 		return proposedOwner;
 	}
 
-	public void setProposedOwner(Map<Player, Integer> proposedOwner) {
+	public synchronized  void setProposedOwner(Map<Player, Integer> proposedOwner) {
 		this.proposedOwner = proposedOwner;
 	}
 	
-	public int getStepsTaken() {
+	public synchronized  int getStepsTaken() {
 		return stepsTaken;
 	}
 
-	public void setStepsTaken(int stepsTaken) {
+	public synchronized  void setStepsTaken(int stepsTaken) {
 		this.stepsTaken = stepsTaken;
 	}
 
 	public GridCell(int x,int y){
 		setX(x);
 		setY(y);
-		setBombs(new TreeMap<Long,List<Bomb>>());
-		setAlts(new TreeMap<Double,Double>());
+		setBombs(Collections.synchronizedSortedMap(new TreeMap<Long,List<Bomb>>()));
+		setAlts(Collections.synchronizedSortedMap(new TreeMap<Double,Double>()));
 		setTower(null);
 		resetOwner();
 	}
 
-	public void resetOwner() {
+	public synchronized  void resetOwner() {
 		setOwner(new Pair<Player,Integer>(Player.BARBARIAN,0));
-		setProposedOwner(new HashMap<Player,Integer>());
+		setProposedOwner(Collections.synchronizedMap(new HashMap<Player,Integer>()));
 	}
 
-	public boolean towerPresent() {
+	public synchronized  boolean towerPresent() {
 		return (t != null);
 	}
 
-	public boolean addTower(Tower tower) {
+	public synchronized  boolean addTower(Tower tower) {
 		setTower(tower);
 		return towerPresent();
 	}
 	
 
-	public int numBombsPresent() {
+	public synchronized  int numBombsPresent() {
 		int count = 0;
 		for(List<Bomb> e:bombs.values()){
 			count += e.size();
@@ -157,7 +158,7 @@ public class GridCell {
 		return(count);
 	}
 	
-	public boolean addBomb(Bomb bomb) {
+	public synchronized  boolean addBomb(Bomb bomb) {
 		int size = numBombsPresent();
 		List<Bomb> list = getBombs().get(bomb.getExplosionTime());
 		if(list == null){
@@ -169,11 +170,11 @@ public class GridCell {
 		return (size2 == (size+1));
 	}
 
-	public void updateAltitude(double alt) {
+	public synchronized  void updateAltitude(double alt) {
 		alts.put(alt,alt);
 	}
 
-	public Double estimateAltitude() {
+	public synchronized  Double estimateAltitude() {
 		Double x = 0.0d;
 		for(Double a :alts.keySet()){
 			x+=a;
@@ -184,7 +185,7 @@ public class GridCell {
 
 	// for any levels above the floor lower it no lower than the floor
 	// if it starts below the floor, then leave it there.
-	public void lowerTowerTerritoryLevel(int delta,int floor) {
+	public synchronized  void lowerTowerTerritoryLevel(int delta,int floor) {
 		Pair<Player, Integer> o = getOwner();
 		if(o != null){
 			Integer level = o.getSecond();
@@ -203,7 +204,7 @@ public class GridCell {
 		}
 	}
 	
-	public void raiseTowerTerritoryLevel(int delta,int ceiling) {
+	public synchronized  void raiseTowerTerritoryLevel(int delta,int ceiling) {
 		Pair<Player, Integer> o = getOwner();
 		if(o != null){
 			Integer level = o.getSecond();
@@ -220,7 +221,7 @@ public class GridCell {
 		}
 	}
 
-	public void resolveOwner() {
+	public synchronized  void resolveOwner() {
 		Player maxPlayer = null;
 		int max = -1;
 		for( Entry<Player, Integer> po : getProposedOwner().entrySet()){
@@ -238,7 +239,7 @@ public class GridCell {
 	}
 
 	@Override
-	public int hashCode() {
+	public synchronized  int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((alts == null) ? 0 : alts.hashCode());
@@ -251,7 +252,7 @@ public class GridCell {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public synchronized  boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -263,37 +264,37 @@ public class GridCell {
 		}
 		GridCell other = (GridCell) obj;
 		if (alts == null) {
-			if (other.alts != null) {
+			if (other.getAlts() != null) {
 				return false;
 			}
-		} else if (!alts.equals(other.alts)) {
+		} else if (!alts.equals(other.getAlts())) {
 			return false;
 		}
 		if (bombs == null) {
-			if (other.bombs != null) {
+			if (other.getBombs() != null) {
 				return false;
 			}
-		} else if (!bombs.equals(other.bombs)) {
+		} else if (!bombs.equals(other.getBombs())) {
 			return false;
 		}
 		if (owner == null) {
-			if (other.owner != null) {
+			if (other.getOwner() != null) {
 				return false;
 			}
-		} else if (!owner.equals(other.owner)) {
+		} else if (!owner.equals(other.getOwner())) {
 			return false;
 		}
 		if (t == null) {
-			if (other.t != null) {
+			if (other.getTower() != null) {
 				return false;
 			}
-		} else if (!t.equals(other.t)) {
+		} else if (!t.equals(other.getTower())) {
 			return false;
 		}
-		if (x != other.x) {
+		if (x != other.getX()) {
 			return false;
 		}
-		if (y != other.y) {
+		if (y != other.getY()) {
 			return false;
 		}
 		return true;

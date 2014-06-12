@@ -38,17 +38,16 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.uci.ics.luci.TerraTower.events.TTEventBuildTower;
 import edu.uci.ics.luci.TerraTower.events.TTEventBurnBombFuse;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreatePowerUp;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.TTEventDropBomb;
-import edu.uci.ics.luci.TerraTower.events.TTEventBuildTower;
 import edu.uci.ics.luci.TerraTower.events.TTEventRedeemPowerUp;
 import edu.uci.ics.luci.TerraTower.events.TTEventStepTowerTerritoryGrowth;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
-import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 import edu.uci.ics.luci.utility.Globals;
 
 public class TTEventWrapperQueuerTest {
@@ -241,8 +240,7 @@ public class TTEventWrapperQueuerTest {
 		
 		
 
-		PowerUp pup = new PowerUp("code",-1000L,-1000L,-1000L,false);
-		TTEventCreatePowerUp ttEvent8 = new TTEventCreatePowerUp(worldName,worldPassword,pup);
+		TTEventCreatePowerUp ttEvent8 = new TTEventCreatePowerUp(worldName,worldPassword,"code",-1000L,-1000L,-1000L);
 		resultChecker = new ResultChecker(false);
 		event = new TTEventWrapper(TTEventType.CREATE_POWER_UP,ttEvent8,resultChecker);
 		events.add(event);
@@ -288,6 +286,7 @@ public class TTEventWrapperQueuerTest {
 		Globals.getGlobals().setQuitting(true);
 		
 		for(TTEventWrapper loopEvent: events){
+			//System.err.println("loopEvent "+loopEvent.toJSON().toJSONString());
 			BufferedReader reader = null;
 			boolean foundTheLine = false;
 			try{
@@ -295,11 +294,18 @@ public class TTEventWrapperQueuerTest {
 				reader = Files.newBufferedReader(newFile, Charset.defaultCharset());
 				String lineFromFile = "";
 				while((lineFromFile = reader.readLine()) != null){
+					//System.err.println(lineFromFile);
 					if(lineFromFile.contains(loopEvent.toJSON().toJSONString())){
 						foundTheLine = true;
 					}
 				}
-				assertTrue(foundTheLine);
+				try{
+					assertTrue(foundTheLine);
+				}
+				catch(AssertionError e){
+					System.err.println("Couldn't find: "+loopEvent.toJSON().toJSONString());
+					throw e;
+				}
 				reader.close();
 			}catch(IOException e){
 				fail(e.toString());

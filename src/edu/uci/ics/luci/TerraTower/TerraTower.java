@@ -21,8 +21,6 @@
 
 package edu.uci.ics.luci.TerraTower;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +58,6 @@ import edu.uci.ics.luci.utility.webserver.AccessControl;
 import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
 import edu.uci.ics.luci.utility.webserver.RequestDispatcher;
 import edu.uci.ics.luci.utility.webserver.WebServer;
-import edu.uci.ics.luci.utility.webserver.WebUtil;
 import edu.uci.ics.luci.utility.webserver.handlers.HandlerVersion;
 
 public class TerraTower {
@@ -189,12 +186,12 @@ public class TerraTower {
 			try{
 				json = (JSONObject) JSONValue.parse(powerUps.get(i).toString());
 				pup = PowerUp.fromJSON(json);
+				wrapper = new TTEventWrapper(TTEventType.CREATE_POWER_UP, new TTEventCreatePowerUp(worldName,worldPassword,pup.getCode(),pup.getTowerDelayDelta(),pup.getBombDelayDelta(),pup.getBombFuseDelta()),rc);
+				eventPublisher.onData(wrapper);
 			}
 			catch(NullPointerException e){
 				getLog().error("Power up did not parse correctly:"+powerUps.get(i).toString()+"\n"+e);
 			}
-			wrapper = new TTEventWrapper(TTEventType.CREATE_POWER_UP, new TTEventCreatePowerUp(worldName,worldPassword,pup),rc);
-			eventPublisher.onData(wrapper);
 		}
 		for(EventHandlerResultChecker r :results){
 			r.block();
@@ -214,7 +211,7 @@ public class TerraTower {
 			requestHandlerRegistry.put("drop_bomb", new HandlerDropBomb(eventPublisher));
 			requestHandlerRegistry.put("redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
 			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
-			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState());
+			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState(true));
 			requestHandlerRegistry.put("shutdown", new HandlerShutdown(Globals.getGlobals()));
 
 			RequestDispatcher dispatcher = new RequestDispatcher(

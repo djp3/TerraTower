@@ -22,8 +22,10 @@ package edu.uci.ics.luci.TerraTower.world;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,11 +52,11 @@ public class WorldManager {
 	Territory territory = null;
 	
 	//Map from playerName to player
-	HashMap<String,Player> players;
+	Map<String,Player> players;
 	
 	List<Tower> towers;
 	List<Bomb> bombs;
-	HashMap<String,PowerUp> powerUps;
+	Map<String, PowerUp> powerUps;
 
 	
 	public WorldManager(String password){
@@ -64,37 +66,37 @@ public class WorldManager {
 	public WorldManager(byte[] hashedPassword){
 		this.worldHashedPassword=Arrays.copyOf(hashedPassword,hashedPassword.length);
 		
-		players = new HashMap<String,Player>();
+		players = Collections.synchronizedMap(new HashMap<String,Player>());
 	
-		towers = new ArrayList<Tower>();
-		bombs = new ArrayList<Bomb>();
+		towers = Collections.synchronizedList(new ArrayList<Tower>());
+		bombs = Collections.synchronizedList(new ArrayList<Bomb>());
 		
-		powerUps = new HashMap<String,PowerUp>();
+		powerUps = Collections.synchronizedMap(new HashMap<String,PowerUp>());
 	}
 	
 	
-	public boolean passwordGood(String proposedPassword) {
+	public synchronized  boolean passwordGood(String proposedPassword) {
 		return(PasswordUtils.checkPassword(proposedPassword,worldHashedPassword));
 	}
 
-	public boolean passwordGood(byte[] proposedPassword) {
+	public synchronized  boolean passwordGood(byte[] proposedPassword) {
 		return(PasswordUtils.checkPassword(proposedPassword,worldHashedPassword));
 	}
 
-	public void setTerritory(Territory t) {
+	public synchronized  void setTerritory(Territory t) {
 		territory=t;
 	}
 	
-	public Territory getTerritory(){
+	public synchronized  Territory getTerritory(){
 		return territory;
 	}
 
-	public boolean playerExists(String playerName) {
+	public synchronized  boolean playerExists(String playerName) {
 		Player player = players.get(playerName);
 		return(player!=null);
 	}
 
-	public Player createPlayer(String playerName, byte[] hashedPassword) {
+	public synchronized  Player createPlayer(String playerName, byte[] hashedPassword) {
 		if(playerExists(playerName)){
 			return null;
 		}
@@ -103,7 +105,7 @@ public class WorldManager {
 		return player;
 	}
 	
-	public Player getPlayer(String playerName,String password){
+	public synchronized  Player getPlayer(String playerName,String password){
 		Player player= players.get(playerName);
 		if(player == null){
 			return null;
@@ -114,7 +116,7 @@ public class WorldManager {
 		return(player);
 	}
 	
-	public Player getPlayer(String playerName,byte[] hashedPassword){
+	public synchronized  Player getPlayer(String playerName,byte[] hashedPassword){
 		Player player= players.get(playerName);
 		if(player == null){
 			return null;
@@ -125,11 +127,11 @@ public class WorldManager {
 		return(player);
 	}
 	
-	public boolean towerPresent(int x,int y){
+	public synchronized  boolean towerPresent(int x,int y){
 		return(territory.towerPresent(x,y));
 	}
 	
-	public boolean addTower(Tower tower){
+	public synchronized  boolean addTower(Tower tower){
 		if(towerPresent(tower.getX(),tower.getY())){
 			return false;
 		}
@@ -143,11 +145,11 @@ public class WorldManager {
 		
 	}
 	
-	public boolean powerUpExists(String code) {
+	public synchronized  boolean powerUpExists(String code) {
 		return(powerUps.containsKey(code));
 	}
 
-	public PowerUp createPowerUp(PowerUp pup){
+	public synchronized  PowerUp createPowerUp(PowerUp pup){
 		if(powerUpExists(pup.getCode())){
 			return null;
 		}
@@ -155,28 +157,28 @@ public class WorldManager {
 		return pup;
 	}
 	
-	public PowerUp getPowerUp(String code){
+	public synchronized  PowerUp getPowerUp(String code){
 		PowerUp pup= powerUps.get(code);
 		return(pup);
 	}
 	
 
-	public void stepTowerTerritoryGrowth(boolean withRandom) {
+	public synchronized  void stepTowerTerritoryGrowth(boolean withRandom) {
 		getTerritory().stepTowerTerritoryGrowth(10,2,withRandom);
 	}
 	
 	
 
-	public int numBombsPresent(int x,int y){
+	public synchronized  int numBombsPresent(int x,int y){
 		return(territory.numBombsPresent(x,y));
 	}
 	
-	public boolean addBomb(Bomb bomb){
+	public synchronized  boolean addBomb(Bomb bomb){
 		return(territory.addBomb(bomb));
 	}
 	
 
-	public void burnBombFuse(long eventTime) {
+	public synchronized  void burnBombFuse(long eventTime) {
 		getTerritory().burnBombFuse(eventTime);
 	}
 	

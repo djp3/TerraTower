@@ -50,19 +50,22 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 		}
 		return log;
 	}
+	
+	static private Map<Pair<String, String>, Long> rateLimitData = Collections.synchronizedMap(new HashMap<Pair<String,String>,Long>());
+	
+	private boolean rateLimit;
 
-	public HandlerGetGameState() {
+	public HandlerGetGameState(boolean rateLimit) {
 		super(null);
+		this.rateLimit = rateLimit;
+		if(this.rateLimit){
+		}
 	}
 
 	@Override
 	public HandlerAbstract copy() {
-		return new HandlerGetGameState();
+		return new HandlerGetGameState(this.rateLimit);
 	}
-	
-	
-	static private Map<Pair<String, String>, Long> rateLimit = Collections.synchronizedMap(new HashMap<Pair<String,String>,Long>());
-	
 	
 	/**
 	 * @param parameters a map of key and value that was passed through the REST request
@@ -96,19 +99,22 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 				}
 			}
 		}
-		Pair<String, String> p = new Pair<String,String>(ip.getCanonicalHostName(),getPlayerName());
-		if(rateLimit.containsKey(p)){
-			Long lastTime = rateLimit.get(p);
-			if(System.currentTimeMillis()-lastTime < 30*1000){
-				errors.add("Requesting game state too rapidly, once per 30 seconds please");
-				getLog().info("***Rate limit ***"+p.toString());
+		
+		if(this.rateLimit){
+			Pair<String, String> p = new Pair<String,String>(ip.getCanonicalHostName(),getPlayerName());
+			if(rateLimitData.containsKey(p)){
+				Long lastTime = rateLimitData.get(p);
+				if(System.currentTimeMillis()-lastTime < 30*1000){
+					errors.add("Requesting game state too rapidly, once per 30 seconds please");
+					getLog().info("***Rate limit ***"+p.toString());
+				}
+				else{
+					rateLimitData.put(p, System.currentTimeMillis());
+				}
 			}
 			else{
-				rateLimit.put(p, System.currentTimeMillis());
+				rateLimitData.put(p, System.currentTimeMillis());
 			}
-		}
-		else{
-			rateLimit.put(p, System.currentTimeMillis());
 		}
 		
 		JSONObject ret = new JSONObject();

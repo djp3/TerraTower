@@ -108,12 +108,12 @@ public class Territory {
 			}
 		}
 		
-		leaderBoard = new HashMap<Player,Integer>();
+		leaderBoard = Collections.synchronizedMap(new HashMap<Player,Integer>());
 
 	}
 
 	
-	public boolean xInBounds(double x) {
+	public synchronized  boolean xInBounds(double x) {
 		if ((x < this.getLeft()) || (x > this.getRight())) {
 			return false;
 		} else {
@@ -121,7 +121,7 @@ public class Territory {
 		}
 	}
 	
-	public boolean yInBounds(double y) {
+	public synchronized  boolean yInBounds(double y) {
 		if ((y < this.getBottom()) || (y > this.getTop())) {
 			return false;
 		} else {
@@ -129,7 +129,7 @@ public class Territory {
 		}
 	}
 
-	public int xIndex(double x) {
+	public synchronized  int xIndex(double x) {
 		if(!xInBounds(x)){
 			throw new IllegalArgumentException("x is out of bounds");
 		}
@@ -145,7 +145,7 @@ public class Territory {
 		return (xIndex);
 	}
 
-	public int yIndex(double y) {
+	public synchronized  int yIndex(double y) {
 		if(!yInBounds(y)){
 			throw new IllegalArgumentException("y is out of bounds");
 		}
@@ -161,136 +161,135 @@ public class Territory {
 		return (yIndex);
 	}
 
-	public GridCell index(double x, double y) {
+	public synchronized  GridCell index(double x, double y) {
 		return grid[xIndex(x)][yIndex(y)];
 	}
 	
-	public GridCell index(int x, int y) {
+	public synchronized  GridCell index(int x, int y) {
 		return grid[x][y];
 	}
 
 
-	/*
-	private WorldManager getWorldManager() {
-		return parent;
-	}
-
-
-	private void setWorldManager(WorldManager parent) {
-		this.parent = parent;
-	}*/
-
-
-	public double getLeft() {
+	public synchronized  double getLeft() {
 		return left;
 	}
 
 
-	public void setLeft(double left) {
+	public synchronized  void setLeft(double left) {
 		this.left = left;
 	}
 
 
-	public double getRight() {
+	public synchronized  double getRight() {
 		return right;
 	}
 
 
-	public void setRight(double right) {
+	public synchronized  void setRight(double right) {
 		this.right = right;
 	}
 
 
-	public int getNumXSplits() {
+	public synchronized  int getNumXSplits() {
 		return numXSplits;
 	}
 
 
-	public void setNumXSplits(int numXSplits) {
+	public synchronized  void setNumXSplits(int numXSplits) {
 		this.numXSplits = numXSplits;
 	}
 
 
-	public double getStepX() {
+	public synchronized  double getStepX() {
 		return stepX;
 	}
 
 
-	public void setStepX(double stepX) {
+	public synchronized  void setStepX(double stepX) {
 		this.stepX = stepX;
 	}
 
 	
-	public double getStepXMeters() {
+	public synchronized  double getStepXMeters() {
 		return stepXMeters;
 	}
 
 
-	public void setStepXMeters(double stepXMeters) {
+	public synchronized  void setStepXMeters(double stepXMeters) {
 		this.stepXMeters = stepXMeters;
 	}
 	
-	public double getBottom() {
+	public synchronized  double getBottom() {
 		return bottom;
 	}
 
 
-	public void setBottom(double bottom) {
+	public synchronized  void setBottom(double bottom) {
 		this.bottom = bottom;
 	}
 
 
-	public double getTop() {
+	public synchronized  double getTop() {
 		return top;
 	}
 
 
-	public void setTop(double top) {
+	public synchronized  void setTop(double top) {
 		this.top = top;
 	}
 
 
-	public int getNumYSplits() {
+	public synchronized  int getNumYSplits() {
 		return numYSplits;
 	}
 
 
-	public void setNumYSplits(int numYSplits) {
+	public synchronized  void setNumYSplits(int numYSplits) {
 		this.numYSplits = numYSplits;
 	}
 
 
-	public double getStepY() {
+	public synchronized  double getStepY() {
 		return stepY;
 	}
 
 
-	public void setStepY(double stepY) {
+	public synchronized  void setStepY(double stepY) {
 		this.stepY = stepY;
 	}
 	
 	
-	public double getStepYMeters() {
+	public synchronized  double getStepYMeters() {
 		return stepYMeters;
 	}
 
 
-	public void setStepYMeters(double stepYMeters) {
+	public synchronized  void setStepYMeters(double stepYMeters) {
 		this.stepYMeters = stepYMeters;
 	}
 
 
-	public boolean towerPresent(int x, int y) {
+	public synchronized boolean isLeaderBoardOutdated() {
+		return leaderBoardOutdated;
+	}
+
+
+	public synchronized void setLeaderBoardOutdated(boolean leaderBoardOutdated) {
+		this.leaderBoardOutdated = leaderBoardOutdated;
+	}
+
+
+	public synchronized  boolean towerPresent(int x, int y) {
 		return(grid[x][y].towerPresent());
 	}
 
 
-	public boolean addTower(Tower tower) {
+	public synchronized  boolean addTower(Tower tower) {
 		return(grid[tower.getX()][tower.getY()].addTower(tower));
 	}
 
 
-	public void updateAltitude(int xIndex, int yIndex, double alt) {
+	public synchronized  void updateAltitude(int xIndex, int yIndex, double alt) {
 		index(xIndex,yIndex).updateAltitude(alt);
 	}
 
@@ -298,13 +297,13 @@ public class Territory {
 	
 
 
-	public void stepTowerTerritoryGrowth(int towerMax,int towerStart) {
+	public synchronized  void stepTowerTerritoryGrowth(int towerMax,int towerStart) {
 		stepTowerTerritoryGrowth(towerMax,towerStart,false);
 	}
 	
 	
 	
-	public void stepTowerTerritoryGrowth(int towerMax,int towerStart,boolean withRandom) {
+	public synchronized  void stepTowerTerritoryGrowth(int towerMax,int towerStart,boolean withRandom) {
 		List<Tower> towerList = new ArrayList<Tower>();
 		
 		//printGrid();
@@ -371,11 +370,11 @@ public class Territory {
 			}
 		}
 		
-		leaderBoardOutdated = true;
+		setLeaderBoardOutdated(true);
 		//printGrid();
 	}
 
-	void printGrid() {
+	public synchronized void printGrid() {
 		System.out.println();
 		for (int y = 0; y < numYSplits; y++) {
 			for (int x = 0; x < numXSplits; x++) {
@@ -502,8 +501,8 @@ public class Territory {
 		}
 	}
 	
-	public List<Pair<Integer, Player>> getLeaderBoard(){
-		if(leaderBoardOutdated){
+	public synchronized  List<Pair<Integer, Player>> getLeaderBoard(){
+		if(isLeaderBoardOutdated()){
 			leaderBoard.clear();
 			for (int x = 0; x < numXSplits; x++) {
 				for (int y = 0; y < numYSplits; y++) {
@@ -517,7 +516,7 @@ public class Territory {
 					}
 				}
 			}
-			leaderBoardOutdated = false;
+			setLeaderBoardOutdated(false);
 		}
 		List<Pair<Integer,Player>> ret = new ArrayList<Pair<Integer,Player>>();
 		for(Entry<Player, Integer> e :leaderBoard.entrySet()){
@@ -528,17 +527,17 @@ public class Territory {
 	}
 
 
-	public int numBombsPresent(int x, int y) {
+	public synchronized  int numBombsPresent(int x, int y) {
 		return(grid[x][y].numBombsPresent());
 	}
 
 
-	public boolean addBomb(Bomb bomb) {
+	public synchronized  boolean addBomb(Bomb bomb) {
 		return(grid[bomb.getX()][bomb.getY()].addBomb(bomb));
 	}
 
 
-	public void burnBombFuse(long eventTime) {
+	public synchronized  void burnBombFuse(long eventTime) {
 		for (int x = 0; x < numXSplits; x++) {
 			for (int y = 0; y < numYSplits; y++) {
 				if(grid[x][y].numBombsPresent() > 0){
@@ -579,7 +578,7 @@ public class Territory {
 
 
 	private void effectBombDamage(int x, int y) {
-		leaderBoardOutdated = true;
+		setLeaderBoardOutdated(true);
 		grid[x][y].resetOwner();
 		if(grid[x][y].towerPresent()){
 			Tower tower = grid[x][y].getTower();
@@ -588,7 +587,7 @@ public class Territory {
 	}
 
 
-	public static boolean inRange(int bx, int by, int x, int y, int strength) {
+	public synchronized  static boolean inRange(int bx, int by, int x, int y, int strength) {
 		int dx = (bx - x);
 		int dy = (by - y);
 		int d = strength;
@@ -602,14 +601,14 @@ public class Territory {
 
 
 	@Override
-	public int hashCode() {
+	public synchronized  int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		long temp;
 		temp = Double.doubleToLongBits(bottom);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + Arrays.deepHashCode(grid);			//Special!!
-		result = prime * result + (leaderBoardOutdated ? 1231 : 1237);
+		result = prime * result + (isLeaderBoardOutdated() ? 1231 : 1237);
 		temp = Double.doubleToLongBits(left);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + numXSplits;
@@ -631,7 +630,7 @@ public class Territory {
 
 
 	@Override
-	public boolean equals(Object obj) {
+	public synchronized  boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -643,46 +642,46 @@ public class Territory {
 		}
 		Territory other = (Territory) obj;
 		if (Double.doubleToLongBits(bottom) != Double
-				.doubleToLongBits(other.bottom)) {
+				.doubleToLongBits(other.getBottom())) {
 			return false;
 		}
 		if (!Arrays.deepEquals(grid, other.grid)) {
 			return false;
 		}
-		if (leaderBoardOutdated != other.leaderBoardOutdated) {
+		if (isLeaderBoardOutdated() != other.isLeaderBoardOutdated()) {
 			return false;
 		}
 		if (Double.doubleToLongBits(left) != Double
-				.doubleToLongBits(other.left)) {
+				.doubleToLongBits(other.getLeft())) {
 			return false;
 		}
-		if (numXSplits != other.numXSplits) {
+		if (numXSplits != other.getNumXSplits()) {
 			return false;
 		}
-		if (numYSplits != other.numYSplits) {
+		if (numYSplits != other.getNumYSplits()) {
 			return false;
 		}
 		if (Double.doubleToLongBits(right) != Double
-				.doubleToLongBits(other.right)) {
+				.doubleToLongBits(other.getRight())) {
 			return false;
 		}
 		if (Double.doubleToLongBits(stepX) != Double
-				.doubleToLongBits(other.stepX)) {
+				.doubleToLongBits(other.getStepX())) {
 			return false;
 		}
 		if (Double.doubleToLongBits(stepXMeters) != Double
-				.doubleToLongBits(other.stepXMeters)) {
+				.doubleToLongBits(other.getStepXMeters())) {
 			return false;
 		}
 		if (Double.doubleToLongBits(stepY) != Double
-				.doubleToLongBits(other.stepY)) {
+				.doubleToLongBits(other.getStepY())) {
 			return false;
 		}
 		if (Double.doubleToLongBits(stepYMeters) != Double
-				.doubleToLongBits(other.stepYMeters)) {
+				.doubleToLongBits(other.getStepYMeters())) {
 			return false;
 		}
-		if (Double.doubleToLongBits(top) != Double.doubleToLongBits(other.top)) {
+		if (Double.doubleToLongBits(top) != Double.doubleToLongBits(other.getTop())) {
 			return false;
 		}
 		return true;

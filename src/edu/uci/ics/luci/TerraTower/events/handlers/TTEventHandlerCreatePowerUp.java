@@ -30,7 +30,10 @@ import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 public class TTEventHandlerCreatePowerUp extends TTEventHandler{
 	
 	private boolean parametersChecked = false;
-	private PowerUp pup = null;
+	private String code;
+	private Long towerDelayDelta;
+	private Long bombDelayDelta;
+	private Long bombFuseDelta;
 	
 	private boolean getParametersChecked() {
 		return parametersChecked;
@@ -62,16 +65,19 @@ public class TTEventHandlerCreatePowerUp extends TTEventHandler{
 			return ret;
 		}
 		
-		pup = event.getPowerUp();
-		if(pup == null){
+		code = event.getCode();
+		if(code == null){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
-			errors.add("PowerUp can't be null");
+			errors.add("PowerUp code can't be null");
 			ret.put("errors", errors);
 			return ret;
 		}
+		towerDelayDelta = event.getTowerDelayDelta();
+		bombDelayDelta = event.getBombDelayDelta();
+		bombFuseDelta = event.getBombFuseDelta();
 		
-		if(wm.powerUpExists(pup.getCode())){
+		if(wm.powerUpExists(code)){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
 			errors.add("PowerUp with that code already exists");
@@ -101,19 +107,11 @@ public class TTEventHandlerCreatePowerUp extends TTEventHandler{
 			return ret;
 		}
 		
-		//This shouldn't be possible, but code checker doesn't know that
-		if(pup == null){
-			ret.put("error","true");
-			JSONArray errors = new JSONArray();
-			errors.add("PowerUp can't be null");
-			ret.put("errors", errors);
-			return ret;
-		}
-		
 		this.setParametersChecked(false);
 		
 		ret = new JSONObject();
 		
+		PowerUp pup = new PowerUp(code, towerDelayDelta,bombDelayDelta,bombFuseDelta,false);
 		if(wm.createPowerUp(pup) == null){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
