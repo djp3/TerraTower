@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 	
+/* Version 1.1 17:04pm */
 public class MyGUITemplate : MonoBehaviour
 {		
 	/********************  Things that are attached from the Unity GUI * *****************/
