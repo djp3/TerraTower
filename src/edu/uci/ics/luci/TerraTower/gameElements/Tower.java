@@ -20,7 +20,14 @@
 */
 package edu.uci.ics.luci.TerraTower.gameElements;
 
-public class Tower {
+import java.io.Serializable;
+
+public class Tower implements Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1795952645134214954L;
 	
 	private Player owner;
 	private int x;

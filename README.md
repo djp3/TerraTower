@@ -26,6 +26,7 @@ A [description of the game is here](http://www.ics.uci.edu/~djp3/classes/2014_03
  * Lower the altitude of the camera
  * Have a points system that is more than just territory
  * Allow people to assign themselves a color
+ * Put some kind of interlock in the client so people stop mashing buttons for refreshes
 
 * Brainstorm ideas
  * Have a mini-game to battle between territories

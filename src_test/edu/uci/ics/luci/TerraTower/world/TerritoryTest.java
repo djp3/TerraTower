@@ -301,7 +301,8 @@ public class TerritoryTest {
 		assertTrue(!territory1.equals(null));
 		assertTrue(!territory1.equals("foo"));
 		assertTrue(territory1.equals(territory1));
-		assertTrue(territory1.equals(territory2));
+		assertTrue(territory1.equals(territory1.deepCopy()));
+		assertTrue(territory1.equals(territory2.deepCopy()));
 		assertEquals(territory1.hashCode(),territory2.hashCode());
 		
 		territory2.setBottom(-2.0);

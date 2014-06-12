@@ -27,12 +27,10 @@
 	</Appenders>
 	<Loggers>
 		<!-- includeLocation set to false for performance -->
-		<!--
-		<AsyncLogger name="edu.uci.ics.luci.utility.Globals" level="errors" includeLocation="false" additivity="false">
+		<AsyncLogger name="edu.uci.ics.luci.utility.webserver.AccessControl" level="errors" includeLocation="false" additivity="false">
 			<AppenderRef ref="STDERR" />
 			<AppenderRef ref="RollingRandomAccessFile" />
 		</AsyncLogger>
-		  -->
 		<AsyncLogger name="edu.uci.ics.luci" level="trace" includeLocation="true" additivity="false">
 			<AppenderRef ref="STDERR" />
 			<AppenderRef ref="RollingRandomAccessFile" />

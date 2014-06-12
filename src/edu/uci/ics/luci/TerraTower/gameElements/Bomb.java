@@ -20,7 +20,14 @@
 */
 package edu.uci.ics.luci.TerraTower.gameElements;
 
-public class Bomb {
+import java.io.Serializable;
+
+public class Bomb implements Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8236538347818005297L;
 	
 	Player owner;
 	int x;

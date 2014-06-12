@@ -211,7 +211,7 @@ public class TerraTower {
 			requestHandlerRegistry.put("drop_bomb", new HandlerDropBomb(eventPublisher));
 			requestHandlerRegistry.put("redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
 			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
-			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState(true));
+			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState());
 			requestHandlerRegistry.put("shutdown", new HandlerShutdown(Globals.getGlobals()));
 
 			RequestDispatcher dispatcher = new RequestDispatcher(

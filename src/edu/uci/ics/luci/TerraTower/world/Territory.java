@@ -20,6 +20,7 @@
 */
 package edu.uci.ics.luci.TerraTower.world;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,8 +39,16 @@ import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 import edu.uci.ics.luci.utility.datastructure.Pair;
 
-public class Territory {
+public class Territory implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3206636784420193073L;
+	
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+		    value="SE_TRANSIENT_FIELD_NOT_RESTORED", 
+		    justification="I know what I'm doing")
 	private static transient volatile Logger log = null;
 	public static Logger getLog(){
 		if(log == null){
@@ -65,7 +74,7 @@ public class Territory {
 	double stepY;
 	double stepYMeters;
 	private boolean leaderBoardOutdated = true;
-	private transient Map<Player,Integer> leaderBoard;
+	private Map<Player,Integer> leaderBoard;
 
 	public Territory(double left, double right, int numXSplits, double bottom,
 			double top, int numYSplits) {
@@ -687,6 +696,11 @@ public class Territory {
 		return true;
 	}
 	
+	//@SuppressWarnings("unchecked")
+	public Territory deepCopy() {
+		Territory cloned = (Territory) org.apache.commons.lang.SerializationUtils.clone(this);
+		return(cloned);
+	}
 	
 
 }

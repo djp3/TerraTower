@@ -51,20 +51,15 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 		return log;
 	}
 	
-	static private Map<Pair<String, String>, Long> rateLimitData = Collections.synchronizedMap(new HashMap<Pair<String,String>,Long>());
-	
-	private boolean rateLimit;
+	static Map<Pair<String, Territory>, Pair<byte[], byte[]>> responseCache = Collections.synchronizedMap(new HashMap<Pair<String, Territory>,Pair<byte[],byte[]>>());
 
-	public HandlerGetGameState(boolean rateLimit) {
+	public HandlerGetGameState() {
 		super(null);
-		this.rateLimit = rateLimit;
-		if(this.rateLimit){
-		}
 	}
 
 	@Override
 	public HandlerAbstract copy() {
-		return new HandlerGetGameState(this.rateLimit);
+		return new HandlerGetGameState();
 	}
 	
 	/**
@@ -100,34 +95,29 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 			}
 		}
 		
-		if(this.rateLimit){
-			Pair<String, String> p = new Pair<String,String>(ip.getCanonicalHostName(),getPlayerName());
-			if(rateLimitData.containsKey(p)){
-				Long lastTime = rateLimitData.get(p);
-				if(System.currentTimeMillis()-lastTime < 30*1000){
-					errors.add("Requesting game state too rapidly, once per 30 seconds please");
-					getLog().info("***Rate limit ***"+p.toString());
-				}
-				else{
-					rateLimitData.put(p, System.currentTimeMillis());
-				}
-			}
-			else{
-				rateLimitData.put(p, System.currentTimeMillis());
-			}
-		}
 		
 		JSONObject ret = new JSONObject();
 		if(errors.size() != 0){
 			ret.put("error", "true");
 			ret.put("errors", errors);
+			pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toJSONString()).getBytes());
 		}
 		else{
-			ret = constructJSON(territory,getPlayerName());
+			Pair<String, Territory> p = new Pair<String,Territory>(getPlayerName(),territory);
+			if(responseCache.containsKey(p)){
+				getLog().info("Cache Hit");
+				pair = responseCache.get(p);
+			}
+			else{
+				getLog().info("Cache Miss");
+				ret = constructJSON(territory,getPlayerName());
+				p = new Pair<String,Territory>(getPlayerName(),territory.deepCopy());
+				pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toJSONString()).getBytes());
+				responseCache.put(p,pair);
+			}
 		}
 		
-		pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toJSONString()).getBytes());
-		getLog().info("Done handling get_game_state"+(System.currentTimeMillis()-time));
+		getLog().info("Done handling get_game_state "+(System.currentTimeMillis()-time));
 		return pair;
 	}
 

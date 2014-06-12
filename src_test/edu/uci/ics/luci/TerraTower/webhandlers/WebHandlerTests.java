@@ -116,7 +116,7 @@ public class WebHandlerTests {
 			requestHandlerRegistry.put("drop_bomb", new HandlerDropBomb(eventPublisher));
 			requestHandlerRegistry.put("redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
 			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
-			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState(false));
+			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState());
 			requestHandlerRegistry.put("shutdown", new HandlerShutdown(Globals.getGlobals()));
 			
 			RequestDispatcher requestDispatcher = new RequestDispatcher(requestHandlerRegistry);
@@ -804,14 +804,16 @@ public class WebHandlerTests {
 		assertEquals(Integer.valueOf(4),owner.getSecond());
 		
 		long time = System.currentTimeMillis();
-		JSONObject x = HandlerGetGameState.constructJSON(t, player.getPlayerName());
+		//JSONObject x = HandlerGetGameState.constructJSON(t, player.getPlayerName());
+		//t.deepCopy();
 		//System.err.println("Elapsed time:"+(System.currentTimeMillis()-time));
 		//System.err.println("Size = "+x.toString().length());
 		//System.err.println("Size = "+x.toJSONString().length());
 		//System.err.println("Size = "+x.toJSONString(JSONStyle.MAX_COMPRESS).length());
 		time = System.currentTimeMillis();
 		for(int i = 0 ; i < 1000; i++){
-			HandlerGetGameState.constructJSON(t, player.getPlayerName()).toJSONString(JSONStyle.MAX_COMPRESS).getBytes();
+			//HandlerGetGameState.constructJSON(t, player.getPlayerName()).toJSONString(JSONStyle.MAX_COMPRESS).getBytes();
+			//t.deepCopy();
 		}
 		//System.err.println("Elapsed time:"+((System.currentTimeMillis()-time)/1000.0));
 			

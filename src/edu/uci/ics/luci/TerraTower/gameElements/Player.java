@@ -20,13 +20,19 @@
 */
 package edu.uci.ics.luci.TerraTower.gameElements;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
 import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
 
-public class Player implements Comparable<Player>{
+public class Player implements Comparable<Player>,Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2900518019186147978L;
 	
 	private static Random r;
 	public static final Player BARBARIAN;

@@ -20,6 +20,7 @@
 */
 package edu.uci.ics.luci.TerraTower.world;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,9 +38,16 @@ import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 import edu.uci.ics.luci.utility.datastructure.Pair;
 
-public class GridCell {
+public class GridCell implements Serializable{
 	
-
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1311316755909795378L;
+	
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+		    value="SE_TRANSIENT_FIELD_NOT_RESTORED", 
+		    justification="I know what I'm doing")
 	private static transient volatile Logger log = null;
 	public static Logger getLog(){
 		if(log == null){
@@ -59,8 +67,8 @@ public class GridCell {
 	private Pair<Player,Integer> owner;
 	
 	//Used during the territory expansion as temp variables
-	private transient Map<Player,Integer> proposedOwner;
-	private transient int stepsTaken;
+	private Map<Player,Integer> proposedOwner;
+	private int stepsTaken;
 	
 	public synchronized int getX() {
 		return x;
@@ -236,6 +244,8 @@ public class GridCell {
 		else{
 			setOwner(new Pair<Player,Integer>(null,0));
 		}
+		getProposedOwner().clear();
+		setStepsTaken(0);
 	}
 
 	@Override
