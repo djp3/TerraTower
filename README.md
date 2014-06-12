@@ -4,6 +4,14 @@ TerraTower
 
 An augmented reality physical tower defense inspired game with a splash of capture the flag.  The game engine is in Java and the clients are made in Unity for Android or iOS.
 A [description of the game is here](http://www.ics.uci.edu/~djp3/classes/2014_03_ICS163/tasks/terraTowerClient.html).
+6/12/14
+* We played a big game with 26 teams for the ICS 163 final exam
+ * Fun
+ * The game state update must be sped up drastically
+ * Server needs to be more robust
+ * Bombs should blow up an area corresponding to physical radius, not number of squares
+ * Territory should grow in a circle better
+ * Android client needs a decent vertex color shader
 
 6/11/14
 * We ran a playtest at UCI and got the following feedback:
