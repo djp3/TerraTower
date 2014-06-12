@@ -22,11 +22,12 @@ package edu.uci.ics.luci.TerraTower.webhandlers;
 
 
 import java.net.InetAddress;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
-import net.minidev.json.JSONStyle;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,6 +60,10 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 		return new HandlerGetGameState();
 	}
 	
+	
+	static private Map<Pair<String, String>, Long> rateLimit = Collections.synchronizedMap(new HashMap<Pair<String,String>,Long>());
+	
+	
 	/**
 	 * @param parameters a map of key and value that was passed through the REST request
 	 * @return a pair where the first element is the content type and the bytes are the output bytes to send back
@@ -66,7 +71,7 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 	@Override
 	public Pair<byte[], byte[]> handle(InetAddress ip, HTTPRequest httpRequestType, Map<String, String> headers, String restFunction, Map<String, String> parameters) {
 		Pair<byte[], byte[]> pair = null;
-		//long time = System.currentTimeMillis();
+		long time = System.currentTimeMillis();
 		
 
 		JSONArray errors = new JSONArray();
@@ -91,6 +96,20 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 				}
 			}
 		}
+		Pair<String, String> p = new Pair<String,String>(ip.getCanonicalHostName(),getPlayerName());
+		if(rateLimit.containsKey(p)){
+			Long lastTime = rateLimit.get(p);
+			if(System.currentTimeMillis()-lastTime < 30*1000){
+				errors.add("Requesting game state too rapidly, once per 30 seconds please");
+				getLog().info("***Rate limit ***"+p.toString());
+			}
+			else{
+				rateLimit.put(p, System.currentTimeMillis());
+			}
+		}
+		else{
+			rateLimit.put(p, System.currentTimeMillis());
+		}
 		
 		JSONObject ret = new JSONObject();
 		if(errors.size() != 0){
@@ -101,8 +120,8 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 			ret = constructJSON(territory,getPlayerName());
 		}
 		
-		pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toJSONString(JSONStyle.MAX_COMPRESS)).getBytes());
-		//getLog().info("Done handling get_game_state"+(System.currentTimeMillis()-time));
+		pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toJSONString()).getBytes());
+		getLog().info("Done handling get_game_state"+(System.currentTimeMillis()-time));
 		return pair;
 	}
 

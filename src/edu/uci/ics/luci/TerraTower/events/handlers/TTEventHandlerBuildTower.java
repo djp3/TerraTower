@@ -37,6 +37,7 @@ public class TTEventHandlerBuildTower extends TTEventHandlerPlayer{
 	private int yIndex;
 	private double alt;
 	private Territory territory = null;
+	private long eventTime;
 	
 
 	private boolean getParametersChecked() {
@@ -77,6 +78,7 @@ public class TTEventHandlerBuildTower extends TTEventHandlerPlayer{
 			ret.put("errors", errors);
 			return ret;
 		}
+		
 		
 
 		//Has it been too soon since last tower?
@@ -121,6 +123,8 @@ public class TTEventHandlerBuildTower extends TTEventHandlerPlayer{
 			return ret;
 		}
 		
+		this.eventTime = eventTime;
+		
 		this.setParametersChecked(true);
 		
 		return null;
@@ -155,6 +159,9 @@ public class TTEventHandlerBuildTower extends TTEventHandlerPlayer{
 			errors.add("Unable to add tower due to an unknown reason");
 			ret.put("errors", errors);
 			return ret;
+		}
+		else{
+			player.setLastTowerPlacedTime(this.eventTime);
 		}
 		
 		if(this.alt > 0.0){

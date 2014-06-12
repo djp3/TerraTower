@@ -620,7 +620,17 @@ public class WebHandlerTests {
 		
 		
 		
+		/* Deal with rate limit */
+		System.out.print("Waiting 60 seconds to defeat rate limit");
+		for(int i = 0 ; i < 60;i++){
+			try {
+				Thread.sleep(1*1000);
+				System.out.print(".");
+			} catch (InterruptedException e1) {
+			}
+		}
 		
+		System.out.println(".");
 		
 		/* Game State */
 		responseString = null;

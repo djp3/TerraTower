@@ -159,7 +159,9 @@ public class TTEventHandlerDropBomb extends TTEventHandlerPlayer{
 			ret.put("errors", errors);
 			return ret;
 		}
-		player.setLastBombPlacedTime(eventTime);
+		else{
+			player.setLastBombPlacedTime(eventTime);
+		}
 		
 		if(this.alt > 0.0){
 			territory.updateAltitude(xIndex,yIndex,alt);

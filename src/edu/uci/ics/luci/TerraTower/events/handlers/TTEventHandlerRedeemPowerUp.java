@@ -158,6 +158,10 @@ public class TTEventHandlerRedeemPowerUp extends TTEventHandlerPlayer{
 		}
 		player.setTowerDelay(towerDelay);
 		
+		if(!pup.getCode().equals("test")){
+			pup.setRedeemed(true);
+		}
+		
 		JSONObject results = new JSONObject();
 		results.put("bomb_delay", bombDelay+"");
 		results.put("tower_delay", towerDelay+"");
