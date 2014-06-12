@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.minidev.json.JSONObject;
+import net.minidev.json.JSONStyle;
 import net.minidev.json.JSONValue;
 
 import org.junit.After;
@@ -43,6 +44,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
+import edu.uci.ics.luci.TerraTower.PasswordUtils;
 import edu.uci.ics.luci.TerraTower.ResultChecker;
 import edu.uci.ics.luci.TerraTower.TTEventWrapper;
 import edu.uci.ics.luci.TerraTower.TTEventWrapperQueuer;
@@ -52,9 +54,13 @@ import edu.uci.ics.luci.TerraTower.events.TTEventCreatePowerUp;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
+import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
+import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerShutdown;
+import edu.uci.ics.luci.TerraTower.world.Territory;
 import edu.uci.ics.luci.utility.Globals;
+import edu.uci.ics.luci.utility.datastructure.Pair;
 import edu.uci.ics.luci.utility.webserver.AccessControl;
 import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
 import edu.uci.ics.luci.utility.webserver.RequestDispatcher;
@@ -745,6 +751,61 @@ public class WebHandlerTests {
 		
 		assertTrue(Globals.getGlobals().isQuitting());
 
+	}
+	
+	
+	@Test
+	public void testJSONConstruction() {
+		
+		Territory t = new Territory(-5.0,5.0,10,-5.0,5.0,10);
+		Player player = new Player("a",PasswordUtils.hashPassword("b"));
+		Tower tower = new Tower(player,0,0);
+		t.addTower(tower);
+			
+		t.stepTowerTerritoryGrowth(5, 2);
+		Pair<Player, Integer> owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+			
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+			
+		owner = t.index(-3.5,-3.5).getOwner();
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+			
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(3),owner.getSecond());
+			
+		owner = t.index(-5.0,-4.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(2),owner.getSecond());
+			
+		owner = t.index(-3.5,-3.5).getOwner();
+		assertTrue(Player.BARBARIAN.equals(owner.getFirst()));
+		assertEquals(Integer.valueOf(0),owner.getSecond());
+			
+			
+		t.stepTowerTerritoryGrowth(5, 2);
+		owner = t.index(-5.0,-5.0).getOwner();
+		assertEquals(player,owner.getFirst());
+		assertEquals(Integer.valueOf(4),owner.getSecond());
+		
+		long time = System.currentTimeMillis();
+		JSONObject x = HandlerGetGameState.constructJSON(t, player.getPlayerName());
+		//System.err.println("Elapsed time:"+(System.currentTimeMillis()-time));
+		//System.err.println("Size = "+x.toString().length());
+		//System.err.println("Size = "+x.toJSONString().length());
+		//System.err.println("Size = "+x.toJSONString(JSONStyle.MAX_COMPRESS).length());
+		time = System.currentTimeMillis();
+		for(int i = 0 ; i < 1000; i++){
+			HandlerGetGameState.constructJSON(t, player.getPlayerName()).toJSONString(JSONStyle.MAX_COMPRESS).getBytes();
+		}
+		//System.err.println("Elapsed time:"+((System.currentTimeMillis()-time)/1000.0));
+			
 	}
 
 

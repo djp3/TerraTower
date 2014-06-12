@@ -26,6 +26,7 @@ import java.util.Map;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import net.minidev.json.JSONStyle;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,6 +66,7 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 	@Override
 	public Pair<byte[], byte[]> handle(InetAddress ip, HTTPRequest httpRequestType, Map<String, String> headers, String restFunction, Map<String, String> parameters) {
 		Pair<byte[], byte[]> pair = null;
+		//long time = System.currentTimeMillis();
 		
 
 		JSONArray errors = new JSONArray();
@@ -96,69 +98,78 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 			ret.put("errors", errors);
 		}
 		else{
-			JSONObject response = new JSONObject();
-			response.put("origin_x", territory.getLeft());
-			response.put("origin_y", territory.getBottom());
+			ret = constructJSON(territory,getPlayerName());
+		}
+		
+		pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toJSONString(JSONStyle.MAX_COMPRESS)).getBytes());
+		//getLog().info("Done handling get_game_state"+(System.currentTimeMillis()-time));
+		return pair;
+	}
+
+	static public JSONObject constructJSON(Territory territory,String playerName) {
+		JSONObject ret = new JSONObject();
+		
+		JSONObject response = new JSONObject();
+		response.put("origin_x", territory.getLeft());
+		response.put("origin_y", territory.getBottom());
 			
-			response.put("num_x_splits", territory.getNumXSplits());
-			response.put("num_y_splits", territory.getNumYSplits());
+		response.put("num_x_splits", territory.getNumXSplits());
+		response.put("num_y_splits", territory.getNumYSplits());
 			
-			response.put("step_x_meters", territory.getStepXMeters());
-			response.put("step_y_meters", territory.getStepYMeters());
-			JSONArray result = new JSONArray();
-			for(int x = 0; x < territory.getNumXSplits();x++){
-				for(int y = 0; y < territory.getNumYSplits();y++){
-					JSONObject jCell = new JSONObject();
-					GridCell cell = territory.index(x,y);
-					jCell.put("index_x", x+"");
-					jCell.put("index_y", y+"");
-					//jCell.put("left",""+(x*territory.getStepX()+territory.getLeft()));
-					//jCell.put("right",""+((x+1)*territory.getStepX()+territory.getLeft()));
-					//jCell.put("top",""+((y+1)*territory.getStepX()+territory.getBottom()));
-					//jCell.put("bottom",""+((y)*territory.getStepX()+territory.getBottom()));
-					jCell.put("alt",""+cell.estimateAltitude());
-					jCell.put("land_owner", cell.getOwner().getFirst().getPlayerName());
-					jCell.put("land_claim", cell.getOwner().getSecond());
-					if(cell.towerPresent()){
-						if(cell.getTower().getOwner().getPlayerName().equals(getPlayerName())){
-							jCell.put("tower", "true");
-						}
-						else{
-							jCell.put("tower", "unknown");
-						}
+		response.put("step_x_meters", territory.getStepXMeters());
+		response.put("step_y_meters", territory.getStepYMeters());
+		JSONArray result = new JSONArray();
+		for(int x = 0; x < territory.getNumXSplits();x++){
+			for(int y = 0; y < territory.getNumYSplits();y++){
+				JSONObject jCell = new JSONObject();
+				GridCell cell = territory.index(x,y);
+				jCell.put("index_x", x+"");
+				jCell.put("index_y", y+"");
+				//jCell.put("left",""+(x*territory.getStepX()+territory.getLeft()));
+				//jCell.put("right",""+((x+1)*territory.getStepX()+territory.getLeft()));
+				//jCell.put("top",""+((y+1)*territory.getStepX()+territory.getBottom()));
+				//jCell.put("bottom",""+((y)*territory.getStepX()+territory.getBottom()));
+				jCell.put("alt",""+cell.estimateAltitude());
+				jCell.put("land_owner", cell.getOwner().getFirst().getPlayerName());
+				jCell.put("land_claim", cell.getOwner().getSecond());
+				if(cell.towerPresent()){
+					if(cell.getTower().getOwner().getPlayerName().equals(playerName)){
+						jCell.put("tower", "true");
 					}
 					else{
 						jCell.put("tower", "unknown");
 					}
-					boolean bombPresent = false;
-					if(cell.numBombsPresent()> 0){
-						bombPresent = true;
-						/* Only make bombs you own visible */
-						/*
-						for(Entry<Long, List<Bomb>> e:cell.getBombs().entrySet()){
-							for(Bomb b:e.getValue()){
-								if(b.getOwner().getPlayerName().equals(getPlayerName())){
-									bombPresent = true;
-								}
-							}
-						}*/
-					}
-					if(bombPresent){
-						jCell.put("bomb", "true");
-					}
-					else{
-						jCell.put("bomb", "unknown");
-					}
-					result.add(jCell);
 				}
+				else{
+					jCell.put("tower", "unknown");
+				}
+				boolean bombPresent = false;
+				if(cell.numBombsPresent()> 0){
+					bombPresent = true;
+					/* Only make bombs you own visible */
+					/*
+					for(Entry<Long, List<Bomb>> e:cell.getBombs().entrySet()){
+							for(Bomb b:e.getValue()){
+							if(b.getOwner().getPlayerName().equals(getPlayerName())){
+								bombPresent = true;
+							}
+						}
+					}*/
+				}
+				if(bombPresent){
+					jCell.put("bomb", "true");
+				}
+				else{
+					jCell.put("bomb", "unknown");
+				}
+				result.add(jCell);
 			}
-			response.put("result", result);
-			ret.put("error", "false");
-			ret.put("data", response);
 		}
+		response.put("result", result);
+		ret.put("error", "false");
+		ret.put("data", response);
 		
-		pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toString()).getBytes());
-		return pair;
+		return ret;
 	}
 }
 
