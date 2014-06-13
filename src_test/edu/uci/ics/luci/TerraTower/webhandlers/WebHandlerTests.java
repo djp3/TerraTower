@@ -133,9 +133,8 @@ public class WebHandlerTests {
 		
 		String logFileName = "test/test_"+this.getClass().getCanonicalName();     
 		
-		GlobalsTerraTower globals = new GlobalsTerraTower(TEST_VERSION);
+		GlobalsTerraTower globals = new GlobalsTerraTower(TEST_VERSION,true);
 		GlobalsTerraTower.setGlobals(globals);
-		globals.setTesting(true);
 		
 		TTEventWrapperQueuer eventPublisher = TerraTower.createEventQueue(logFileName);     
 		globals.addQuittable(eventPublisher);

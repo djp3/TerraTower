@@ -76,19 +76,20 @@ public class GlobalsTerraTower extends Globals {
 	}
 	
 	public GlobalsTerraTower(String version){
-		this(version,true);
+		this(version,false);
+	}
+	
+	public GlobalsTerraTower(String version, boolean testing){
+		super();
+		this.version = version;
+		setTesting(true);
+		setLog4JPropertyFileName(LOG4J_CONFIG_FILE_DEFAULT);
 	}
 	
 	public static GlobalsTerraTower getGlobalsTerraTower(){
 		return (GlobalsTerraTower) Globals.getGlobals();
 	}
 	
-	protected GlobalsTerraTower(String version, boolean testing){
-		super();
-		this.version = version;
-		setTesting(true);
-		setLog4JPropertyFileName(LOG4J_CONFIG_FILE_DEFAULT);
-	}
 	
 
 	public boolean createWorld(String worldName, String password) {

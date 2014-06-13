@@ -76,9 +76,8 @@ public class TTEventWrapperQueuerTest {
 		
 		String logFileName = "test/test_"+this.getClass().getCanonicalName();     
 		
-		GlobalsTerraTower globals = new GlobalsTerraTower("TEST_VERSION");
+		GlobalsTerraTower globals = new GlobalsTerraTower("TEST_VERSION",true);
 		Globals.setGlobals(globals);
-		globals.setTesting(true);
 		
 		TTEventWrapperQueuer eventPublisher = TerraTower.createEventQueue(logFileName);     
 		globals.addQuittable(eventPublisher);
