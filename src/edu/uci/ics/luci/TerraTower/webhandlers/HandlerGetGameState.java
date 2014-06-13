@@ -106,7 +106,7 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 		else{
 			Pair<String, Integer> p = new Pair<String,Integer>(getPlayerName(),territory.hashCode());
 			if(responseCache.containsKey(p)){
-				getLog().info("Cache Hit");
+				getLog().info("Cache Hit:"+responseCache.size()+" entries,"+responseCacheKey.size()+" key entries");
 				pair = responseCache.get(p);
 			}
 			else{
