@@ -82,7 +82,7 @@ public class GlobalsTerraTower extends Globals {
 	public GlobalsTerraTower(String version, boolean testing){
 		super();
 		this.version = version;
-		setTesting(true);
+		setTesting(testing);
 		setLog4JPropertyFileName(LOG4J_CONFIG_FILE_DEFAULT);
 	}
 	

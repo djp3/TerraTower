@@ -61,7 +61,7 @@ public class HandlerShutdownTest {
 	
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		Globals.setGlobals(new GlobalsTerraTower(TerraTower.VERSION));
+		Globals.setGlobals(new GlobalsTerraTower(TerraTower.VERSION,true));
 	}
 
 	@AfterClass

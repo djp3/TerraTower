@@ -33,7 +33,7 @@ public class PasswordUtilsTest {
 	@Test
 	public void test() {
 		//this is to force a UTF-8 check
-		Globals.setGlobals(new GlobalsTerraTower("TEST VERSION"));
+		Globals.setGlobals(new GlobalsTerraTower("TEST VERSION",true));
 		String p = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()-_[{]};:'\"\\|,<.>/?åéøüñ";
 		
 		byte[] first = PasswordUtils.hashPassword(p);

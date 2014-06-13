@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.minidev.json.JSONObject;
-import net.minidev.json.JSONStyle;
 import net.minidev.json.JSONValue;
 
 import org.junit.After;
