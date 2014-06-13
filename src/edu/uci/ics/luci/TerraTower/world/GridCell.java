@@ -20,7 +20,6 @@
 */
 package edu.uci.ics.luci.TerraTower.world;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,16 +37,8 @@ import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 import edu.uci.ics.luci.utility.datastructure.Pair;
 
-public class GridCell implements Serializable{
+public class GridCell {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1311316755909795378L;
-	
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings(
-		    value="SE_TRANSIENT_FIELD_NOT_RESTORED", 
-		    justification="I know what I'm doing")
 	private static transient volatile Logger log = null;
 	public static Logger getLog(){
 		if(log == null){
@@ -249,12 +240,15 @@ public class GridCell implements Serializable{
 	}
 
 	@Override
-	public synchronized  int hashCode() {
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((alts == null) ? 0 : alts.hashCode());
 		result = prime * result + ((bombs == null) ? 0 : bombs.hashCode());
 		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
+		result = prime * result
+				+ ((proposedOwner == null) ? 0 : proposedOwner.hashCode());
+		result = prime * result + stepsTaken;
 		result = prime * result + ((t == null) ? 0 : t.hashCode());
 		result = prime * result + x;
 		result = prime * result + y;
@@ -262,7 +256,7 @@ public class GridCell implements Serializable{
 	}
 
 	@Override
-	public synchronized  boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -274,45 +268,52 @@ public class GridCell implements Serializable{
 		}
 		GridCell other = (GridCell) obj;
 		if (alts == null) {
-			if (other.getAlts() != null) {
+			if (other.alts != null) {
 				return false;
 			}
-		} else if (!alts.equals(other.getAlts())) {
+		} else if (!alts.equals(other.alts)) {
 			return false;
 		}
 		if (bombs == null) {
-			if (other.getBombs() != null) {
+			if (other.bombs != null) {
 				return false;
 			}
-		} else if (!bombs.equals(other.getBombs())) {
+		} else if (!bombs.equals(other.bombs)) {
 			return false;
 		}
 		if (owner == null) {
-			if (other.getOwner() != null) {
+			if (other.owner != null) {
 				return false;
 			}
-		} else if (!owner.equals(other.getOwner())) {
+		} else if (!owner.equals(other.owner)) {
+			return false;
+		}
+		if (proposedOwner == null) {
+			if (other.proposedOwner != null) {
+				return false;
+			}
+		} else if (!proposedOwner.equals(other.proposedOwner)) {
+			return false;
+		}
+		if (stepsTaken != other.stepsTaken) {
 			return false;
 		}
 		if (t == null) {
-			if (other.getTower() != null) {
+			if (other.t != null) {
 				return false;
 			}
-		} else if (!t.equals(other.getTower())) {
+		} else if (!t.equals(other.t)) {
 			return false;
 		}
-		if (x != other.getX()) {
+		if (x != other.x) {
 			return false;
 		}
-		if (y != other.getY()) {
+		if (y != other.y) {
 			return false;
 		}
 		return true;
 	}
 
-
-	
-	
 	
 
 }

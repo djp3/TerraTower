@@ -20,14 +20,8 @@
 */
 package edu.uci.ics.luci.TerraTower.gameElements;
 
-import java.io.Serializable;
 
-public class Tower implements Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1795952645134214954L;
+public class Tower {
 	
 	private Player owner;
 	private int x;
@@ -73,7 +67,7 @@ public class Tower implements Serializable{
 	}
 
 	@Override
-	public synchronized  int hashCode() {
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (destroyed ? 1231 : 1237);
@@ -84,7 +78,7 @@ public class Tower implements Serializable{
 	}
 
 	@Override
-	public synchronized  boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -95,24 +89,26 @@ public class Tower implements Serializable{
 			return false;
 		}
 		Tower other = (Tower) obj;
-		if (destroyed != other.isDestroyed()) {
+		if (destroyed != other.destroyed) {
 			return false;
 		}
 		if (owner == null) {
-			if (other.getOwner()!= null) {
+			if (other.owner != null) {
 				return false;
 			}
-		} else if (!owner.equals(other.getOwner())) {
+		} else if (!owner.equals(other.owner)) {
 			return false;
 		}
-		if (x != other.getX()) {
+		if (x != other.x) {
 			return false;
 		}
-		if (y != other.getY()) {
+		if (y != other.y) {
 			return false;
 		}
 		return true;
 	}
+
+	
 
 
 

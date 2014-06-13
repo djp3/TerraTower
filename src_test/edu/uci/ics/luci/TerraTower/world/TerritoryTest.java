@@ -278,9 +278,26 @@ public class TerritoryTest {
 		assertTrue(wm.passwordGood(password));
 		assertTrue(!wm.passwordGood(password+"x"));
 		
-		Territory territory1 = new Territory(-1.0,1.0,10,-1.0,1.0,10);
-		Territory territory2 = new Territory(-1.0,1.0,10,-1.0,1.0,10);
+		Territory territory1 = new Territory(-1.0,1.0,10,-1.0,1.0,15);
+		Territory territory2 = new Territory(-1.0,1.0,10,-1.0,1.0,15);
 		assertTrue(territory1.equals(territory2));
+		
+		
+		/*Trying to figure out why hashCodes aren't equal*/
+		/* First check the gridcells*/
+		for(int xx = 0; xx < territory1.getNumXSplits(); xx++){
+			for(int yy = 0; yy < territory1.getNumYSplits(); yy++){
+				try{
+					assertEquals(territory1.index(xx, yy).hashCode(),territory2.index(xx, yy).hashCode());
+				}
+				catch(AssertionError e){
+					System.err.println("Problem with xx = "+xx+",yy = "+yy);
+					throw e;
+				}
+			}
+		}
+		/*Then check the leaderboard */
+		assertEquals(territory1.getLeaderBoard().hashCode(),territory2.getLeaderBoard().hashCode());
 		assertEquals(territory1.hashCode(),territory2.hashCode());
 		
 		wm.setTerritory(territory1);
@@ -301,8 +318,6 @@ public class TerritoryTest {
 		assertTrue(!territory1.equals(null));
 		assertTrue(!territory1.equals("foo"));
 		assertTrue(territory1.equals(territory1));
-		assertTrue(territory1.equals(territory1.deepCopy()));
-		assertTrue(territory1.equals(territory2.deepCopy()));
 		assertEquals(territory1.hashCode(),territory2.hashCode());
 		
 		territory2.setBottom(-2.0);

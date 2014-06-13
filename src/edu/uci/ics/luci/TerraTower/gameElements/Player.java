@@ -20,19 +20,13 @@
 */
 package edu.uci.ics.luci.TerraTower.gameElements;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
 import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
 
-public class Player implements Comparable<Player>,Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2900518019186147978L;
+public class Player implements Comparable<Player>{
 	
 	private static Random r;
 	public static final Player BARBARIAN;
@@ -153,8 +147,10 @@ public class Player implements Comparable<Player>,Serializable{
 	}
 
 
+
+
 	@Override
-	public synchronized  int hashCode() {
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (bombDelay ^ (bombDelay >>> 32));
@@ -172,7 +168,7 @@ public class Player implements Comparable<Player>,Serializable{
 
 
 	@Override
-	public synchronized  boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -183,29 +179,29 @@ public class Player implements Comparable<Player>,Serializable{
 			return false;
 		}
 		Player other = (Player) obj;
-		if (bombDelay != other.getBombDelay()) {
+		if (bombDelay != other.bombDelay) {
 			return false;
 		}
-		if (bombFuse != other.getBombFuse()) {
+		if (bombFuse != other.bombFuse) {
 			return false;
 		}
-		if (!Arrays.equals(hashedPassword, other.getHashedPassword())) {
+		if (!Arrays.equals(hashedPassword, other.hashedPassword)) {
 			return false;
 		}
-		if (lastBombPlacedTime != other.getLastBombPlacedTime()) {
+		if (lastBombPlacedTime != other.lastBombPlacedTime) {
 			return false;
 		}
-		if (lastTowerPlacedTime != other.getLastTowerPlacedTime()) {
+		if (lastTowerPlacedTime != other.lastTowerPlacedTime) {
 			return false;
 		}
 		if (playerName == null) {
-			if (other.getPlayerName() != null) {
+			if (other.playerName != null) {
 				return false;
 			}
-		} else if (!playerName.equals(other.getPlayerName())) {
+		} else if (!playerName.equals(other.playerName)) {
 			return false;
 		}
-		if (towerDelay != other.getTowerDelay()) {
+		if (towerDelay != other.towerDelay) {
 			return false;
 		}
 		return true;

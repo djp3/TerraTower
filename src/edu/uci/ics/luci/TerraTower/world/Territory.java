@@ -20,7 +20,6 @@
 */
 package edu.uci.ics.luci.TerraTower.world;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,16 +38,8 @@ import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.Tower;
 import edu.uci.ics.luci.utility.datastructure.Pair;
 
-public class Territory implements Serializable{
+public class Territory{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3206636784420193073L;
-	
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings(
-		    value="SE_TRANSIENT_FIELD_NOT_RESTORED", 
-		    justification="I know what I'm doing")
 	private static transient volatile Logger log = null;
 	public static Logger getLog(){
 		if(log == null){
@@ -610,36 +601,52 @@ public class Territory implements Serializable{
 
 
 	@Override
-	public synchronized  int hashCode() {
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		long temp;
 		temp = Double.doubleToLongBits(bottom);
+		//System.err.println("1:"+result);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + Arrays.deepHashCode(grid);			//Special!!
-		result = prime * result + (isLeaderBoardOutdated() ? 1231 : 1237);
+		//System.err.println("2:"+result);
+		result = prime * result + Arrays.deepHashCode(grid);				//Special
+		//System.err.println("3:"+result);
+		result = prime * result
+				+ ((leaderBoard == null) ? 0 : leaderBoard.hashCode());
+		//System.err.println("4:"+result);
+		result = prime * result + (leaderBoardOutdated ? 1231 : 1237);
+		//System.err.println("5:"+result);
 		temp = Double.doubleToLongBits(left);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
+		//System.err.println("6:"+result);
 		result = prime * result + numXSplits;
+		//System.err.println("7:"+result);
 		result = prime * result + numYSplits;
+		//System.err.println("8:"+result);
 		temp = Double.doubleToLongBits(right);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
+		//System.err.println("9:"+result);
 		temp = Double.doubleToLongBits(stepX);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
+		//System.err.println("10:"+result);
 		temp = Double.doubleToLongBits(stepXMeters);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
+		//System.err.println("11:"+result);
 		temp = Double.doubleToLongBits(stepY);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
+		//System.err.println("12:"+result);
 		temp = Double.doubleToLongBits(stepYMeters);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
+		//System.err.println("13:"+result);
 		temp = Double.doubleToLongBits(top);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
+		//System.err.println("14:"+result);
 		return result;
 	}
 
 
 	@Override
-	public synchronized  boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -651,56 +658,58 @@ public class Territory implements Serializable{
 		}
 		Territory other = (Territory) obj;
 		if (Double.doubleToLongBits(bottom) != Double
-				.doubleToLongBits(other.getBottom())) {
+				.doubleToLongBits(other.bottom)) {
 			return false;
 		}
 		if (!Arrays.deepEquals(grid, other.grid)) {
 			return false;
 		}
-		if (isLeaderBoardOutdated() != other.isLeaderBoardOutdated()) {
+		if (leaderBoard == null) {
+			if (other.leaderBoard != null) {
+				return false;
+			}
+		} else if (!leaderBoard.equals(other.leaderBoard)) {
+			return false;
+		}
+		if (leaderBoardOutdated != other.leaderBoardOutdated) {
 			return false;
 		}
 		if (Double.doubleToLongBits(left) != Double
-				.doubleToLongBits(other.getLeft())) {
+				.doubleToLongBits(other.left)) {
 			return false;
 		}
-		if (numXSplits != other.getNumXSplits()) {
+		if (numXSplits != other.numXSplits) {
 			return false;
 		}
-		if (numYSplits != other.getNumYSplits()) {
+		if (numYSplits != other.numYSplits) {
 			return false;
 		}
 		if (Double.doubleToLongBits(right) != Double
-				.doubleToLongBits(other.getRight())) {
+				.doubleToLongBits(other.right)) {
 			return false;
 		}
 		if (Double.doubleToLongBits(stepX) != Double
-				.doubleToLongBits(other.getStepX())) {
+				.doubleToLongBits(other.stepX)) {
 			return false;
 		}
 		if (Double.doubleToLongBits(stepXMeters) != Double
-				.doubleToLongBits(other.getStepXMeters())) {
+				.doubleToLongBits(other.stepXMeters)) {
 			return false;
 		}
 		if (Double.doubleToLongBits(stepY) != Double
-				.doubleToLongBits(other.getStepY())) {
+				.doubleToLongBits(other.stepY)) {
 			return false;
 		}
 		if (Double.doubleToLongBits(stepYMeters) != Double
-				.doubleToLongBits(other.getStepYMeters())) {
+				.doubleToLongBits(other.stepYMeters)) {
 			return false;
 		}
-		if (Double.doubleToLongBits(top) != Double.doubleToLongBits(other.getTop())) {
+		if (Double.doubleToLongBits(top) != Double.doubleToLongBits(other.top)) {
 			return false;
 		}
 		return true;
 	}
-	
-	//@SuppressWarnings("unchecked")
-	public Territory deepCopy() {
-		Territory cloned = (Territory) org.apache.commons.lang.SerializationUtils.clone(this);
-		return(cloned);
-	}
-	
+
+
 
 }

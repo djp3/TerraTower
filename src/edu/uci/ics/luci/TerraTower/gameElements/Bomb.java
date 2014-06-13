@@ -20,14 +20,8 @@
 */
 package edu.uci.ics.luci.TerraTower.gameElements;
 
-import java.io.Serializable;
 
-public class Bomb implements Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8236538347818005297L;
+public class Bomb{
 	
 	Player owner;
 	int x;
@@ -94,7 +88,7 @@ public class Bomb implements Serializable{
 	}
 
 	@Override
-	public synchronized  int hashCode() {
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (exploded ? 1231 : 1237);
@@ -108,7 +102,7 @@ public class Bomb implements Serializable{
 	}
 
 	@Override
-	public synchronized boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -119,31 +113,32 @@ public class Bomb implements Serializable{
 			return false;
 		}
 		Bomb other = (Bomb) obj;
-		if (exploded != other.isExploded()) {
+		if (exploded != other.exploded) {
 			return false;
 		}
-		if (explosionTime != other.getExplosionTime()) {
+		if (explosionTime != other.explosionTime) {
 			return false;
 		}
 		if (owner == null) {
-			if (other.getOwner() != null) {
+			if (other.owner != null) {
 				return false;
 			}
-		} else if (!owner.equals(other.getOwner())) {
+		} else if (!owner.equals(other.owner)) {
 			return false;
 		}
-		if (strength != other.getStrength()) {
+		if (strength != other.strength) {
 			return false;
 		}
-		if (x != other.getX()) {
+		if (x != other.x) {
 			return false;
 		}
-		if (y != other.getY()) {
+		if (y != other.y) {
 			return false;
 		}
 		return true;
 	}
 
+	
 
 
 }

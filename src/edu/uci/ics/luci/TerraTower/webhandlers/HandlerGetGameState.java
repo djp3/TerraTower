@@ -51,7 +51,8 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 		return log;
 	}
 	
-	static Map<Pair<String, Territory>, Pair<byte[], byte[]>> responseCache = Collections.synchronizedMap(new HashMap<Pair<String, Territory>,Pair<byte[],byte[]>>());
+	static Map<Pair<String, Integer>, Pair<byte[], byte[]>> responseCache = Collections.synchronizedMap(new HashMap<Pair<String, Integer>,Pair<byte[],byte[]>>());
+	static Map<String,Pair<String,Integer>> responseCacheKey = Collections.synchronizedMap(new HashMap<String, Pair<String, Integer>>());
 
 	public HandlerGetGameState() {
 		super(null);
@@ -103,16 +104,27 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 			pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toJSONString()).getBytes());
 		}
 		else{
-			Pair<String, Territory> p = new Pair<String,Territory>(getPlayerName(),territory);
+			Pair<String, Integer> p = new Pair<String,Integer>(getPlayerName(),territory.hashCode());
 			if(responseCache.containsKey(p)){
 				getLog().info("Cache Hit");
 				pair = responseCache.get(p);
 			}
 			else{
 				getLog().info("Cache Miss");
+				/* get the key associated with the player for the cache we just missed */
+				Pair<String, Integer> oldP = responseCacheKey.get(getPlayerName());
+				/* remove the cache entry */
+				if(oldP == null){
+					getLog().fatal("The Game State cache is broken somehow");
+				}
+				else{
+					responseCache.remove(oldP);
+				}
+				/* Make the new response */
 				ret = constructJSON(territory,getPlayerName());
-				p = new Pair<String,Territory>(getPlayerName(),territory.deepCopy());
 				pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toJSONString()).getBytes());
+				/* Store it in the cache */
+				responseCacheKey.put(getPlayerName(), p);
 				responseCache.put(p,pair);
 			}
 		}
