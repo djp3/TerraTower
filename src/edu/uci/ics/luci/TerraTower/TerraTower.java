@@ -119,7 +119,7 @@ public class TerraTower {
 		Configuration config = new PropertiesConfiguration( "TerraTower.properties");
 
 		/* Set up the global variable */
-		Globals.setGlobals(new GlobalsTerraTower(VERSION));
+		Globals.setGlobals(new GlobalsTerraTower(VERSION,false));
 		
 		/* Set up an event queue with logging */
 		String logFileName = config.getString("event.logfile");
