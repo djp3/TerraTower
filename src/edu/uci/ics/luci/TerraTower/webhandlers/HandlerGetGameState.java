@@ -111,13 +111,10 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 			}
 			else{
 				getLog().info("Cache Miss");
-				/* get the key associated with the player for the cache we just missed */
+				/* get the key associated with the player for the cache probe we just missed */
 				Pair<String, Integer> oldP = responseCacheKey.get(getPlayerName());
 				/* remove the cache entry */
-				if(oldP == null){
-					getLog().fatal("The Game State cache is broken somehow");
-				}
-				else{
+				if(oldP != null){
 					responseCache.remove(oldP);
 				}
 				/* Make the new response */
