@@ -18,3 +18,4 @@ test/*
 *.swp
 
 UnityTerraTowerClient/UnityTerraTowerClient/Temp/*
+UnityTerraTowerClient/EclipseWorkspace/.metadata/*
