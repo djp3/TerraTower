@@ -38,6 +38,10 @@ A [description of the game is here](http://www.ics.uci.edu/~djp3/classes/2014_03
    * Allow people to assign themselves a color
    * Announce change in leaderboard
 
+6/20/14
+ * set version to v0.0.1
+ * Checked in the Unity client files and everything else from the end of ICS 163
+
 6/13/14
  * Made the bombs look bigger
  * Fixing the territory caching on the server/engine side
