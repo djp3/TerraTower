@@ -1,3 +1,6 @@
+# Mac finder Files
+.DS_Store
+
 # Binary Files
 bin/*
 *.class
@@ -17,5 +20,18 @@ test/*
 #vim editor files
 *.swp
 
+
+#Unity files
 UnityTerraTowerClient/UnityTerraTowerClient/Temp/*
+UnityTerraTowerClient/UnityTerraTowerClient/Library/*
+UnityTerraTowerClient/UnityTerraTowerClient/Obj/*
+*.csproj
+*.unityproj
+*.sln
+*.user
+*.userprefs
+
+
+#Eclipse files
 UnityTerraTowerClient/EclipseWorkspace/.metadata/*
+

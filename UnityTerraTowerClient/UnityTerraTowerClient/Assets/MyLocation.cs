@@ -14,15 +14,15 @@ public class MyLocation : MonoBehaviour {
 	/* When mock locations is true the apparent movement is from north east to south west, from low altitude to high altude, over span seconds */
 	public bool mockLocations;  //Set in the UI
 	private long mockLocationCount = 0L;
-	//private float east = -117.8411751f;
-	//private float west = -117.8442599f;
-	//private float north = 33.6472217f;
-	//private float south = 33.6446338f;
+	private float east = -117.8411751f;
+	private float west = -117.8442599f;
+	private float north = 33.6472217f;
+	private float south = 33.6446338f;
 
-	private float north = 33.6358538f;
-	private float east = -117.8372621f;
-	private float south = 33.635025f;
-	private float west = -117.8384372f;
+	//private float north = 33.6358538f;
+	//private float east = -117.8372621f;
+	//private float south = 33.635025f;
+	//private float west = -117.8384372f;
 
 	private float low = 10f;
 	private float high = 100f;
@@ -53,6 +53,61 @@ public class MyLocation : MonoBehaviour {
 		public static double toRadians(double angle) {
 			return Math.PI * angle / 180.0;
 		}
+		
+		public static double toDegrees(double deg) {
+			return deg * 180.0 / Math.PI;
+		}
+	
+		/* Calculate the new latitude and longitude based on current lat and long and a bearing and distance away */
+		/* bearing in degrees */
+		/* distance in meters */
+		public static double[] ComputeLatLng(double startLat, double startLng, double bearing, double distance) {
+			double[] vNewLatLng = new double[2];
+			//distance = distance / 6371000; //for meters
+			distance = distance / 6372800; //for meters
+			bearing = Haversine.toRadians(bearing);
+			
+			double vLat1 = Haversine.toRadians(startLat);
+			double vLng1 = Haversine.toRadians(startLng);
+			
+			double vNewLat = Math.Asin(Math.Sin(vLat1) * Math.Cos(distance) +
+			                           Math.Cos(vLat1) * Math.Sin(distance) * Math.Cos(bearing));
+			
+			double vNewLng = vLng1 + Math.Atan2(Math.Sin(bearing) * Math.Sin(distance) * Math.Cos(vLat1),
+			                                 Math.Cos(distance) - Math.Sin(vLat1) * Math.Sin(vNewLat));
+
+			if (double.IsNaN(vNewLat) || double.IsNaN(vNewLng)) {
+				return null;
+			}
+			
+			vNewLatLng[0] = Haversine.toDegrees(vNewLat);
+			vNewLatLng[1] = Haversine.toDegrees(vNewLng);
+			
+			return vNewLatLng;
+		}
+
+		/* Computer a latitude and longitude based on an origin lat and lng and a distance away from the origin in meters */
+		public static double[] ComputeLatLng2(double originLat, double originLng, double x, double y) {
+			double h = Math.Sqrt (x * x + y * y);
+			double bearing;
+			if ((x > 0) & (y > 0)) {
+				bearing = (Math.PI/2) - Math.Sin (y / h);
+			} else {
+				if ((x > 0) & (y < 0)) {
+					bearing = Math.PI / 2 + Math.Sin (-y / h);
+				} else {
+					if ((x < 0) & (y > 0)) {
+						bearing = 3*Math.PI / 2 + Math.Sin (y / h);
+					} else {
+						bearing = Math.PI + (Math.PI / 2 - Math.Sin (-y / h));
+					}
+				}
+			}
+			return ComputeLatLng (originLat, originLng, toDegrees(bearing), h);
+		}
+
+
+
 	}
 
 	/* Getters for finding the most recent location */
@@ -71,6 +126,20 @@ public class MyLocation : MonoBehaviour {
 		
 	// Use this for initialization
 	IEnumerator Start () {
+		/*double[] thing = Haversine.ComputeLatLng2 (0.0f, 0.0f, 2000f, 2000f);
+		Debug.Log ("Answer 0:" + thing[0]+":"+thing[1]);
+		thing = Haversine.ComputeLatLng2 (0.0, 0.0, -2000, 2000);
+		Debug.Log ("Answer 0:" + thing[0]+":"+thing[1]);
+		thing = Haversine.ComputeLatLng2 (0.0, 0.0, 2000, -2000);
+		Debug.Log ("Answer 0:" + thing[0]+":"+thing[1]);
+		thing = Haversine.ComputeLatLng2 (0.0, 0.0, -2000, -2000);
+		Debug.Log ("Answer 0:" + thing[0]+":"+thing[1]);
+
+
+		Debug.Log("Answer 1:"+Haversine.toDegrees(Math.Asin (4.0/Math.Sqrt(32.0))));
+		Debug.Log("Answer 2:"+Haversine.toDegrees(Math.Asin (3.0/Math.Sqrt(32.0))));
+		Debug.Log("Answer 3:"+Haversine.toDegrees(Math.Asin (2.0/Math.Sqrt(32.0))));*/
+
 		working = false;
 			
 		// First, check if user has location service enabled

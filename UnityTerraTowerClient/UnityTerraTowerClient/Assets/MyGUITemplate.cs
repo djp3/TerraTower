@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
 	
-/* Version 1.1 17:04pm */
+/* Version 1.1 21:55pm */
 public class MyGUITemplate : MonoBehaviour
 {		
 	/********************  Things that are attached from the Unity GUI * *****************/
