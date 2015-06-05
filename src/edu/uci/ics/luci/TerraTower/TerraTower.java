@@ -1,5 +1,5 @@
 /*
-	Copyright 2014
+	Copyright 2014-2015
 		University of California, Irvine (c/o Donald J. Patterson)
 */
 /*
@@ -52,7 +52,6 @@ import edu.uci.ics.luci.TerraTower.webhandlers.HandlerDropBomb;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerGetGameState;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerGetLeaderBoard;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerRedeemPowerUp;
-import edu.uci.ics.luci.TerraTower.webhandlers.HandlerShutdown;
 import edu.uci.ics.luci.utility.Globals;
 import edu.uci.ics.luci.utility.webserver.AccessControl;
 import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
