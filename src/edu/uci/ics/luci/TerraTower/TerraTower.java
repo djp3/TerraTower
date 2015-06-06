@@ -54,10 +54,12 @@ import edu.uci.ics.luci.TerraTower.webhandlers.HandlerGetLeaderBoard;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerRedeemPowerUp;
 import edu.uci.ics.luci.utility.Globals;
 import edu.uci.ics.luci.utility.webserver.AccessControl;
-import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
 import edu.uci.ics.luci.utility.webserver.RequestDispatcher;
 import edu.uci.ics.luci.utility.webserver.WebServer;
+import edu.uci.ics.luci.utility.webserver.handlers.HandlerAbstract;
+import edu.uci.ics.luci.utility.webserver.handlers.HandlerShutdown;
 import edu.uci.ics.luci.utility.webserver.handlers.HandlerVersion;
+import edu.uci.ics.luci.utility.webserver.input.channel.socket.HTTPInputOverSocket;
 
 public class TerraTower {
 	private static int port = 9021;
@@ -203,7 +205,13 @@ public class TerraTower {
 		HashMap<String, HandlerAbstract> requestHandlerRegistry;
 
 		try {
+			boolean secure = false;
+			
+			HTTPInputOverSocket inputChannel = new HTTPInputOverSocket(port,secure);
+					
+			// Null is a default Handler
 			requestHandlerRegistry = new HashMap<String, HandlerAbstract>();
+			requestHandlerRegistry.put(null, new HandlerVersion(VERSION));
 			requestHandlerRegistry.put("", new HandlerVersion(VERSION));
 			requestHandlerRegistry.put("version", new HandlerVersion(VERSION));
 			requestHandlerRegistry.put("build_tower", new HandlerBuildTower(eventPublisher));
@@ -212,12 +220,12 @@ public class TerraTower {
 			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
 			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState());
 			requestHandlerRegistry.put("shutdown", new HandlerShutdown(Globals.getGlobals()));
-
-			RequestDispatcher dispatcher = new RequestDispatcher(
-					requestHandlerRegistry);
-			ws = new WebServer(dispatcher, port, false, new AccessControl());
-			ws.start(1000);
-
+						
+			RequestDispatcher requestDispatcher = new RequestDispatcher(requestHandlerRegistry);
+			AccessControl accessControl = new AccessControl();
+			accessControl.reset();
+			ws = new WebServer(inputChannel, requestDispatcher, accessControl);
+			ws.start();
 			Globals.getGlobals().addQuittable(ws);
 
 		} catch (RuntimeException e) {

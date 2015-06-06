@@ -21,9 +21,7 @@
 package edu.uci.ics.luci.TerraTower.webhandlers;
 
 
-import java.net.InetAddress;
 import java.util.List;
-import java.util.Map;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -37,8 +35,10 @@ import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.world.Territory;
 import edu.uci.ics.luci.TerraTower.world.WorldManager;
 import edu.uci.ics.luci.utility.datastructure.Pair;
-import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
-import edu.uci.ics.luci.utility.webserver.RequestDispatcher.HTTPRequest;
+import edu.uci.ics.luci.utility.webserver.handlers.HandlerAbstract;
+import edu.uci.ics.luci.utility.webserver.input.request.Request;
+import edu.uci.ics.luci.utility.webserver.output.channel.Output;
+import edu.uci.ics.luci.utility.webserver.output.response.Response;
 
 public class HandlerGetLeaderBoard extends HandlerAbstractWorld{
 	
@@ -66,40 +66,41 @@ public class HandlerGetLeaderBoard extends HandlerAbstractWorld{
 	 * @return a pair where the first element is the content type and the bytes are the output bytes to send back
 	 */
 	@Override
-	public Pair<byte[], byte[]> handle(InetAddress ip, HTTPRequest httpRequestType, Map<String, String> headers, String restFunction, Map<String, String> parameters) {
-		Pair<byte[], byte[]> pair = null;
+	public Response handle(Request request, Output o) {
 		
-
+		JSONObject ret = new JSONObject();
+		
+		Response response = o.makeOutputChannelResponse();
+		
 		JSONArray errors = new JSONArray();
 		
-		errors.addAll(getWorldParameters(restFunction,parameters));
+		errors.addAll(getWorldParameters(request.getCommand(),request.getParameters()));
 		
 		GlobalsTerraTower globalsTerraTower = GlobalsTerraTower.getGlobalsTerraTower();
 		List<Pair<Integer, Player>> leaderBoard = null;
 		if(globalsTerraTower == null){
-			errors.add("Problem handling "+restFunction+": globals was null");
+			errors.add("Problem handling "+request.getCommand()+": globals was null");
 		}
 		else{
 			WorldManager world = globalsTerraTower.getWorld(getWorldName(), getWorldPassword());
 			if(world == null){
-				errors.add("Problem handling "+restFunction+": world manager was null");
+				errors.add("Problem handling "+request.getCommand()+": world manager was null");
 			}
 			else{
 				Territory territory = world.getTerritory();
 				if(territory == null){
-					errors.add("Problem handling "+restFunction+": territory was null");
+					errors.add("Problem handling "+request.getCommand()+": territory was null");
 				}
 				else{
 					leaderBoard = territory.getLeaderBoard();
 					if(leaderBoard == null){
-						errors.add("Problem handling "+restFunction+": leader board was null");
+						errors.add("Problem handling "+request.getCommand()+": leader board was null");
 					}
 				}
 			}
 		}
 		
 		
-		JSONObject ret = new JSONObject();
 		if(errors.size() != 0){
 			ret.put("error", "true");
 			ret.put("errors", errors);
@@ -113,8 +114,11 @@ public class HandlerGetLeaderBoard extends HandlerAbstractWorld{
 			ret.put("result", result);
 		}
 		
-		pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toString()).getBytes());
-		return pair;
+		response.setStatus(Response.Status.OK);
+		response.setDataType(Response.DataType.JSON);
+		response.setBody(wrapCallback(request.getParameters(),ret.toString()));
+		
+		return response;
 	}
 }
 

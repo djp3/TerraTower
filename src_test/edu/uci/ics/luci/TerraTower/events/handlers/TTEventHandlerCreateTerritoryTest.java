@@ -33,9 +33,12 @@ import org.junit.Test;
 import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.utility.Globals;
 
 public class TTEventHandlerCreateTerritoryTest {
+	
+	final static String TEST_VERSION ="-999";
 	
 	static final String worldName = "name"+System.currentTimeMillis();
 	static final String worldPassword = "password"+System.currentTimeMillis();
@@ -121,11 +124,20 @@ public class TTEventHandlerCreateTerritoryTest {
 	
 	@Test
 	public void testOnEvent() {
+		GlobalsTerraTower globals = new GlobalsTerraTower(TEST_VERSION,true);
+		GlobalsTerraTower.setGlobals(globals);
+		
+		TTEventHandlerCreateWorld ttWorld = new TTEventHandlerCreateWorld();
+		TTEventCreateWorld eventWorld = new TTEventCreateWorld(worldName,worldPassword);
+		JSONObject json = ttWorld.checkParameters(0, eventWorld);
+		assertTrue(json == null);
+		ttWorld.onEvent();
+		
 		TTEventHandlerCreateTerritory tt = new TTEventHandlerCreateTerritory();
 
 		/*Ok! */
 		TTEventCreateTerritory event = new TTEventCreateTerritory(worldName,worldPassword,left,right,numXSplits,bottom,top,numYSplits);
-		JSONObject json = tt.checkParameters(0,event);
+		json = tt.checkParameters(0,event);
 		assertTrue(json == null);
 		
 		//set up the world

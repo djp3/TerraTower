@@ -92,9 +92,11 @@ public class TTEventHandlerTest {
 	
 	@Test
 	public void testOnEvent() {
-		TTEventHandler tt = new TTEventHandler();
 		GlobalsTerraTower g = new GlobalsTerraTower("TEST_VERSION");
 		Globals.setGlobals(g);
+		
+		TTEventHandler tt = new TTEventHandler();
+		
 		g.createWorld(worldName, worldPassword);
 		
 		TTEvent event = new TTEvent(worldName,worldPassword);

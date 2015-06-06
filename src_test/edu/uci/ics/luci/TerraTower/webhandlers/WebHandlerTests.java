@@ -29,6 +29,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.List;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -59,24 +61,19 @@ import edu.uci.ics.luci.TerraTower.world.Territory;
 import edu.uci.ics.luci.utility.Globals;
 import edu.uci.ics.luci.utility.datastructure.Pair;
 import edu.uci.ics.luci.utility.webserver.AccessControl;
-import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
 import edu.uci.ics.luci.utility.webserver.RequestDispatcher;
 import edu.uci.ics.luci.utility.webserver.WebServer;
 import edu.uci.ics.luci.utility.webserver.WebUtil;
+import edu.uci.ics.luci.utility.webserver.handlers.HandlerAbstract;
+import edu.uci.ics.luci.utility.webserver.handlers.HandlerError;
+import edu.uci.ics.luci.utility.webserver.handlers.HandlerShutdown;
 import edu.uci.ics.luci.utility.webserver.handlers.HandlerVersion;
+import edu.uci.ics.luci.utility.webserver.input.channel.socket.HTTPInputOverSocket;
 
 public class WebHandlerTests {
 	
-	private static int testPort = 9020;
-	private static synchronized int testPortPlusPlus(){
-		int x = testPort;
-		testPort++;
-		return(x);
-	}
-	
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		Globals.setGlobals(null);
 	}
 
 	@AfterClass
@@ -92,36 +89,62 @@ public class WebHandlerTests {
 
 	private WebServer ws = null;
 
-	HashMap<String,HandlerAbstract> requestHandlerRegistry;
 	
 
 	@Before
 	public void setUp() throws Exception {
+		
 	}
 
 	@After
 	public void tearDown() throws Exception {
 	}
 	
+	private static int testPort = 9020;
+	public static synchronized int testPortPlusPlus(){
+		int x = testPort;
+		testPort++;
+		return(x);
+	}
+	
+
+	public static WebServer startAWebServerSocket(Globals globals,int port,boolean secure) {
+		try {
+			HTTPInputOverSocket inputChannel = new HTTPInputOverSocket(port,secure);
+			HashMap<String, HandlerAbstract> requestHandlerRegistry = new HashMap<String,HandlerAbstract>();
+			
+			// Null is a default Handler
+			requestHandlerRegistry.put(null,new HandlerError(Globals.getGlobals().getSystemVersion()));
+				
+			RequestDispatcher requestDispatcher = new RequestDispatcher(requestHandlerRegistry);
+			AccessControl accessControl = new AccessControl();
+			accessControl.reset();
+			WebServer ws = new WebServer(inputChannel, requestDispatcher, accessControl);
+			ws.start();
+			globals.addQuittable(ws);
+			return ws;
+		} catch (RuntimeException e) {
+			fail("Couldn't start webserver"+e);
+		}
+		return null;
+	}
 
 
 	private void startAWebServer(int port, TTEventWrapperQueuer eventPublisher) {
 		try {
-			requestHandlerRegistry = new HashMap<String, HandlerAbstract>();
-			requestHandlerRegistry.put(null, new HandlerVersion(Globals.getGlobals().getSystemVersion()));
-			requestHandlerRegistry.put("", new HandlerVersion(Globals.getGlobals().getSystemVersion()));
-			requestHandlerRegistry.put("version", new HandlerVersion(Globals.getGlobals().getSystemVersion()));
-			requestHandlerRegistry.put("build_tower", new HandlerBuildTower(eventPublisher));
-			requestHandlerRegistry.put("drop_bomb", new HandlerDropBomb(eventPublisher));
-			requestHandlerRegistry.put("redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
-			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
-			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState());
-			requestHandlerRegistry.put("shutdown", new HandlerShutdown(Globals.getGlobals()));
+			boolean secure = false;
+			ws = startAWebServerSocket(Globals.getGlobals(),port,secure);
+			ws.getRequestDispatcher().updateRequestHandlerRegistry(null, new HandlerVersion(Globals.getGlobals().getSystemVersion()));
+			ws.getRequestDispatcher().updateRequestHandlerRegistry("", new HandlerVersion(Globals.getGlobals().getSystemVersion()));
+			ws.getRequestDispatcher().updateRequestHandlerRegistry("/", new HandlerVersion(Globals.getGlobals().getSystemVersion()));
+			ws.getRequestDispatcher().updateRequestHandlerRegistry("/version", new HandlerVersion(Globals.getGlobals().getSystemVersion()));
+			ws.getRequestDispatcher().updateRequestHandlerRegistry("/build_tower", new HandlerBuildTower(eventPublisher));
+			ws.getRequestDispatcher().updateRequestHandlerRegistry("/drop_bomb", new HandlerDropBomb(eventPublisher));
+			ws.getRequestDispatcher().updateRequestHandlerRegistry("/redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
+			ws.getRequestDispatcher().updateRequestHandlerRegistry("/get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
+			ws.getRequestDispatcher().updateRequestHandlerRegistry("/get_game_state", new HandlerGetGameState());
+			ws.getRequestDispatcher().updateRequestHandlerRegistry("/shutdown", new HandlerShutdown(Globals.getGlobals()));
 			
-			RequestDispatcher requestDispatcher = new RequestDispatcher(requestHandlerRegistry);
-			ws = new WebServer(requestDispatcher, port, false, new AccessControl());
-			ws.start();
-			Globals.getGlobals().addQuittable(ws);
 		} catch (RuntimeException e) {
 			fail("Couldn't start webserver"+e);
 		}
@@ -142,7 +165,9 @@ public class WebHandlerTests {
 		TTEventCreateWorld ttEvent1 = new TTEventCreateWorld(worldName,worldPassword);
 		ResultChecker resultChecker = new ResultChecker(false);
 		TTEventWrapper event = new TTEventWrapper(TTEventType.CREATE_WORLD,ttEvent1,resultChecker);
+		
 		events.add(event);
+		
 		eventPublisher.onData(event);
 		synchronized(resultChecker.getSemaphore()){
 			while(resultChecker.getResultOK() == null){
@@ -233,17 +258,25 @@ public class WebHandlerTests {
 		
 		TTEventWrapperQueuer publisher = startATestSystem();
 		
-		startAWebServer(testPortPlusPlus(),publisher);
+		int port = testPortPlusPlus();
+		startAWebServer(port,publisher);
 		
 		/* Check the version */
 		String responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
+			URIBuilder uriBuilder = new URIBuilder()
+										.setScheme("http")
+										.setHost("localhost")
+										.setPort(ws.getInputChannel().getPort())
+										.setPath("/");
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder,null,null,null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		}catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception");
@@ -264,12 +297,19 @@ public class WebHandlerTests {
 		/* Build a tower without world name */
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
+			URIBuilder uriBuilder = new URIBuilder()
+											.setScheme("http")
+											.setHost("localhost")
+											.setPort(ws.getInputChannel().getPort())
+											.setPath("/build_tower");
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/build_tower", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder,null,null,null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		}catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception");
@@ -287,22 +327,27 @@ public class WebHandlerTests {
 		
 		
 
-		
 		/* Build a tower without world password */
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/build_tower")
+					.setParameter("world_name", worldName);
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/build_tower", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception");
 		}
-		//System.out.println(responseString);
+		// System.out.println(responseString);
 		
 
 		response = null;
@@ -322,14 +367,20 @@ public class WebHandlerTests {
 		/* Build a tower without player name */
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/build_tower")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword);
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/build_tower", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception");
@@ -355,15 +406,21 @@ public class WebHandlerTests {
 		/* Build a tower without player password */
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
-			params.put("player_name", playerName);
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/build_tower")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword)
+					.setParameter("player_name", playerName);
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/build_tower", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception");
@@ -386,16 +443,22 @@ public class WebHandlerTests {
 		/* Build a tower without lat */
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
-			params.put("player_name", playerName);
-			params.put("player_password", playerPassword);
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/build_tower")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword)
+					.setParameter("player_name", playerName)
+					.setParameter("player_password", playerPassword);
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/build_tower", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception");
@@ -419,17 +482,23 @@ public class WebHandlerTests {
 		/* Build a tower without lng */
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
-			params.put("player_name", playerName);
-			params.put("player_password", playerPassword);
-			params.put("lat", "0.0");
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/build_tower")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword)
+					.setParameter("player_name", playerName)
+					.setParameter("player_password", playerPassword)
+					.setParameter("lat","0.0");
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/build_tower", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception");
@@ -454,18 +523,24 @@ public class WebHandlerTests {
 		/* Build a tower without alt */
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
-			params.put("player_name", playerName);
-			params.put("player_password", playerPassword);
-			params.put("lat", "0.0");
-			params.put("lng", "0.0");
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/build_tower")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword)
+					.setParameter("player_name", playerName)
+					.setParameter("player_password", playerPassword)
+					.setParameter("lat","0.0")
+					.setParameter("lng","0.0");
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/build_tower", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception");
@@ -484,19 +559,25 @@ public class WebHandlerTests {
 		/* Build weird numbers */
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
-			params.put("player_name", playerName);
-			params.put("player_password", playerPassword);
-			params.put("lat", "woof");
-			params.put("lng", "bark");
-			params.put("alt", "meow");
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/build_tower")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword)
+					.setParameter("player_name", playerName)
+					.setParameter("player_password", playerPassword)
+					.setParameter("lat","woof")
+					.setParameter("lng","bark")
+					.setParameter("alt","meow");
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/build_tower", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception"+e);
@@ -517,19 +598,25 @@ public class WebHandlerTests {
 		/* Build a tower OK! */
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
-			params.put("player_name", playerName);
-			params.put("player_password", playerPassword);
-			params.put("lat", "33.645");
-			params.put("lng", "-117.842");
-			params.put("alt", "10.0");
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/build_tower")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword)
+					.setParameter("player_name", playerName)
+					.setParameter("player_password", playerPassword)
+					.setParameter("lat","33.645")
+					.setParameter("lng","-117.842")
+					.setParameter("alt","10.0");
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/build_tower", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception"+e);
@@ -551,19 +638,25 @@ public class WebHandlerTests {
 		/* Drop a bomb*/
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
-			params.put("player_name", playerName);
-			params.put("player_password", playerPassword);
-			params.put("lat", "33.645");
-			params.put("lng", "-117.842");
-			params.put("alt", "10.0");
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/drop_bomb")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword)
+					.setParameter("player_name", playerName)
+					.setParameter("player_password", playerPassword)
+					.setParameter("lat","33.645")
+					.setParameter("lng","-117.842")
+					.setParameter("alt","10.0");
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/drop_bomb", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception"+e);
@@ -586,15 +679,21 @@ public class WebHandlerTests {
 		/* Game State without a player password */
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
-			params.put("player_name", playerName);
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/get_game_state")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword)
+					.setParameter("player_name", playerName);
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/get_game_state", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception"+e);
@@ -609,7 +708,12 @@ public class WebHandlerTests {
 		} catch (ClassCastException e) {
 			fail("Bad JSON Response");
 		} catch (AssertionError e){
-			System.err.println(response.toJSONString());
+			if(response != null){
+				System.err.println(response.toJSONString());
+			}
+			else{
+				System.err.println("response is null");
+			}
 			throw e;
 		}
 		
@@ -632,16 +736,22 @@ public class WebHandlerTests {
 		/* Game State */
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
-			params.put("player_name", playerName);
-			params.put("player_password", playerPassword);
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/get_game_state")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword)
+					.setParameter("player_name", playerName)
+					.setParameter("player_password", playerPassword);
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/get_game_state", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception"+e);
@@ -656,7 +766,12 @@ public class WebHandlerTests {
 		} catch (ClassCastException e) {
 			fail("Bad JSON Response");
 		} catch (AssertionError e){
-			System.err.println(response.toJSONString());
+			if(response != null){
+				System.err.println(response.toJSONString());
+			}
+			else{
+				System.err.println("response is null");
+			}
 			throw e;
 		}
 		
@@ -668,14 +783,20 @@ public class WebHandlerTests {
 		/* Get Leader Board*/
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
-			
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/get_leader_board", false, params, 30 * 1000);
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/get_leader_board")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword);
+
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception"+e);
@@ -690,7 +811,12 @@ public class WebHandlerTests {
 		} catch (ClassCastException e) {
 			fail("Bad JSON Response");
 		} catch (AssertionError e){
-			System.err.println(response.toJSONString());
+			if(response != null){
+				System.err.println(response.toJSONString());
+			}
+			else{
+				System.err.println("response is null");
+			}
 			throw e;
 		}
 		
@@ -698,17 +824,24 @@ public class WebHandlerTests {
 		/* Redeem a power up*/
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put("world_name", worldName);
-			params.put("world_password", worldPassword);
-			params.put("player_name", playerName);
-			params.put("player_password", playerPassword);
-			params.put("code", "code");
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/redeem_power_up")
+					.setParameter("world_name", worldName)
+					.setParameter("world_password", worldPassword)
+					.setParameter("player_name", playerName)
+					.setParameter("player_password", playerPassword)
+					.setParameter("code", "code");
+					
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/redeem_power_up", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception"+e);
@@ -723,7 +856,12 @@ public class WebHandlerTests {
 		} catch (ClassCastException e) {
 			fail("Bad JSON Response");
 		} catch (AssertionError e){
-			System.err.println(response.toJSONString());
+			if(response != null){
+				System.err.println(response.toJSONString());
+			}
+			else{
+				System.err.println("response is null");
+			}
 			throw e;
 		}
 		
@@ -734,12 +872,19 @@ public class WebHandlerTests {
 		
 		responseString = null;
 		try {
-			HashMap<String, String> params = new HashMap<String, String>();
+			URIBuilder uriBuilder = new URIBuilder().setScheme("http")
+					.setHost("localhost")
+					.setPort(ws.getInputChannel().getPort())
+					.setPath("/shutdown");
+					
 
-			responseString = WebUtil.fetchWebPage("http://localhost:" + ws.getPort() + "/shutdown", false, params, 30 * 1000);
+			responseString = WebUtil.fetchWebPage(uriBuilder, null, null, null, 30 * 1000);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Bad URL");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("URLSyntaxException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
 			fail("IO Exception");
@@ -801,18 +946,18 @@ public class WebHandlerTests {
 		assertEquals(player,owner.getFirst());
 		assertEquals(Integer.valueOf(4),owner.getSecond());
 		
-		long time = System.currentTimeMillis();
+		//long time = System.currentTimeMillis();
 		//JSONObject x = HandlerGetGameState.constructJSON(t, player.getPlayerName());
 		//t.deepCopy();
 		//System.err.println("Elapsed time:"+(System.currentTimeMillis()-time));
 		//System.err.println("Size = "+x.toString().length());
 		//System.err.println("Size = "+x.toJSONString().length());
 		//System.err.println("Size = "+x.toJSONString(JSONStyle.MAX_COMPRESS).length());
-		time = System.currentTimeMillis();
-		for(int i = 0 ; i < 1000; i++){
+		//time = System.currentTimeMillis();
+		//for(int i = 0 ; i < 1000; i++){
 			//HandlerGetGameState.constructJSON(t, player.getPlayerName()).toJSONString(JSONStyle.MAX_COMPRESS).getBytes();
 			//t.deepCopy();
-		}
+		//}
 		//System.err.println("Elapsed time:"+((System.currentTimeMillis()-time)/1000.0));
 			
 	}
