@@ -62,9 +62,9 @@ import edu.uci.ics.luci.utility.webserver.handlers.HandlerVersion;
 import edu.uci.ics.luci.utility.webserver.input.channel.socket.HTTPInputOverSocket;
 
 public class TerraTower {
-	private static int port = 9021;
+	private static int port = 9020;
 	
-	public final static String VERSION="0.1";
+	public final static String VERSION="0.2";
 
 	private static transient volatile Logger log = null;
 
@@ -213,13 +213,14 @@ public class TerraTower {
 			requestHandlerRegistry = new HashMap<String, HandlerAbstract>();
 			requestHandlerRegistry.put(null, new HandlerVersion(VERSION));
 			requestHandlerRegistry.put("", new HandlerVersion(VERSION));
-			requestHandlerRegistry.put("version", new HandlerVersion(VERSION));
-			requestHandlerRegistry.put("build_tower", new HandlerBuildTower(eventPublisher));
-			requestHandlerRegistry.put("drop_bomb", new HandlerDropBomb(eventPublisher));
-			requestHandlerRegistry.put("redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
-			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
-			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState());
-			requestHandlerRegistry.put("shutdown", new HandlerShutdown(Globals.getGlobals()));
+			requestHandlerRegistry.put("/", new HandlerVersion(VERSION));
+			requestHandlerRegistry.put("/version", new HandlerVersion(VERSION));
+			requestHandlerRegistry.put("/build_tower", new HandlerBuildTower(eventPublisher));
+			requestHandlerRegistry.put("/drop_bomb", new HandlerDropBomb(eventPublisher));
+			requestHandlerRegistry.put("/redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
+			requestHandlerRegistry.put("/get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
+			requestHandlerRegistry.put("/get_game_state", new HandlerGetGameState());
+			requestHandlerRegistry.put("/shutdown", new HandlerShutdown(Globals.getGlobals()));
 						
 			RequestDispatcher requestDispatcher = new RequestDispatcher(requestHandlerRegistry);
 			AccessControl accessControl = new AccessControl();
