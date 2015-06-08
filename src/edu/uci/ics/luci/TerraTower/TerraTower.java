@@ -62,7 +62,7 @@ import edu.uci.ics.luci.utility.webserver.handlers.HandlerVersion;
 import edu.uci.ics.luci.utility.webserver.input.channel.socket.HTTPInputOverSocket;
 
 public class TerraTower {
-	private static int port = 9020;
+	private static int port = 9021;
 	
 	public final static String VERSION="0.2";
 
