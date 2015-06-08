@@ -190,7 +190,8 @@ public class MyLocation : MonoBehaviour {
 				if ((Input.location.lastData.longitude != lastLng) || (Input.location.lastData.latitude != lastLat)) {
 					lastLng = Input.location.lastData.longitude;
 					lastLat = Input.location.lastData.latitude;
-					lastAlt = Input.location.lastData.altitude;
+					lastAlt=11;
+					//lastAlt = Input.location.lastData.altitude;
 				}
 			}
 		}
