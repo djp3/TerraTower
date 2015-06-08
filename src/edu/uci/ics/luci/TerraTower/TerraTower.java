@@ -242,35 +242,38 @@ public class TerraTower {
 		while(!Globals.getGlobals().isQuitting()){
 			/*In case Thread.sleep is interrupted we wrap in a loop */
 			
-			while(System.currentTimeMillis() - lastTime < clockStep){
+			while(!Globals.getGlobals().isQuitting() && ((System.currentTimeMillis() - lastTime) < clockStep)){
 				try {
 					Thread.sleep(GlobalsTerraTower.ONE_SECOND);
 				} catch (InterruptedException e) {
 				}
 			}
 			
-			/* Step the tower growth by one */
-			rc = new EventHandlerResultChecker();
-			wrapper = new TTEventWrapper(TTEventType.STEP_TOWER_TERRITORY_GROWTH, new TTEventStepTowerTerritoryGrowth(worldName,worldPassword),rc);
-			eventPublisher.onData(wrapper);
-			rc.block();
-			if(rc.getResults().get("error").equals("true")){
-				getLog().error("Couldn't step tower territory:"+rc.getResults().get("errors"));
-			}
+			if(!Globals.getGlobals().isQuitting()){
+				/* Step the tower growth by one */
+				rc = new EventHandlerResultChecker();
+				wrapper = new TTEventWrapper(TTEventType.STEP_TOWER_TERRITORY_GROWTH, new TTEventStepTowerTerritoryGrowth(worldName,worldPassword),rc);
+				eventPublisher.onData(wrapper);
+				rc.block();
+				if(rc.getResults().get("error").equals("true")){
+					getLog().error("Couldn't step tower territory:"+rc.getResults().get("errors"));
+				}
 			
-			/* Burn the bomb fuses */
-			rc = new EventHandlerResultChecker();
-			wrapper = new TTEventWrapper(TTEventType.BURN_BOMB_FUSE, new TTEventBurnBombFuse(worldName,worldPassword),rc);
-			eventPublisher.onData(wrapper);
-			rc.block();
-			if(rc.getResults().get("error").equals("true")){
-				getLog().error("Couldn't burn the bomb fuse:"+rc.getResults().get("errors"));
-			}
+				/* Burn the bomb fuses */
+				rc = new EventHandlerResultChecker();
+				wrapper = new TTEventWrapper(TTEventType.BURN_BOMB_FUSE, new TTEventBurnBombFuse(worldName,worldPassword),rc);
+				eventPublisher.onData(wrapper);
+				rc.block();
+				if(rc.getResults().get("error").equals("true")){
+					getLog().error("Couldn't burn the bomb fuse:"+rc.getResults().get("errors"));
+				}
 			
-			lastTime = System.currentTimeMillis();
+				lastTime = System.currentTimeMillis();
+				
+				((GlobalsTerraTower)Globals.getGlobals()).getWorld(worldName, worldPassword).getTerritory().printGrid();
+			}
 		}
-		
+		getLog().info("TerraTower shutdown");
 	}
-		
 }
 

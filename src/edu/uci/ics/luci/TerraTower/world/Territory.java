@@ -376,34 +376,49 @@ public class Territory{
 
 	public synchronized void printGrid() {
 		System.out.println();
-		for (int y = 0; y < numYSplits; y++) {
+		for (int x = 0; x < numXSplits; x++) {
+			System.out.printf(" %09d",x);
+		}
+		System.out.println();
+		for (int y = numYSplits-1; y >=  0; y--) {
 			for (int x = 0; x < numXSplits; x++) {
 				Player player = grid[x][y].getOwner().getFirst();
+				System.out.print(" ");
 				if(player == null){
-					System.out.print("\t ");
+					System.out.print("__");
 				}
 				else{
-					System.out.print("\t"+player.getPlayerName().substring(0, 1));
+					int last = player.getPlayerName().length();
+					if(last > 2){
+						System.out.print(player.getPlayerName().substring(0, 2));
+					}
+					else if(last == 1){
+						System.out.print(" "+player.getPlayerName().substring(0, 1));
+					}
+					else{
+						System.out.print("??");
+					}
 				}
 				if(grid[x][y].towerPresent()){
-					System.out.print("<t>");
+					System.out.print("T");
 				}
 				else{
-					System.out.print("...");
+					System.out.print("_");
 				}
 				if(grid[x][y].numBombsPresent() != 0 ){
-					System.out.print("<"+grid[x][y].numBombsPresent()+">");
+					System.out.printf("_%02d",grid[x][y].numBombsPresent());
+				}
+				else{
+					System.out.print("___");
+				}
+				
+				
+				// Strength of ownership 
+				if(grid[x][y].getOwner().getSecond() != 0 ){
+					System.out.printf(" %02d",grid[x][y].getOwner().getSecond());
 				}
 				else{
 					System.out.print("...");
-				}
-				
-				
-				if(grid[x][y].getOwner().getSecond() != 0 ){
-					System.out.print(" "+grid[x][y].getOwner().getSecond());
-				}
-				else{
-					System.out.print(" ");
 				}
 			}
 			System.out.println();
