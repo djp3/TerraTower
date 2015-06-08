@@ -14,9 +14,9 @@ public class GyroController : MonoBehaviour
 	private const float lowPassFilterFactor = 0.2f;
 
 	private readonly Quaternion baseIdentity =  Quaternion.Euler(90, 0, 0);
-	private readonly Quaternion landscapeRight =  Quaternion.Euler(0, 0, 90);
-	private readonly Quaternion landscapeLeft =  Quaternion.Euler(0, 0, -90);
-	private readonly Quaternion upsideDown =  Quaternion.Euler(0, 0, 180);
+	//private readonly Quaternion landscapeRight =  Quaternion.Euler(0, 0, 90);
+	//private readonly Quaternion landscapeLeft =  Quaternion.Euler(0, 0, -90);
+	//private readonly Quaternion upsideDown =  Quaternion.Euler(0, 0, 180);
 	
 	private Quaternion cameraBase =  Quaternion.identity;
 	private Quaternion calibration =  Quaternion.identity;
@@ -56,6 +56,11 @@ public class GyroController : MonoBehaviour
 		GUILayout.Label("input.gyro.attitude: " + Input.gyro.attitude);
 		GUILayout.Label("transform.rotation: " + transform.rotation);
 
+		if (GUILayout.Button("Update camera base rotation (Horizontal only)", GUILayout.Height(200)))
+		{
+			UpdateCameraBaseRotation(true);
+		}
+
 		if (GUILayout.Button("On/off gyro: " + Input.gyro.enabled, GUILayout.Height(100)))
 		{
 			Input.gyro.enabled = !Input.gyro.enabled;
@@ -89,12 +94,9 @@ public class GyroController : MonoBehaviour
 			transform.rotation = Quaternion.identity;
 		}
 		
-		if (GUILayout.Button("Update camera base rotation (Horizontal only)", GUILayout.Height(80)))
-		{
-			UpdateCameraBaseRotation(true);
-		}
+
 		
-		if (GUILayout.Button("Close", GUILayout.Height(80)))
+		if (GUILayout.Button("Close", GUILayout.Height(200)))
 		{
 			debug = false;
 		}
