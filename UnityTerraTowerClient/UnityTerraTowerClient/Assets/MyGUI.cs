@@ -27,7 +27,7 @@ public class MyGUI : MonoBehaviour
 
 	/********************  Private hooks to other parts of the environment *****************/
 	/* This is a private hook to the camera that is used to control the view */
-	private GameObject camera;
+	private GameObject myCamera;
 	private MyNetworkHelper myNetworkHelper;
 	private MyLocation myLocation;
 	private GyroController myGyroController;
@@ -124,8 +124,8 @@ public class MyGUI : MonoBehaviour
 		checkNetworkHelper ();
 		checkMyLocation ();
 		checkMyGyroController ();
-		camera = GameObject.Find ("Main Camera");
 
+		myCamera = GameObject.Find ("Main Camera");
 
 		/* get an initial location */
 		lastLat = myLocation.getLat();
@@ -135,7 +135,7 @@ public class MyGUI : MonoBehaviour
 		/* Set the camera components to initial values */
 		fracJourney = 0.0f;
 		destination = new Vector3 (lastLng,  lastAlt + 20, lastLat);
-		origin = new Vector3 (camera.transform.position.x, camera.transform.position.y, camera.transform.position.z);
+		origin = new Vector3 (myCamera.transform.position.x, myCamera.transform.position.y, myCamera.transform.position.z);
 
 
 		/* Add a few default colors */
@@ -295,9 +295,10 @@ public class MyGUI : MonoBehaviour
 						int indexY = int.Parse(_indexY.ToString());
 						float landClaim = float.Parse (_landClaim.ToString());
 						float alt = float.Parse(_alt.ToString());
+						float heightOfThing = landClaim / 5.0f;
 
 						// Set the territory color based on the owner indicated
-						vertices [indexY*numXSplits+indexX].y = landClaim;
+						vertices [indexY*numXSplits+indexX].y = heightOfThing;
 						colors[indexY*numXSplits+indexX] = getOwnerColor(_landOwner.ToString ());
 
 						if(float.IsNaN(alt)){
@@ -306,7 +307,7 @@ public class MyGUI : MonoBehaviour
 
 						//If there is a tower, then create one
 						if(_tower.ToString().Equals ("true")){
-							Object thing = Instantiate(tower,new Vector3(indexX*stepXMeters,landClaim,indexY*stepYMeters),Quaternion.Euler(270,0,0));
+							Object thing = Instantiate(tower,new Vector3(indexX*stepXMeters,heightOfThing,indexY*stepYMeters),Quaternion.Euler(270,0,0));
 							((GameObject)thing).transform.localScale = new Vector3(0.05f,0.05f,0.1f);
 							tempWorld.Add (thing);
 							Debug.Log("Got a tower"+indexX*stepXMeters+" "+alt+" "+indexY*stepYMeters);
@@ -314,7 +315,7 @@ public class MyGUI : MonoBehaviour
 
 						//If there is a bomb, then create one
 						if(_bomb.ToString().Equals ("true")){
-							Object thing = Instantiate(bomb,new Vector3(indexX*stepXMeters,5.0f+landClaim,indexY*stepYMeters),Quaternion.identity);
+							Object thing = Instantiate(bomb,new Vector3(indexX*stepXMeters,5.0f+heightOfThing,indexY*stepYMeters),Quaternion.identity);
 							((GameObject)thing).transform.localScale = new Vector3(5.0f,5.0f,5.0f);
 							tempWorld.Add (thing);
 							Debug.Log("Got a bomb"+indexX*stepXMeters+" "+alt+" "+indexY*stepYMeters);
@@ -537,7 +538,7 @@ public class MyGUI : MonoBehaviour
 	void Update() {
 		if (firstPersonShooter) {
 			if(myMesh != null){
-				double[] thing = MyLocation.Haversine.ComputeLatLng2(originY,originX,camera.transform.position.x,camera.transform.position.z);
+				double[] thing = MyLocation.Haversine.ComputeLatLng2(originY,originX,myCamera.transform.position.x,myCamera.transform.position.z);
 				lastLng = (float)thing[1];
 				lastLat = (float)thing[0];
 				lastAlt = 20.0f;
@@ -558,15 +559,15 @@ public class MyGUI : MonoBehaviour
 					if (lastLat < originY) {
 						ydelta = -ydelta;
 					}
-					destination = new Vector3 ((float)xdelta, lastAlt + 20.0f, (float)ydelta);
-					origin = new Vector3 (camera.transform.position.x, camera.transform.position.y, camera.transform.position.z);
+					destination = new Vector3 ((float)xdelta, lastAlt + 0.0f, (float)ydelta);
+					origin = new Vector3 (myCamera.transform.position.x, myCamera.transform.position.y, myCamera.transform.position.z);
 					fracJourney = 0.0f;
 				}
 
 			} else {
 				if (fracJourney <= 1.0f) {
 					fracJourney += 0.001f;
-					camera.transform.position = Vector3.Lerp (origin, destination, fracJourney);
+					myCamera.transform.position = Vector3.Lerp (origin, destination, fracJourney);
 				}
 			}
 		}
