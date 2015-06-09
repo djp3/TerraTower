@@ -93,9 +93,6 @@ public class HandlerGetLeaderBoard extends HandlerAbstractWorld{
 				}
 				else{
 					leaderBoard = territory.getLeaderBoard();
-					if(leaderBoard == null){
-						errors.add("Problem handling "+request.getCommand()+": leader board was null");
-					}
 				}
 			}
 		}

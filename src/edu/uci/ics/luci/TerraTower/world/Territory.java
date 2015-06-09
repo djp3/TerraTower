@@ -616,11 +616,11 @@ public class Territory{
 
 
 	@Override
-	public int hashCode() {
+	public synchronized int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		long temp;
-		temp = Double.doubleToLongBits(bottom);
+		temp = Double.doubleToLongBits(getBottom());
 		//System.err.println("1:"+result);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		//System.err.println("2:"+result);
@@ -629,31 +629,31 @@ public class Territory{
 		result = prime * result
 				+ ((leaderBoard == null) ? 0 : leaderBoard.hashCode());
 		//System.err.println("4:"+result);
-		result = prime * result + (leaderBoardOutdated ? 1231 : 1237);
+		result = prime * result + (isLeaderBoardOutdated() ? 1231 : 1237);
 		//System.err.println("5:"+result);
-		temp = Double.doubleToLongBits(left);
+		temp = Double.doubleToLongBits(getLeft());
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		//System.err.println("6:"+result);
-		result = prime * result + numXSplits;
+		result = prime * result + getNumXSplits();
 		//System.err.println("7:"+result);
-		result = prime * result + numYSplits;
+		result = prime * result + getNumYSplits();
 		//System.err.println("8:"+result);
-		temp = Double.doubleToLongBits(right);
+		temp = Double.doubleToLongBits(getRight());
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		//System.err.println("9:"+result);
-		temp = Double.doubleToLongBits(stepX);
+		temp = Double.doubleToLongBits(getStepX());
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		//System.err.println("10:"+result);
-		temp = Double.doubleToLongBits(stepXMeters);
+		temp = Double.doubleToLongBits(getStepXMeters());
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		//System.err.println("11:"+result);
-		temp = Double.doubleToLongBits(stepY);
+		temp = Double.doubleToLongBits(getStepY());
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		//System.err.println("12:"+result);
-		temp = Double.doubleToLongBits(stepYMeters);
+		temp = Double.doubleToLongBits(getStepYMeters());
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		//System.err.println("13:"+result);
-		temp = Double.doubleToLongBits(top);
+		temp = Double.doubleToLongBits(getTop());
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		//System.err.println("14:"+result);
 		return result;
@@ -661,7 +661,7 @@ public class Territory{
 
 
 	@Override
-	public boolean equals(Object obj) {
+	public synchronized boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -672,8 +672,8 @@ public class Territory{
 			return false;
 		}
 		Territory other = (Territory) obj;
-		if (Double.doubleToLongBits(bottom) != Double
-				.doubleToLongBits(other.bottom)) {
+		if (Double.doubleToLongBits(getBottom()) != Double
+				.doubleToLongBits(other.getBottom())) {
 			return false;
 		}
 		if (!Arrays.deepEquals(grid, other.grid)) {
@@ -686,40 +686,40 @@ public class Territory{
 		} else if (!leaderBoard.equals(other.leaderBoard)) {
 			return false;
 		}
-		if (leaderBoardOutdated != other.leaderBoardOutdated) {
+		if (isLeaderBoardOutdated() != other.isLeaderBoardOutdated()) {
 			return false;
 		}
-		if (Double.doubleToLongBits(left) != Double
-				.doubleToLongBits(other.left)) {
+		if (Double.doubleToLongBits(getLeft()) != Double
+				.doubleToLongBits(other.getLeft())) {
 			return false;
 		}
-		if (numXSplits != other.numXSplits) {
+		if (getNumXSplits() != other.getNumXSplits()) {
 			return false;
 		}
-		if (numYSplits != other.numYSplits) {
+		if (getNumYSplits() != other.getNumYSplits()) {
 			return false;
 		}
-		if (Double.doubleToLongBits(right) != Double
-				.doubleToLongBits(other.right)) {
+		if (Double.doubleToLongBits(getRight()) != Double
+				.doubleToLongBits(other.getRight())) {
 			return false;
 		}
-		if (Double.doubleToLongBits(stepX) != Double
-				.doubleToLongBits(other.stepX)) {
+		if (Double.doubleToLongBits(getStepX()) != Double
+				.doubleToLongBits(other.getStepX())) {
 			return false;
 		}
-		if (Double.doubleToLongBits(stepXMeters) != Double
-				.doubleToLongBits(other.stepXMeters)) {
+		if (Double.doubleToLongBits(getStepXMeters()) != Double
+				.doubleToLongBits(other.getStepXMeters())) {
 			return false;
 		}
-		if (Double.doubleToLongBits(stepY) != Double
-				.doubleToLongBits(other.stepY)) {
+		if (Double.doubleToLongBits(getStepY()) != Double
+				.doubleToLongBits(other.getStepY())) {
 			return false;
 		}
-		if (Double.doubleToLongBits(stepYMeters) != Double
-				.doubleToLongBits(other.stepYMeters)) {
+		if (Double.doubleToLongBits(getStepYMeters()) != Double
+				.doubleToLongBits(other.getStepYMeters())) {
 			return false;
 		}
-		if (Double.doubleToLongBits(top) != Double.doubleToLongBits(other.top)) {
+		if (Double.doubleToLongBits(getTop()) != Double.doubleToLongBits(other.getTop())) {
 			return false;
 		}
 		return true;

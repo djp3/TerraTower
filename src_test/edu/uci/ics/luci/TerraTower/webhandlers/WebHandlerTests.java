@@ -30,9 +30,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
@@ -151,7 +149,7 @@ public class WebHandlerTests {
 	}
 	
 	public TTEventWrapperQueuer startATestSystem(){
-		List<TTEventWrapper> events = new ArrayList<TTEventWrapper>();
+		//List<TTEventWrapper> events = new ArrayList<TTEventWrapper>();
 		
 		String logFileName = "test/test_"+this.getClass().getCanonicalName();     
 		
@@ -166,7 +164,7 @@ public class WebHandlerTests {
 		ResultChecker resultChecker = new ResultChecker(false);
 		TTEventWrapper event = new TTEventWrapper(TTEventType.CREATE_WORLD,ttEvent1,resultChecker);
 		
-		events.add(event);
+		//events.add(event);
 		
 		eventPublisher.onData(event);
 		synchronized(resultChecker.getSemaphore()){
@@ -188,7 +186,7 @@ public class WebHandlerTests {
 		TTEventCreateTerritory ttEvent2 = new TTEventCreateTerritory(worldName,worldPassword,-117.8442599,-117.8411751,100,33.6446338,33.6472217,100);
 		resultChecker = new ResultChecker(false);
 		event = new TTEventWrapper(TTEventType.CREATE_TERRITORY,ttEvent2,resultChecker);
-		events.add(event);
+		//events.add(event);
 		eventPublisher.onData(event);
 		synchronized(resultChecker.getSemaphore()){
 			while(resultChecker.getResultOK() == null){
@@ -210,7 +208,7 @@ public class WebHandlerTests {
 		TTEventCreatePlayer ttEvent3 = new TTEventCreatePlayer(worldName,worldPassword,playerName,playerPassword);
 		resultChecker = new ResultChecker(false);
 		event = new TTEventWrapper(TTEventType.CREATE_PLAYER,ttEvent3,resultChecker);
-		events.add(event);
+		//events.add(event);
 		eventPublisher.onData(event);
 		synchronized(resultChecker.getSemaphore()){
 			while(resultChecker.getResultOK() == null){
@@ -232,7 +230,7 @@ public class WebHandlerTests {
 		TTEventCreatePowerUp ttEvent8 = new TTEventCreatePowerUp(worldName,worldPassword,"code",-1000L,-1000L,-1000L);
 		resultChecker = new ResultChecker(false);
 		event = new TTEventWrapper(TTEventType.CREATE_POWER_UP,ttEvent8,resultChecker);
-		events.add(event);
+		//events.add(event);
 		eventPublisher.onData(event);
 		synchronized(resultChecker.getSemaphore()){
 			while(resultChecker.getResultOK() == null){
@@ -864,10 +862,6 @@ public class WebHandlerTests {
 			}
 			throw e;
 		}
-		
-		
-		
-		
 		
 		
 		responseString = null;

@@ -32,12 +32,15 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
 import edu.uci.ics.luci.TerraTower.PasswordUtils;
 
 public class PlayerTest {
 	
 	static final String playerName = "name"+System.currentTimeMillis();
 	static final String playerPassword = "password"+System.currentTimeMillis();
+	
+	final static String TEST_VERSION ="-999";
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -49,10 +52,13 @@ public class PlayerTest {
 
 	@Before
 	public void setUp() throws Exception {
+		GlobalsTerraTower globals = new GlobalsTerraTower(TEST_VERSION,true);
+		GlobalsTerraTower.setGlobals(globals);
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		GlobalsTerraTower.setGlobals(null);
 	}
 
 	@Test

@@ -21,8 +21,6 @@
 package edu.uci.ics.luci.TerraTower.webhandlers;
 
 
-import java.net.InetAddress;
-import java.util.Map;
 import java.util.Set;
 
 import net.minidev.json.JSONArray;
@@ -34,7 +32,6 @@ import org.apache.logging.log4j.Logger;
 import edu.uci.ics.luci.TerraTower.TTEventWrapperQueuer;
 import edu.uci.ics.luci.TerraTower.events.TTEventRedeemPowerUp;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
-import edu.uci.ics.luci.utility.datastructure.Pair;
 import edu.uci.ics.luci.utility.webserver.handlers.HandlerAbstract;
 import edu.uci.ics.luci.utility.webserver.input.request.Request;
 import edu.uci.ics.luci.utility.webserver.output.channel.Output;
