@@ -32,8 +32,8 @@ import org.junit.Test;
 
 import edu.uci.ics.luci.TerraTower.GlobalsTerraTower;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
-import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
 import edu.uci.ics.luci.TerraTower.events.TTEventBuildTower;
+import edu.uci.ics.luci.TerraTower.events.TTEventCreatePlayer;
 import edu.uci.ics.luci.TerraTower.world.Territory;
 import edu.uci.ics.luci.TerraTower.world.WorldManager;
 import edu.uci.ics.luci.utility.Globals;
@@ -113,21 +113,21 @@ public class TTEventHandlerBuildTowerTest {
 		
 		/*Out of bounds x */
 		event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,lat,-190.0,alt);
-		tt.player.setLastTowerPlacedTime(-1 - g.DEFAULT_TOWER_DELAY);
+		tt.player.setLastTowerPlacedTime(-1 - g.getTowerDelay());
 		json = tt.checkParameters(0,event);
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
 		
 		/*Out of bounds x */
 		event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,-100.0,lng,alt);
-		tt.player.setLastTowerPlacedTime(-1 - g.DEFAULT_TOWER_DELAY);
+		tt.player.setLastTowerPlacedTime(-1 - g.getTowerDelay());
 		json = tt.checkParameters(0,event);
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
 		
 		/*Ok */
 		event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-		tt.player.setLastTowerPlacedTime(-1 - g.DEFAULT_TOWER_DELAY);
+		tt.player.setLastTowerPlacedTime(-1 - g.getTowerDelay());
 		json = tt.checkParameters(0,event);
 		assertTrue(json == null);
 		
@@ -138,7 +138,7 @@ public class TTEventHandlerBuildTowerTest {
 		
 		/* Fail for existing tower */
 		event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-		tt.player.setLastTowerPlacedTime(-1 - g.DEFAULT_TOWER_DELAY);
+		tt.player.setLastTowerPlacedTime(-1 - g.getTowerDelay());
 		json = tt.checkParameters(0,event);
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
@@ -172,7 +172,7 @@ public class TTEventHandlerBuildTowerTest {
 		
 		/*Ok */
 		event = new TTEventBuildTower(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-		tt.player.setLastTowerPlacedTime(-1 - g.DEFAULT_TOWER_DELAY);
+		tt.player.setLastTowerPlacedTime(-1 - g.getTowerDelay());
 		json = tt.checkParameters(0,event);
 		assertTrue(json == null);
 		

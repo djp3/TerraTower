@@ -51,13 +51,15 @@ public class GlobalsTerraTower extends Globals {
 	
 	static final long ONE_SECOND = 1000;
 	static final long ONE_MINUTE = 60 * ONE_SECOND;
-	public static final long DEFAULT_TOWER_DELAY = 5 * ONE_MINUTE;
-	public static final long DEFAULT_BOMB_DELAY = 5 * ONE_MINUTE;
-
-	public static final long DEFAULT_BOMB_FUSE = 5 * ONE_MINUTE;
-
-	public static final int DEFAULT_TOWER_STRENGTH = 10;
 	
+	private long _DEFAULT_TOWER_DELAY = 5 * ONE_MINUTE;
+	private long towerDelay = _DEFAULT_TOWER_DELAY;
+	private long _DEFAULT_BOMB_DELAY = 5 * ONE_MINUTE;
+	private long bombDelay = _DEFAULT_BOMB_DELAY;
+	private long _DEFAULT_BOMB_FUSE = 5 * ONE_MINUTE;
+	private long bombFuse = _DEFAULT_BOMB_FUSE;
+	private int _DEFAULT_TOWER_STRENGTH = 10;
+	private int towerStrength = _DEFAULT_TOWER_STRENGTH;
 
 	private static transient volatile Logger log = null;
 	public static Logger getLog(){
@@ -89,6 +91,46 @@ public class GlobalsTerraTower extends Globals {
 	public static GlobalsTerraTower getGlobalsTerraTower(){
 		return (GlobalsTerraTower) Globals.getGlobals();
 	}
+	
+	
+	/* Tower Delay is the amount of time between successive placement of towers */
+	public void setTowerDelay(long towerDelay){
+		this.towerDelay = towerDelay;
+	}
+	
+	public long getTowerDelay(){
+		return towerDelay;
+	}
+	
+	/* Tower Strength is the max land claim they can make */
+	public void setTowerStrength(int towerStrength){
+		this.towerStrength = towerStrength;
+	}
+	
+	public int getTowerStrength(){
+		return towerStrength;
+	}
+	
+	/* Bomb Delay is the amount of time between successive placement of bombs */
+	public void setBombDelay(long bombDelay){
+		this.bombDelay = bombDelay;
+	}
+	
+	public long getBombDelay(){
+		return bombDelay;
+	}
+	
+	/* Bomb Fuse is the amount of time before a bomb blows up */
+	public void setBombFuse(long bombFuse){
+		this.bombFuse = bombFuse;
+	}
+	
+	public long getBombFuse(){
+		return bombFuse;
+	}
+	
+	
+	
 	
 	
 
