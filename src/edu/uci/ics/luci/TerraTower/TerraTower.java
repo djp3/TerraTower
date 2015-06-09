@@ -24,6 +24,8 @@ package edu.uci.ics.luci.TerraTower;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -46,6 +48,7 @@ import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.TTEventStepTowerTerritoryGrowth;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
+import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerBuildTower;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerDropBomb;
@@ -53,6 +56,7 @@ import edu.uci.ics.luci.TerraTower.webhandlers.HandlerGetGameState;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerGetLeaderBoard;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerRedeemPowerUp;
 import edu.uci.ics.luci.utility.Globals;
+import edu.uci.ics.luci.utility.datastructure.Pair;
 import edu.uci.ics.luci.utility.webserver.AccessControl;
 import edu.uci.ics.luci.utility.webserver.RequestDispatcher;
 import edu.uci.ics.luci.utility.webserver.WebServer;
@@ -120,7 +124,12 @@ public class TerraTower {
 		Configuration config = new PropertiesConfiguration( "TerraTower.properties");
 
 		/* Set up the global variable */
-		Globals.setGlobals(new GlobalsTerraTower(VERSION,false));
+		GlobalsTerraTower globalsTerraTower = new GlobalsTerraTower(VERSION,false);
+		globalsTerraTower.setTowerDelay(config.getLong("tower.delay"));
+		globalsTerraTower.setTowerStrength(config.getInt("tower.strength"));
+		globalsTerraTower.setBombDelay(config.getLong("bomb.delay"));
+		globalsTerraTower.setBombFuse(config.getLong("bomb.fuse"));
+		Globals.setGlobals(globalsTerraTower);
 		
 		/* Set up an event queue with logging */
 		String logFileName = config.getString("event.logfile");
@@ -235,10 +244,10 @@ public class TerraTower {
 			return;
 		}
 
-		
 		long clockStep = config.getLong("clock.step");
 		/* Start the game server */
 		long lastTime = System.currentTimeMillis();
+		long startTime = lastTime;
 		while(!Globals.getGlobals().isQuitting()){
 			/*In case Thread.sleep is interrupted we wrap in a loop */
 			
@@ -270,7 +279,33 @@ public class TerraTower {
 			
 				lastTime = System.currentTimeMillis();
 				
-				((GlobalsTerraTower)Globals.getGlobals()).getWorld(worldName, worldPassword).getTerritory().printGrid();
+				
+				/*Print out stats */
+				//((GlobalsTerraTower)Globals.getGlobals()).getWorld(worldName, worldPassword).getTerritory().printGrid();
+				//Leaderboard good for importing to a spreadsheet
+				List<Pair<Integer, Player>> leaderBoard = ((GlobalsTerraTower)Globals.getGlobals()).getWorld(worldName, worldPassword).getTerritory().getLeaderBoard();
+				TreeMap<String,Integer> reorg = new TreeMap<String,Integer>();
+				for(Pair<Integer, Player> p:leaderBoard){
+					reorg.put(p.getSecond().getPlayerName(), p.getFirst());
+				}
+				StringBuilder sb = new StringBuilder();
+				sb.append((lastTime-startTime)+"");
+				for(Entry<String, Integer> e :reorg.entrySet()){
+					sb.append(",\""+e.getKey()+"\"");
+				}
+				sb.append("\n");
+				sb.append((lastTime-startTime)+"");
+				for(Entry<String, Integer> e :reorg.entrySet()){
+					sb.append(","+e.getValue()+"");
+				}
+				sb.append("\n");
+				System.out.println(sb.toString());
+				
+				//Leaderboard good for figuring out the leader 
+				List<Pair<Integer, Player>> l = leaderBoard;
+				for(Pair<Integer, Player> p:l){
+					System.out.println(p.getSecond().getPlayerName()+":"+p.getFirst());
+				}
 			}
 		}
 		getLog().info("TerraTower shutdown");
