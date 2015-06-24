@@ -1,5 +1,5 @@
 /*
-	Copyright 2014
+	Copyright 2014-2015
 		University of California, Irvine (c/o Donald J. Patterson)
 */
 /*
@@ -21,7 +21,6 @@
 package edu.uci.ics.luci.TerraTower.webhandlers;
 
 
-import java.net.InetAddress;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,9 +36,11 @@ import edu.uci.ics.luci.TerraTower.world.GridCell;
 import edu.uci.ics.luci.TerraTower.world.Territory;
 import edu.uci.ics.luci.TerraTower.world.WorldManager;
 import edu.uci.ics.luci.utility.datastructure.Pair;
-import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
-import edu.uci.ics.luci.utility.webserver.RequestDispatcher.HTTPRequest;
+import edu.uci.ics.luci.utility.webserver.handlers.HandlerAbstract;
 import edu.uci.ics.luci.utility.webserver.handlers.HandlerVersion;
+import edu.uci.ics.luci.utility.webserver.input.request.Request;
+import edu.uci.ics.luci.utility.webserver.output.channel.Output;
+import edu.uci.ics.luci.utility.webserver.output.response.Response;
 
 public class HandlerGetGameState extends HandlerAbstractPlayer{
 	
@@ -51,7 +52,7 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 		return log;
 	}
 	
-	static Map<Pair<String, Integer>, Pair<byte[], byte[]>> responseCache = Collections.synchronizedMap(new HashMap<Pair<String, Integer>,Pair<byte[],byte[]>>());
+	static Map<Pair<String, Integer>, Response> responseCache = Collections.synchronizedMap(new HashMap<Pair<String, Integer>,Response>());
 	static Map<String,Pair<String,Integer>> responseCacheKey = Collections.synchronizedMap(new HashMap<String, Pair<String, Integer>>());
 
 	public HandlerGetGameState() {
@@ -68,46 +69,49 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 	 * @return a pair where the first element is the content type and the bytes are the output bytes to send back
 	 */
 	@Override
-	public Pair<byte[], byte[]> handle(InetAddress ip, HTTPRequest httpRequestType, Map<String, String> headers, String restFunction, Map<String, String> parameters) {
-		Pair<byte[], byte[]> pair = null;
+	public Response handle(Request request, Output o) {
+		
+		JSONObject ret = new JSONObject();
+		
+		Response response = o.makeOutputChannelResponse();
 		long time = System.currentTimeMillis();
 		
-
 		JSONArray errors = new JSONArray();
 		
-		errors.addAll(getWorldParameters(restFunction,parameters));
-		errors.addAll(getPlayerParameters(restFunction,parameters));
+		errors.addAll(getWorldParameters(request.getCommand(),request.getParameters()));
+		errors.addAll(getPlayerParameters(request.getCommand(),request.getParameters()));
 		
 		GlobalsTerraTower globalsTerraTower = GlobalsTerraTower.getGlobalsTerraTower();
 		Territory territory = null;
 		if(globalsTerraTower == null){
-			errors.add("Problem handling "+restFunction+": globals was null");
+			errors.add("Problem handling "+request.getCommand()+": globals was null");
 		}
 		else{
 			WorldManager world = globalsTerraTower.getWorld(getWorldName(), getWorldPassword());
 			if(world == null){
-				errors.add("Problem handling "+restFunction+": world manager was null");
+				errors.add("Problem handling "+request.getCommand()+": world manager was null");
 			}
 			else{
 				territory = world.getTerritory();
 				if(territory == null){
-					errors.add("Problem handling "+restFunction+": territory was null");
+					errors.add("Problem handling "+request.getCommand()+": territory was null");
 				}
 			}
 		}
 		
 		
-		JSONObject ret = new JSONObject();
 		if(errors.size() != 0){
 			ret.put("error", "true");
 			ret.put("errors", errors);
-			pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toJSONString()).getBytes());
+			response.setStatus(Response.Status.OK);
+			response.setDataType(Response.DataType.JSON);
+			response.setBody(wrapCallback(request.getParameters(),ret.toString()));
 		}
 		else{
 			Pair<String, Integer> p = new Pair<String,Integer>(getPlayerName(),territory.hashCode());
 			if(responseCache.containsKey(p)){
 				getLog().info("Cache Hit:"+responseCache.size()+" entries,"+responseCacheKey.size()+" key entries");
-				pair = responseCache.get(p);
+				response = responseCache.get(p);
 			}
 			else{
 				getLog().info("Cache Miss:"+responseCache.size()+" entries,"+responseCacheKey.size()+" key entries");
@@ -119,15 +123,17 @@ public class HandlerGetGameState extends HandlerAbstractPlayer{
 				}
 				/* Make the new response */
 				ret = constructJSON(territory,getPlayerName());
-				pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toJSONString()).getBytes());
+				response.setStatus(Response.Status.OK);
+				response.setDataType(Response.DataType.JSON);
+				response.setBody(wrapCallback(request.getParameters(),ret.toString()));
 				/* Store it in the cache */
 				responseCacheKey.put(getPlayerName(), p);
-				responseCache.put(p,pair);
+				responseCache.put(p,response);
 			}
 		}
 		
 		getLog().info("Done handling get_game_state "+(System.currentTimeMillis()-time));
-		return pair;
+		return response;
 	}
 
 	static public JSONObject constructJSON(Territory territory,String playerName) {

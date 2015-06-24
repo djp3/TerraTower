@@ -1,5 +1,5 @@
 /*
-	Copyright 2014
+	Copyright 2014-2015
 		University of California, Irvine (c/o Donald J. Patterson)
 */
 /*
@@ -173,9 +173,9 @@ public class TTEventHandlerRedeemPowerUpTest {
 			throw e;
 		}
 		
-		event3 = new TTEventCreatePowerUp(worldName,worldPassword,"code3",-GlobalsTerraTower.DEFAULT_TOWER_DELAY,
-				-GlobalsTerraTower.DEFAULT_BOMB_DELAY,
-				-GlobalsTerraTower.DEFAULT_BOMB_FUSE);
+		event3 = new TTEventCreatePowerUp(worldName,worldPassword,"code3",-g.getTowerDelay(),
+				-g.getBombDelay(),
+				-g.getBombFuse());
 		json = tt3.checkParameters(0,event3);
 		try{
 			assertTrue(json == null);

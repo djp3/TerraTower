@@ -1,5 +1,5 @@
 /*
-	Copyright 2014
+	Copyright 2014-2015
 		University of California, Irvine (c/o Donald J. Patterson)
 */
 /*
@@ -72,12 +72,12 @@ public class Player implements Comparable<Player>{
 	}
 
 
-	public synchronized  long getBombDelay() {
+	public synchronized long getBombDelay() {
 		return bombDelay;
 	}
 
 
-	public synchronized  void setBombDelay(long bombDelay) {
+	public synchronized void setBombDelay(long bombDelay) {
 		this.bombDelay = bombDelay;
 	}
 
@@ -125,11 +125,11 @@ public class Player implements Comparable<Player>{
 	public Player(String playerName,byte[] hashedPassword){
 		this.setPlayerName(playerName);
 		this.setHashedPassword(hashedPassword);
-		this.setTowerDelay(GlobalsTerraTower.DEFAULT_TOWER_DELAY);
+		this.setTowerDelay(((GlobalsTerraTower) GlobalsTerraTower.getGlobals()).getTowerDelay());
 		this.setLastTowerPlacedTime(0);
-		this.setBombDelay(GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		this.setBombDelay(((GlobalsTerraTower)GlobalsTerraTower.getGlobals()).getBombDelay());
 		this.setLastBombPlacedTime(0);
-		this.setBombFuse(GlobalsTerraTower.DEFAULT_BOMB_FUSE);
+		this.setBombFuse(((GlobalsTerraTower)GlobalsTerraTower.getGlobals()).getBombFuse());
 	}
 
 
@@ -150,7 +150,7 @@ public class Player implements Comparable<Player>{
 
 
 	@Override
-	public int hashCode() {
+	public synchronized int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (bombDelay ^ (bombDelay >>> 32));
@@ -168,7 +168,7 @@ public class Player implements Comparable<Player>{
 
 
 	@Override
-	public boolean equals(Object obj) {
+	public synchronized boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -179,29 +179,29 @@ public class Player implements Comparable<Player>{
 			return false;
 		}
 		Player other = (Player) obj;
-		if (bombDelay != other.bombDelay) {
+		if (getBombDelay() != other.getBombDelay()) {
 			return false;
 		}
-		if (bombFuse != other.bombFuse) {
+		if (getBombFuse() != other.getBombFuse()) {
 			return false;
 		}
-		if (!Arrays.equals(hashedPassword, other.hashedPassword)) {
+		if (!Arrays.equals(getHashedPassword(), other.getHashedPassword())) {
 			return false;
 		}
-		if (lastBombPlacedTime != other.lastBombPlacedTime) {
+		if (getLastBombPlacedTime() != other.getLastBombPlacedTime()) {
 			return false;
 		}
-		if (lastTowerPlacedTime != other.lastTowerPlacedTime) {
+		if (getLastTowerPlacedTime() != other.getLastTowerPlacedTime()) {
 			return false;
 		}
-		if (playerName == null) {
-			if (other.playerName != null) {
+		if (getPlayerName() == null) {
+			if (other.getPlayerName() != null) {
 				return false;
 			}
-		} else if (!playerName.equals(other.playerName)) {
+		} else if (!getPlayerName().equals(other.getPlayerName())) {
 			return false;
 		}
-		if (towerDelay != other.towerDelay) {
+		if (getTowerDelay() != other.getTowerDelay()) {
 			return false;
 		}
 		return true;
@@ -209,7 +209,7 @@ public class Player implements Comparable<Player>{
 
 
 	@Override
-	public synchronized  int compareTo(Player o) {
+	public synchronized int compareTo(Player o) {
 		int x;
 		
 		if(this.getPlayerName() == null){

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project TerraTower with Jar-in-Jar Loader">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="/Users/djp3/Downloads/TerraTower.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="edu.uci.ics.luci.TerraTower.TerraTower"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./ luci-utility.jar junit.jar org.hamcrest.core_1.1.0.v20090501071000.jar commons-configuration-1.10.jar commons-lang-2.6.jar commons-logging-1.1.1.jar annotations-1.3.2.jar log4j-api-2.0-rc1.jar json-smart-2.0-RC3.jar asm-1.0-RC3.jar asm-3.3.1.jar log4j-core-2.0-rc1.jar disruptor-3.2.1.jar httpclient-4.3.6.jar httpcore-4.3.3.jar commons-codec-1.6.jar sqlite4java-1.0.392.jar"/>
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <fileset dir="/Users/djp3/git/TerraTower/target/classes"/>
+            <zipfileset dir="/Users/djp3/git/luci-utility" includes="luci-utility.jar"/>
+            <zipfileset dir="/Applications/eclipse/plugins/org.junit_4.10.0.v4_10_0_v20120426-0900" includes="junit.jar"/>
+            <zipfileset dir="/Applications/eclipse/plugins" includes="org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/commons-configuration/commons-configuration/1.10" includes="commons-configuration-1.10.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/commons-lang/commons-lang/2.6" includes="commons-lang-2.6.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/commons-logging/commons-logging/1.1.1" includes="commons-logging-1.1.1.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/net/sourceforge/findbugs/annotations/1.3.2" includes="annotations-1.3.2.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/org/apache/logging/log4j/log4j-api/2.0-rc1" includes="log4j-api-2.0-rc1.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/net/minidev/json-smart/2.0-RC3" includes="json-smart-2.0-RC3.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/net/minidev/asm/1.0-RC3" includes="asm-1.0-RC3.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/asm/asm/3.3.1" includes="asm-3.3.1.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/org/apache/logging/log4j/log4j-core/2.0-rc1" includes="log4j-core-2.0-rc1.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/com/lmax/disruptor/3.2.1" includes="disruptor-3.2.1.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/org/apache/httpcomponents/httpclient/4.3.6" includes="httpclient-4.3.6.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/org/apache/httpcomponents/httpcore/4.3.3" includes="httpcore-4.3.3.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/commons-codec/commons-codec/1.6" includes="commons-codec-1.6.jar"/>
+            <zipfileset dir="/Users/djp3/.m2/repository/com/almworks/sqlite4java/sqlite4java/1.0.392" includes="sqlite4java-1.0.392.jar"/>
+        </jar>
+    </target>
+</project>

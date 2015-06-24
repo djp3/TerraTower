@@ -1,10 +1,10 @@
 package edu.uci.ics.luci.TerraTower.webhandlers;
 
 import java.util.Map;
-
-import edu.uci.ics.luci.TerraTower.TTEventWrapperQueuer;
+import java.util.Set;
 
 import net.minidev.json.JSONArray;
+import edu.uci.ics.luci.TerraTower.TTEventWrapperQueuer;
 
 public abstract class HandlerAbstractPlayer extends HandlerAbstractWorld{
 	
@@ -23,16 +23,16 @@ public abstract class HandlerAbstractPlayer extends HandlerAbstractWorld{
 	protected String getPlayerName() {
 		return playerName;
 	}
-
-	protected JSONArray getPlayerParameters(String restFunction,Map<String,String> parameters){
+	
+	protected JSONArray getPlayerParameters(String restFunction,Map<String,Set<String>> parameters){
 		JSONArray errors = new JSONArray();
 		
-		playerName = parameters.get("player_name");
-		if(playerName == null){
+		Set<String> _playerName = parameters.get("player_name");
+		if((_playerName == null) || ((playerName = (_playerName.iterator().next()))==null)){
 			errors.add("Problem handling "+restFunction+": player_name was null");
 		}
-		playerPassword = parameters.get("player_password");
-		if(playerPassword == null){
+		Set<String> _playerPassword = parameters.get("player_password");
+		if((_playerPassword == null) || ((playerPassword = (_playerPassword.iterator().next()))==null)){
 			errors.add("Problem handling "+restFunction+": player_password was null");
 		}
 		return errors;

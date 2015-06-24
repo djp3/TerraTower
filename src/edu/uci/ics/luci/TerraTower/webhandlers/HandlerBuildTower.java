@@ -1,5 +1,5 @@
 /*
-	Copyright 2014
+	Copyright 2014-2015
 		University of California, Irvine (c/o Donald J. Patterson)
 */
 /*
@@ -21,9 +21,6 @@
 package edu.uci.ics.luci.TerraTower.webhandlers;
 
 
-import java.net.InetAddress;
-import java.util.Map;
-
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
@@ -33,10 +30,11 @@ import org.apache.logging.log4j.Logger;
 import edu.uci.ics.luci.TerraTower.TTEventWrapperQueuer;
 import edu.uci.ics.luci.TerraTower.events.TTEventBuildTower;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
-import edu.uci.ics.luci.utility.datastructure.Pair;
-import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
-import edu.uci.ics.luci.utility.webserver.RequestDispatcher.HTTPRequest;
+import edu.uci.ics.luci.utility.webserver.handlers.HandlerAbstract;
 import edu.uci.ics.luci.utility.webserver.handlers.HandlerVersion;
+import edu.uci.ics.luci.utility.webserver.input.request.Request;
+import edu.uci.ics.luci.utility.webserver.output.channel.Output;
+import edu.uci.ics.luci.utility.webserver.output.response.Response;
 
 public class HandlerBuildTower extends HandlerAbstractLocation {
 	
@@ -62,16 +60,18 @@ public class HandlerBuildTower extends HandlerAbstractLocation {
 	 * @return a pair where the first element is the content type and the bytes are the output bytes to send back
 	 */
 	@Override
-	public Pair<byte[], byte[]> handle(InetAddress ip, HTTPRequest httpRequestType, Map<String, String> headers, String restFunction, Map<String, String> parameters) {
-		Pair<byte[], byte[]> pair = null;
+	public Response handle(Request request, Output o) {
+		
+		JSONObject ret = new JSONObject();
+		
+		Response response = o.makeOutputChannelResponse();
 		
 		JSONArray errors = new JSONArray();
 		
-		errors.addAll(getWorldParameters(restFunction,parameters));
-		errors.addAll(getPlayerParameters(restFunction,parameters));
-		errors.addAll(getLocationParameters(restFunction,parameters));
+		errors.addAll(getWorldParameters(request.getCommand(),request.getParameters()));
+		errors.addAll(getPlayerParameters(request.getCommand(),request.getParameters()));
+		errors.addAll(getLocationParameters(request.getCommand(),request.getParameters()));
 		
-		JSONObject ret = new JSONObject();
 		if(errors.size() != 0){
 			ret.put("error", "true");
 			ret.put("errors", errors);
@@ -81,8 +81,11 @@ public class HandlerBuildTower extends HandlerAbstractLocation {
 			ret = this.queueEvent(TTEventType.BUILD_TOWER, tt);
 		}
 		
-		pair = new Pair<byte[],byte[]>(HandlerAbstract.getContentTypeHeader_JSON(),wrapCallback(parameters,ret.toString()).getBytes());
-		return pair;
+		response.setStatus(Response.Status.OK);
+		response.setDataType(Response.DataType.JSON);
+		response.setBody(wrapCallback(request.getParameters(),ret.toString()));
+		
+		return response;
 	}
 }
 

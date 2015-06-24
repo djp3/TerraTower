@@ -1,5 +1,5 @@
 /*
-	Copyright 2014
+	Copyright 2014-2015
 		University of California, Irvine (c/o Donald J. Patterson)
 */
 /*
@@ -164,7 +164,11 @@ public class GridCell {
 			list = new ArrayList<Bomb>();
 		}
 		list.add(bomb);
-		bombs.put(bomb.getExplosionTime(),list);
+		try{
+			bombs.put(bomb.getExplosionTime(),list);
+		} catch (IllegalArgumentException e){
+			getLog().error("This is just here to debug");
+		}
 		int size2 = numBombsPresent();
 		return (size2 == (size+1));
 	}

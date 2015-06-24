@@ -1,5 +1,5 @@
 /*
-	Copyright 2014
+	Copyright 2014-2015
 		University of California, Irvine (c/o Donald J. Patterson)
 */
 /*
@@ -24,6 +24,8 @@ package edu.uci.ics.luci.TerraTower;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -46,24 +48,27 @@ import edu.uci.ics.luci.TerraTower.events.TTEventCreateTerritory;
 import edu.uci.ics.luci.TerraTower.events.TTEventCreateWorld;
 import edu.uci.ics.luci.TerraTower.events.TTEventStepTowerTerritoryGrowth;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
+import edu.uci.ics.luci.TerraTower.gameElements.Player;
 import edu.uci.ics.luci.TerraTower.gameElements.PowerUp;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerBuildTower;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerDropBomb;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerGetGameState;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerGetLeaderBoard;
 import edu.uci.ics.luci.TerraTower.webhandlers.HandlerRedeemPowerUp;
-import edu.uci.ics.luci.TerraTower.webhandlers.HandlerShutdown;
 import edu.uci.ics.luci.utility.Globals;
+import edu.uci.ics.luci.utility.datastructure.Pair;
 import edu.uci.ics.luci.utility.webserver.AccessControl;
-import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
 import edu.uci.ics.luci.utility.webserver.RequestDispatcher;
 import edu.uci.ics.luci.utility.webserver.WebServer;
+import edu.uci.ics.luci.utility.webserver.handlers.HandlerAbstract;
+import edu.uci.ics.luci.utility.webserver.handlers.HandlerShutdown;
 import edu.uci.ics.luci.utility.webserver.handlers.HandlerVersion;
+import edu.uci.ics.luci.utility.webserver.input.channel.socket.HTTPInputOverSocket;
 
 public class TerraTower {
 	private static int port = 9021;
 	
-	public final static String VERSION="0.1";
+	public final static String VERSION="0.2";
 
 	private static transient volatile Logger log = null;
 
@@ -119,7 +124,12 @@ public class TerraTower {
 		Configuration config = new PropertiesConfiguration( "TerraTower.properties");
 
 		/* Set up the global variable */
-		Globals.setGlobals(new GlobalsTerraTower(VERSION,false));
+		GlobalsTerraTower globalsTerraTower = new GlobalsTerraTower(VERSION,false);
+		globalsTerraTower.setTowerDelay(config.getLong("tower.delay"));
+		globalsTerraTower.setTowerStrength(config.getInt("tower.strength"));
+		globalsTerraTower.setBombDelay(config.getLong("bomb.delay"));
+		globalsTerraTower.setBombFuse(config.getLong("bomb.fuse"));
+		Globals.setGlobals(globalsTerraTower);
 		
 		/* Set up an event queue with logging */
 		String logFileName = config.getString("event.logfile");
@@ -204,21 +214,28 @@ public class TerraTower {
 		HashMap<String, HandlerAbstract> requestHandlerRegistry;
 
 		try {
+			boolean secure = false;
+			
+			HTTPInputOverSocket inputChannel = new HTTPInputOverSocket(port,secure);
+					
+			// Null is a default Handler
 			requestHandlerRegistry = new HashMap<String, HandlerAbstract>();
+			requestHandlerRegistry.put(null, new HandlerVersion(VERSION));
 			requestHandlerRegistry.put("", new HandlerVersion(VERSION));
-			requestHandlerRegistry.put("version", new HandlerVersion(VERSION));
-			requestHandlerRegistry.put("build_tower", new HandlerBuildTower(eventPublisher));
-			requestHandlerRegistry.put("drop_bomb", new HandlerDropBomb(eventPublisher));
-			requestHandlerRegistry.put("redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
-			requestHandlerRegistry.put("get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
-			requestHandlerRegistry.put("get_game_state", new HandlerGetGameState());
-			requestHandlerRegistry.put("shutdown", new HandlerShutdown(Globals.getGlobals()));
-
-			RequestDispatcher dispatcher = new RequestDispatcher(
-					requestHandlerRegistry);
-			ws = new WebServer(dispatcher, port, false, new AccessControl());
-			ws.start(1000);
-
+			requestHandlerRegistry.put("/", new HandlerVersion(VERSION));
+			requestHandlerRegistry.put("/version", new HandlerVersion(VERSION));
+			requestHandlerRegistry.put("/build_tower", new HandlerBuildTower(eventPublisher));
+			requestHandlerRegistry.put("/drop_bomb", new HandlerDropBomb(eventPublisher));
+			requestHandlerRegistry.put("/redeem_power_up", new HandlerRedeemPowerUp(eventPublisher));
+			requestHandlerRegistry.put("/get_leader_board", new HandlerGetLeaderBoard(eventPublisher));
+			requestHandlerRegistry.put("/get_game_state", new HandlerGetGameState());
+			requestHandlerRegistry.put("/shutdown", new HandlerShutdown(Globals.getGlobals()));
+						
+			RequestDispatcher requestDispatcher = new RequestDispatcher(requestHandlerRegistry);
+			AccessControl accessControl = new AccessControl();
+			accessControl.reset();
+			ws = new WebServer(inputChannel, requestDispatcher, accessControl);
+			ws.start();
 			Globals.getGlobals().addQuittable(ws);
 
 		} catch (RuntimeException e) {
@@ -227,42 +244,71 @@ public class TerraTower {
 			return;
 		}
 
-		
 		long clockStep = config.getLong("clock.step");
 		/* Start the game server */
 		long lastTime = System.currentTimeMillis();
+		long startTime = lastTime;
 		while(!Globals.getGlobals().isQuitting()){
 			/*In case Thread.sleep is interrupted we wrap in a loop */
 			
-			while(System.currentTimeMillis() - lastTime < clockStep){
+			while(!Globals.getGlobals().isQuitting() && ((System.currentTimeMillis() - lastTime) < clockStep)){
 				try {
 					Thread.sleep(GlobalsTerraTower.ONE_SECOND);
 				} catch (InterruptedException e) {
 				}
 			}
 			
-			/* Step the tower growth by one */
-			rc = new EventHandlerResultChecker();
-			wrapper = new TTEventWrapper(TTEventType.STEP_TOWER_TERRITORY_GROWTH, new TTEventStepTowerTerritoryGrowth(worldName,worldPassword),rc);
-			eventPublisher.onData(wrapper);
-			rc.block();
-			if(rc.getResults().get("error").equals("true")){
-				getLog().error("Couldn't step tower territory:"+rc.getResults().get("errors"));
-			}
+			if(!Globals.getGlobals().isQuitting()){
+				/* Step the tower growth by one */
+				rc = new EventHandlerResultChecker();
+				wrapper = new TTEventWrapper(TTEventType.STEP_TOWER_TERRITORY_GROWTH, new TTEventStepTowerTerritoryGrowth(worldName,worldPassword),rc);
+				eventPublisher.onData(wrapper);
+				rc.block();
+				if(rc.getResults().get("error").equals("true")){
+					getLog().error("Couldn't step tower territory:"+rc.getResults().get("errors"));
+				}
 			
-			/* Burn the bomb fuses */
-			rc = new EventHandlerResultChecker();
-			wrapper = new TTEventWrapper(TTEventType.BURN_BOMB_FUSE, new TTEventBurnBombFuse(worldName,worldPassword),rc);
-			eventPublisher.onData(wrapper);
-			rc.block();
-			if(rc.getResults().get("error").equals("true")){
-				getLog().error("Couldn't burn the bomb fuse:"+rc.getResults().get("errors"));
-			}
+				/* Burn the bomb fuses */
+				rc = new EventHandlerResultChecker();
+				wrapper = new TTEventWrapper(TTEventType.BURN_BOMB_FUSE, new TTEventBurnBombFuse(worldName,worldPassword),rc);
+				eventPublisher.onData(wrapper);
+				rc.block();
+				if(rc.getResults().get("error").equals("true")){
+					getLog().error("Couldn't burn the bomb fuse:"+rc.getResults().get("errors"));
+				}
 			
-			lastTime = System.currentTimeMillis();
+				lastTime = System.currentTimeMillis();
+				
+				
+				/*Print out stats */
+				//((GlobalsTerraTower)Globals.getGlobals()).getWorld(worldName, worldPassword).getTerritory().printGrid();
+				//Leaderboard good for importing to a spreadsheet
+				List<Pair<Integer, Player>> leaderBoard = ((GlobalsTerraTower)Globals.getGlobals()).getWorld(worldName, worldPassword).getTerritory().getLeaderBoard();
+				TreeMap<String,Integer> reorg = new TreeMap<String,Integer>();
+				for(Pair<Integer, Player> p:leaderBoard){
+					reorg.put(p.getSecond().getPlayerName(), p.getFirst());
+				}
+				StringBuilder sb = new StringBuilder();
+				sb.append((lastTime-startTime)+"");
+				for(Entry<String, Integer> e :reorg.entrySet()){
+					sb.append(",\""+e.getKey()+"\"");
+				}
+				sb.append("\n");
+				sb.append((lastTime-startTime)+"");
+				for(Entry<String, Integer> e :reorg.entrySet()){
+					sb.append(","+e.getValue()+"");
+				}
+				sb.append("\n");
+				System.out.println(sb.toString());
+				
+				//Leaderboard good for figuring out the leader 
+				List<Pair<Integer, Player>> l = leaderBoard;
+				for(Pair<Integer, Player> p:l){
+					System.out.println(p.getSecond().getPlayerName()+":"+p.getFirst());
+				}
+			}
 		}
-		
+		getLog().info("TerraTower shutdown");
 	}
-		
 }
 

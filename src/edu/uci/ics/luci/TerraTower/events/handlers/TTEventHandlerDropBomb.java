@@ -1,5 +1,5 @@
 /*
-	Copyright 2014
+	Copyright 2014-2015
 		University of California, Irvine (c/o Donald J. Patterson)
 */
 /*
@@ -152,7 +152,7 @@ public class TTEventHandlerDropBomb extends TTEventHandlerPlayer{
 		
 		ret = new JSONObject();
 			
-		if(!wm.addBomb(new Bomb(player,xIndex,yIndex,player.getBombFuse(),GlobalsTerraTower.DEFAULT_TOWER_STRENGTH))){
+		if(!wm.addBomb(new Bomb(player,xIndex,yIndex,this.eventTime+player.getBombFuse(),((GlobalsTerraTower) GlobalsTerraTower.getGlobals()).getTowerStrength()))){
 			ret.put("error","true");
 			JSONArray errors = new JSONArray();
 			errors.add("Unable to add bomb due to an unknown reason");

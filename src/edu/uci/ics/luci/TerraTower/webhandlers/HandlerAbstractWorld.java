@@ -1,6 +1,7 @@
 package edu.uci.ics.luci.TerraTower.webhandlers;
 
 import java.util.Map;
+import java.util.Set;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -9,7 +10,7 @@ import edu.uci.ics.luci.TerraTower.TTEventWrapper;
 import edu.uci.ics.luci.TerraTower.TTEventWrapperQueuer;
 import edu.uci.ics.luci.TerraTower.events.TTEvent;
 import edu.uci.ics.luci.TerraTower.events.TTEventType;
-import edu.uci.ics.luci.utility.webserver.HandlerAbstract;
+import edu.uci.ics.luci.utility.webserver.handlers.HandlerAbstract;
 
 public abstract class HandlerAbstractWorld extends HandlerAbstract {
 	
@@ -35,15 +36,15 @@ public abstract class HandlerAbstractWorld extends HandlerAbstract {
 		this.eventPublisher = eventPublisher;
 	}
 
-	protected JSONArray getWorldParameters(String restFunction,Map<String,String> parameters){
+	protected JSONArray getWorldParameters(String restFunction,Map<String,Set<String>> parameters){
 		JSONArray errors = new JSONArray();
 		
-		worldName = parameters.get("world_name");
-		if(worldName == null){
+		Set<String> _worldName = parameters.get("world_name");
+		if((_worldName == null) || ((worldName = (_worldName.iterator().next()))==null)){
 			errors.add("Problem handling "+restFunction+": world_name was null");
 		}
-		worldPassword = parameters.get("world_password");
-		if(worldPassword == null){
+		Set<String> _worldPassword = parameters.get("world_password");
+		if((_worldPassword == null) || ((worldPassword = (_worldPassword.iterator().next()))==null)){
 			errors.add("Problem handling "+restFunction+": world_password was null");
 		}
 		return errors;

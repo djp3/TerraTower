@@ -1,5 +1,5 @@
 /*
-	Copyright 2014
+	Copyright 2014-2015
 		University of California, Irvine (c/o Donald J. Patterson)
 */
 /*
@@ -113,21 +113,21 @@ public class TTEventHandlerDropBombTest {
 		
 		/*Out of bounds x */
 		event = new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,lat,-190.0,alt);
-		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		tt.player.setLastBombPlacedTime(-1 - g.getBombDelay());
 		json = tt.checkParameters(0,event);
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
 		
 		/*Out of bounds x */
 		event = new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,-100.0,lng,alt);
-		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		tt.player.setLastBombPlacedTime(-1 - g.getBombDelay());
 		json = tt.checkParameters(0,event);
 		assertTrue(json != null);
 		assertEquals(json.get("error"),"true");
 		
 		/*Ok */
 		event = new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		tt.player.setLastBombPlacedTime(-1 - g.getBombDelay());
 		json = tt.checkParameters(0,event);
 		assertTrue(json == null);
 		
@@ -138,7 +138,7 @@ public class TTEventHandlerDropBombTest {
 		
 		/* ok to add another bomb */
 		event = new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		tt.player.setLastBombPlacedTime(-1 - g.getBombDelay());
 		json = tt.checkParameters(0,event);
 		assertTrue(json == null);
 		
@@ -171,7 +171,7 @@ public class TTEventHandlerDropBombTest {
 		
 		/*Ok */
 		event = new TTEventDropBomb(worldName,worldPassword,playerName,playerPassword,lat,lng,alt);
-		tt.player.setLastBombPlacedTime(-1 - GlobalsTerraTower.DEFAULT_BOMB_DELAY);
+		tt.player.setLastBombPlacedTime(-1 - g.getBombDelay());
 		json = tt.checkParameters(0,event);
 		assertTrue(json == null);
 		

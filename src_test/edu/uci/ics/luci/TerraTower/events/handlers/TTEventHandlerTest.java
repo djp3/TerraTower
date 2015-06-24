@@ -1,5 +1,5 @@
 /*
-	Copyright 2014
+	Copyright 2014-2015
 		University of California, Irvine (c/o Donald J. Patterson)
 */
 /*
@@ -92,9 +92,11 @@ public class TTEventHandlerTest {
 	
 	@Test
 	public void testOnEvent() {
-		TTEventHandler tt = new TTEventHandler();
 		GlobalsTerraTower g = new GlobalsTerraTower("TEST_VERSION");
 		Globals.setGlobals(g);
+		
+		TTEventHandler tt = new TTEventHandler();
+		
 		g.createWorld(worldName, worldPassword);
 		
 		TTEvent event = new TTEvent(worldName,worldPassword);
